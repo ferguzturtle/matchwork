@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detalle del Perfil del Prestador</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+      display: none; /* Hide body initially to prevent unauthorized content flash */
+    }
+  </style>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="bg-surface text-on-surface antialiased flex flex-col min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-background w-full top-0 sticky border-b border-outline-variant dark:border-on-surface-variant flex justify-between items-center px-gutter py-stack-sm z-40">
+<a href="javascript:history.back()" class="text-secondary dark:text-secondary-fixed hover:bg-surface-container-low transition-colors active:opacity-80 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline-md text-headline-md font-bold text-secondary dark:text-secondary-fixed">
+            MatchWorking
+        </h1>
+<div class="hover:bg-surface-container-low transition-colors active:opacity-80 p-1 rounded-full cursor-pointer">
+<img alt="User profile avatar" class="w-8 h-8 rounded-full object-cover" data-alt="A small circular avatar showing a young adult male with short brown hair, smiling gently. The background is a clean, bright solid light gray. The image perfectly embodies a modern, corporate light-mode aesthetic, utilizing high-key lighting to emphasize trustworthiness and professionalism within a clean digital interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZFqqnF_BH-By1mzsFYCV7u7k_S-Vo2kYNjeMxOMfkTxF1UbxTnXU68Ud2Xn8yRamDPt9J8JuVzCctGRR-vzXyE1tcT66CtCXel0aHLu32KfPjpPNd_pLK3XfuHtAEKuIvGfTLxuZrSD61EkT703rfkZXk97MlDCYrfbRxqIjhkZhuXC-GsB6R4_xfuZibtluZlYYh5wbc7R9TfeofAZp6388D_tZ4VDunVCyGyvyXgJkx8vIeyhj90jD7T8pv-jnL_9p9W7xTAdc"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 max-w-5xl mx-auto w-full px-container-margin-mobile md:px-container-margin-desktop py-stack-lg flex flex-col gap-stack-lg">
+<!-- Bento Grid Layout for Profile Core -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-stack-md">
+<!-- Profile Identity Card -->
+<div class="md:col-span-4 bg-surface-container-lowest border border-outline-variant shadow-sm rounded-xl p-stack-lg flex flex-col items-center text-center relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-secondary-fixed to-surface-container-lowest opacity-50 z-0"></div>
+<img id="profile-image" alt="Provider Photo" class="w-32 h-32 rounded-full border-4 border-surface-container-lowest shadow-sm object-cover relative z-10 mb-stack-md" src=""/>
+<div class="relative z-10 flex flex-col items-center">
+<h2 id="profile-name" class="font-headline-lg text-headline-lg text-on-surface mb-1"></h2>
+<p id="profile-profession" class="font-body-md text-body-md text-on-surface-variant mb-3"></p>
+<div class="flex items-center gap-2 bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200 mb-stack-lg">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-md text-label-md">Profesional Verificado</span>
+</div>
+<div class="w-full grid grid-cols-2 gap-4 border-t border-outline-variant pt-stack-md">
+<div class="flex flex-col items-center">
+<span id="profile-rating" class="font-headline-md text-headline-md text-secondary"></span>
+<div class="flex items-center text-amber-500 mb-1">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star_half</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">128 Reseñas</span>
+</div>
+<div class="flex flex-col items-center border-l border-outline-variant">
+<span class="font-headline-md text-headline-md text-secondary">340+</span>
+<span class="font-label-md text-label-md text-on-surface-variant mt-2">Trabajos Completados</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Work Gallery & Details -->
+<div class="md:col-span-8 flex flex-col gap-stack-md">
+<!-- Gallery Bento -->
+<div class="bg-surface-container-lowest border border-outline-variant shadow-sm rounded-xl p-stack-md flex flex-col h-full">
+<div class="flex justify-between items-center mb-stack-sm px-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Trabajos Recientes</h3>
+<button class="font-label-md text-label-md text-secondary hover:text-on-secondary-fixed-variant transition-colors flex items-center gap-1">
+                            Ver Todo <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-2 flex-1">
+<img class="w-full h-32 md:h-48 object-cover rounded-lg" data-alt="A close-up view of a modern electrical panel installation, showcasing immaculate, precisely organized wiring in vibrant reds, blacks, and whites. The lighting is bright and clinical, emphasizing the functional minimalism and meticulous attention to detail. The scene conveys reliability and expert craftsmanship within a high-end residential or commercial setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiGmsJtAqtn7Pw0PWMqzdwYo2Sds1YRsWuIXzZ-JzJkJ6aW2Eur_ysO98zKSPnHJpNWZuN_oC-5XSGUSm85icfBTrGpTVmVTbRjHPJk5Wf3U7UaDA2mMPaesv28I-eKJrqOyAl_kguQ2WkQqB4dtuZ2jbeMpHLt561sXewzbxjoloQsiIL1VVcvtgzVsSx8eIyqb4_0STDitvVG1Cb2AfygWSaxCQglxqJWWTcyE20HGqt7MvzaAGuPW0GGMSnkxbvLyGhBuHWiCw"/>
+<img class="w-full h-32 md:h-48 object-cover rounded-lg" data-alt="A skilled technician's hands adjusting a sleek, contemporary smart home lighting fixture against a pristine white ceiling. The image features a shallow depth of field, focusing sharply on the specialized tools and the metallic finish of the fixture. The lighting is soft and ambient, reinforcing a modern, sophisticated, and technically proficient aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXqfjGwJReW1F2wk3N2uJ6q3fXsl1wgRSA2kmHsVsxNuhgejWhcEqSHwP9lue8PLd6m2-HYgSHHv5NJhlYMCfvhsQRDipEFu07SzA8Lb_45Yxy05IYfl-GKpBHYkJDimAFL9mhPlXaVNuKB_acKkn130iv-K1-GDb--Rwe7gSyhzAcFQ0zFLpfsC9pt4wzlv_dsE6NITlQ1UNaG7oaXHtqeMW8R_Fxon-fALO9NYahU75RbTBtlSVdFsr4JcZvLcGxaKtP8tkWuKw"/>
+<div class="relative w-full h-32 md:h-48 rounded-lg overflow-hidden hidden md:block">
+<img class="w-full h-full object-cover" data-alt="An architectural interior space under construction, showing perfectly aligned exposed conduit pipes running along a stark white wall. The scene is illuminated by crisp, natural daylight streaming through unseen windows, casting subtle geometric shadows. The aesthetic is industrial yet exceptionally clean and organized, aligning with a corporate standard of structural precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnqI6k6M_6xbpib-TFtJS_9uZJTGDCA4iGAmjBtkHytnfulYJ1g90lbREE0_g9bBAMV_O-F46GbAbgM8lOAnELs2fuDJM6YcCKVCcELvhzHyNsZg-P_Lj0GZR73UmOJ5EH7RWzT0fuGEyBA4vBLZLYaIrZN8Y0Lp1nk_zw-NV7UZ19jz62gtM5hliogZ839pUNEPMt6lv3X4QSd6iHRVMixq2lT2kdSh2R35EkdxMZ4e9f48ic-yssT2L3dTGm_io39u_5tBD3GRI"/>
+<div class="absolute inset-0 bg-primary-container/40 flex items-center justify-center cursor-pointer hover:bg-primary-container/50 transition-colors">
+<span class="material-symbols-outlined text-on-primary text-4xl" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Info Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- About Service -->
+<div class="bg-surface-container-lowest border border-outline-variant shadow-sm rounded-xl p-stack-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">info</span>
+                            Descripción del Servicio
+                        </h3>
+<p id="profile-description" class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                        </p>
+</div>
+<!-- Pricing & Logistics -->
+<div class="bg-surface-container-lowest border border-outline-variant shadow-sm rounded-xl p-stack-md flex flex-col justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">payments</span>
+                                Tarifas Estimadas
+                            </h3>
+<div class="flex items-end gap-2 mb-2">
+<span id="profile-price" class="font-headline-md text-headline-md text-on-surface"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant pb-1">/ hora base</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Incluye tarifa de diagnóstico estándar. Los costos de materiales se calculan por separado según el alcance del proyecto.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Customer Reviews Section -->
+<div class="mt-stack-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-md">Opiniones de Clientes</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- Review Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant shadow-sm rounded-xl p-stack-md">
+<div class="flex items-start justify-between mb-stack-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed font-headline-sm text-headline-sm">
+                                M
+                            </div>
+<div>
+<h4 class="font-label-lg text-label-lg text-on-surface">Maria G.</h4>
+<p class="font-label-md text-label-md text-on-surface-variant">12 de octubre, 2023</p>
+</div>
+</div>
+<div class="flex text-amber-500">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">"David fue excepcionalmente profesional. Llegó exactamente a tiempo, diagnosticó el problema con nuestro interruptor de circuito en minutos y lo reemplazó de manera segura. Dejó el espacio de trabajo impecable."</p>
+</div>
+<!-- Review Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant shadow-sm rounded-xl p-stack-md">
+<div class="flex items-start justify-between mb-stack-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed-variant font-headline-sm text-headline-sm">
+                                J
+                            </div>
+<div>
+<h4 class="font-label-lg text-label-lg text-on-surface">James T.</h4>
+<p class="font-label-md text-label-md text-on-surface-variant">28 de septiembre, 2023</p>
+</div>
+</div>
+<div class="flex text-amber-500">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]">star</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">"Buen trabajo instalando nuestro nuevo cargador de vehículos eléctricos. El precio fue transparente y justo. La comunicación fue un poco lenta al principio, pero la calidad de la instalación final es de primera clase."</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Fixed Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 w-full bg-surface-container-lowest shadow-[0_-4px_12px_0px_rgba(0,0,0,0.04)] z-50 border-t border-outline-variant px-container-margin-mobile py-stack-md md:px-container-margin-desktop flex justify-center">
+<div class="w-full max-w-5xl flex justify-end gap-3" id="action-buttons-container">
+</div>
+</div>
+<!-- Modal de Edición de Perfil Premium -->
+<div id="edit-profile-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <!-- Overlay desenfocado -->
+    <div id="edit-profile-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"></div>
+    
+    <!-- Contenedor del Modal -->
+    <div class="relative w-full max-w-lg bg-surface-container-lowest border border-outline-variant shadow-2xl rounded-2xl overflow-hidden z-10 flex flex-col max-h-[90dvh] scale-95 opacity-0 transition-all duration-300 transform">
+        <!-- Header -->
+        <div class="flex justify-between items-center px-6 py-4 border-b border-outline-variant">
+            <h3 class="font-headline-md text-headline-md font-bold text-secondary">Editar Perfil Profesional</h3>
+            <button id="btn-close-edit-modal" class="w-8 h-8 rounded-full hover:bg-surface-container-low transition-colors flex items-center justify-center text-on-surface-variant">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+        
+        <!-- Formulario (Scrollable) -->
+        <form id="edit-profile-form" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4 no-scrollbar">
+            <!-- Nombre -->
+            <div class="flex flex-col gap-1">
+                <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-name">Nombre Completo</label>
+                <input class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="edit-name" placeholder="Ej. Carlos Mendoza" required type="text"/>
+            </div>
+            
+            <!-- Profesión / Título -->
+            <div class="flex flex-col gap-1">
+                <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-profession">Profesión / Título</label>
+                <input class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="edit-profession" placeholder="Ej. Maestro Gasfitero Autorizado" required type="text"/>
+            </div>
+            
+            <!-- Categoría -->
+            <div class="flex flex-col gap-1">
+                <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-category">Categoría de Servicio</label>
+                <select class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors cursor-pointer" id="edit-category">
+                    <option value="gasfiteria">Gasfitería</option>
+                    <option value="electricidad">Electricidad</option>
+                    <option value="limpieza">Limpieza</option>
+                    <option value="climatizacion">Climatización</option>
+                    <option value="transporte">Fletes y Transporte</option>
+                </select>
+            </div>
+            
+            <!-- Tarifa Base por Hora -->
+            <div class="flex flex-col gap-1">
+                <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-price">Tarifa por Hora Base</label>
+                <input class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="edit-price" placeholder="Ej. $150" required type="text"/>
+            </div>
+            
+            <!-- Descripción del Servicio -->
+            <div class="flex flex-col gap-1">
+                <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-description">Descripción del Servicio</label>
+                <textarea class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors resize-none h-24" id="edit-description" placeholder="Describe tu experiencia, certificaciones y los servicios que ofreces..." required></textarea>
+            </div>
+            
+            <!-- Foto de Perfil / Avatar -->
+            <div class="flex flex-col gap-2">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Seleccionar Foto de Perfil</label>
+                
+                <!-- Rejilla de Presets -->
+                <div class="grid grid-cols-5 gap-2" id="avatar-presets-grid">
+                    <!-- Preset 1 -->
+                    <button type="button" data-avatar="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="avatar-preset-btn relative w-12 h-12 rounded-full overflow-hidden border-2 border-transparent hover:border-secondary transition-all focus:outline-none active:scale-90">
+                        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"/>
+                    </button>
+                    <!-- Preset 2 -->
+                    <button type="button" data-avatar="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" class="avatar-preset-btn relative w-12 h-12 rounded-full overflow-hidden border-2 border-transparent hover:border-secondary transition-all focus:outline-none active:scale-90">
+                        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80"/>
+                    </button>
+                    <!-- Preset 3 -->
+                    <button type="button" data-avatar="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80" class="avatar-preset-btn relative w-12 h-12 rounded-full overflow-hidden border-2 border-transparent hover:border-secondary transition-all focus:outline-none active:scale-90">
+                        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80"/>
+                    </button>
+                    <!-- Preset 4 -->
+                    <button type="button" data-avatar="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80" class="avatar-preset-btn relative w-12 h-12 rounded-full overflow-hidden border-2 border-transparent hover:border-secondary transition-all focus:outline-none active:scale-90">
+                        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80"/>
+                    </button>
+                    <!-- Preset 5 (Silhouette) -->
+                    <button type="button" data-avatar="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" class="avatar-preset-btn relative w-12 h-12 rounded-full overflow-hidden border-2 border-transparent hover:border-secondary transition-all focus:outline-none active:scale-90">
+                        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80"/>
+                    </button>
+                </div>
+                
+                <!-- URL de Imagen Personalizada -->
+                <div class="flex flex-col gap-1 mt-2">
+                    <span class="font-label-md text-label-md text-on-surface-variant">O ingresa una URL de foto personalizada:</span>
+                    <input class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="edit-avatar-url" placeholder="https://ejemplo.com/mi-foto.jpg" type="text"/>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Footer -->
+        <div class="flex justify-end gap-3 px-6 py-4 border-t border-outline-variant bg-surface-container-low">
+            <button id="btn-cancel-edit" type="button" class="bg-surface-container-lowest border border-outline-variant text-on-surface font-label-lg text-label-lg rounded-lg py-2.5 px-5 hover:bg-surface-container-high transition-colors active:scale-95">
+                Cancelar
+            </button>
+            <button id="btn-save-profile" type="button" class="bg-secondary text-on-secondary font-label-lg text-label-lg rounded-lg py-2.5 px-6 hover:opacity-90 transition-all shadow-sm active:scale-95 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">save</span>
+                Guardar Cambios
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { getProviders, requestService, getUserProfile, updateUserProfile, updateProviderAvailability } from '/src/data.js';
+import { supabase } from '/src/supabase.js';
+
+// Auth Guard to prevent unauthorized access
+const checkAuth = async () => {
+    let authorized = false;
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            authorized = true;
+            const userRole = session.user.user_metadata.role || 'customer';
+            localStorage.setItem('user_role', userRole);
+        } else {
+            if (localStorage.getItem('user_role')) {
+                authorized = true;
+            }
+        }
+    } catch (_) {
+        if (localStorage.getItem('user_role')) authorized = true;
+    }
+
+    if (!authorized) {
+        window.location.replace('/index.html');
+    } else {
+        document.body.style.display = 'flex';
+    }
+};
+await checkAuth();
+
+const urlParams = new URLSearchParams(window.location.search);
+const providerId = urlParams.get('id');
+
+let provider = null; // Guardamos el proveedor como variable de módulo
+
+async function init() {
+    let resolvedProviderId = providerId;
+    let currentUserId = null;
+    
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            currentUserId = user.id;
+            // Update logged-in user avatar in the top bar
+            const myProfile = await getUserProfile(user.id);
+            if (myProfile) {
+                document.querySelectorAll('img[alt="User profile avatar"]').forEach(img => img.src = myProfile.avatar_url);
+            }
+        }
+    } catch (_) {}
+
+    if (!resolvedProviderId) {
+        resolvedProviderId = currentUserId;
+    }
+
+    const list = await getProviders();
+    if (resolvedProviderId) {
+        provider = list.find(p => p.id == resolvedProviderId);
+    }
+
+    // Obtener los datos persistentes enriquecidos de profiles de Supabase
+    let richProfile = null;
+    if (resolvedProviderId) {
+        try {
+            richProfile = await getUserProfile(resolvedProviderId);
+        } catch (err) {
+            console.warn("Error fetching rich user profile:", err);
+        }
+    }
+
+    if (provider) {
+        // Enriquecer el proveedor en línea con los campos ricos de la tabla profiles
+        if (richProfile) {
+            provider.name = richProfile.name || provider.name;
+            provider.image = richProfile.avatar_url || provider.image;
+            provider.profession = richProfile.profession || provider.profession;
+            provider.category = richProfile.category || provider.category;
+            provider.price = richProfile.price || provider.price || "$0";
+            provider.description = richProfile.description || provider.description || "Sin descripción disponible.";
+        }
+    } else if (richProfile) {
+        // Si el prestador está fuera de servicio/desconectado del mapa pero existe su cuenta
+        provider = {
+            id: richProfile.id,
+            name: richProfile.name,
+            profession: richProfile.profession || "Nuevo Prestador",
+            category: richProfile.category || "gasfiteria",
+            rating: 5.0,
+            status: 'Fuera de servicio',
+            image: richProfile.avatar_url,
+            price: richProfile.price || "$0",
+            description: richProfile.description || "Sin descripción disponible."
+        };
+    }
+
+    // Fallback absoluto por robustez extrema
+    if (!provider) {
+        provider = list[0];
+    }
+    
+    if (provider) {
+        document.getElementById('profile-image').src = provider.image || provider.avatar_url;
+        document.getElementById('profile-name').innerText = provider.name;
+        document.getElementById('profile-profession').innerText = provider.profession;
+        document.getElementById('profile-rating').innerText = provider.rating || '5.0';
+        document.getElementById('profile-description').innerText = provider.description || 'Sin descripción disponible.';
+        document.getElementById('profile-price').innerText = provider.price || '$0';
+        
+        const actionContainer = document.getElementById('action-buttons-container');
+        if (actionContainer) {
+            if (currentUserId && provider.id === currentUserId) {
+                // Si el dueño del perfil lo está viendo, mostrar dos botones: "Editar Perfil" e "Ir a mi Panel"
+                actionContainer.innerHTML = `
+                    <button id="btn-edit-profile" class="w-full md:w-auto border-2 border-secondary text-secondary hover:bg-secondary/5 font-label-lg text-label-lg rounded-lg py-3 px-8 flex items-center justify-center gap-2 shadow-sm transition-colors active:scale-95 duration-150">
+                        <span class="material-symbols-outlined">edit</span> Editar Perfil
+                    </button>
+                    <button id="btn-panel" class="w-full md:w-auto bg-secondary hover:bg-on-secondary-fixed-variant text-on-secondary font-label-lg text-label-lg rounded-lg py-3 px-8 flex items-center justify-center gap-2 shadow-sm transition-colors active:scale-95 duration-150">
+                        <span class="material-symbols-outlined">dashboard</span> Ir a mi Panel
+                    </button>
+                `;
+                
+                document.getElementById('btn-panel').onclick = (e) => {
+                    e.preventDefault();
+                    window.location.href = '/panel_del_prestador/index.html';
+                };
+                
+                document.getElementById('btn-edit-profile').onclick = (e) => {
+                    e.preventDefault();
+                    openEditProfileModal();
+                };
+            } else {
+                actionContainer.innerHTML = `
+                    <button id="btn-request" class="w-full md:w-auto bg-secondary hover:bg-on-secondary-fixed-variant text-on-secondary font-label-lg text-label-lg rounded-lg py-3 px-8 flex items-center justify-center gap-2 shadow-sm transition-colors active:scale-95 duration-150">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">handshake</span>
+                        Solicitar Match
+                    </button>
+                `;
+                
+                document.getElementById('btn-request').onclick = async (e) => {
+                    e.preventDefault();
+                    await requestService(provider.id, null, 'Hola, me gustaría solicitar tus servicios.');
+                    alert('¡Solicitud de Match enviada a ' + provider.name + '!');
+                    window.location.href = '/mapa_de_b_squeda_cliente/index.html';
+                };
+            }
+        }
+    }
+}
+
+// Lógica de Modal de Edición
+const modal = document.getElementById('edit-profile-modal');
+const modalContainer = modal.querySelector('.relative.w-full.max-w-lg');
+const editOverlay = document.getElementById('edit-profile-overlay');
+
+function openEditProfileModal() {
+    if (!provider) return;
+    document.getElementById('edit-name').value = provider.name || '';
+    document.getElementById('edit-profession').value = provider.profession || '';
+    document.getElementById('edit-category').value = provider.category || 'gasfiteria';
+    document.getElementById('edit-price').value = provider.price || '$0';
+    document.getElementById('edit-description').value = provider.description || '';
+    document.getElementById('edit-avatar-url').value = provider.image || provider.avatar_url || '';
+    
+    // Set visual selection state on presets
+    const currentAvatar = provider.image || provider.avatar_url || '';
+    document.querySelectorAll('.avatar-preset-btn').forEach(btn => {
+        const url = btn.getAttribute('data-avatar');
+        if (url === currentAvatar) {
+            btn.classList.add('border-secondary', 'ring-2', 'ring-secondary/30');
+            btn.classList.remove('border-transparent');
+        } else {
+            btn.classList.remove('border-secondary', 'ring-2', 'ring-secondary/30');
+            btn.classList.add('border-transparent');
+        }
+    });
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => {
+        modalContainer.classList.remove('scale-95', 'opacity-0');
+        modalContainer.classList.add('scale-100', 'opacity-100');
+    }, 50);
+}
+
+function closeEditProfileModal() {
+    modalContainer.classList.remove('scale-100', 'opacity-100');
+    modalContainer.classList.add('scale-95', 'opacity-0');
+    setTimeout(() => {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+    }, 300);
+}
+
+// Add event listeners for preset buttons
+document.querySelectorAll('.avatar-preset-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const url = e.currentTarget.getAttribute('data-avatar');
+        document.getElementById('edit-avatar-url').value = url;
+        
+        // Highlight active preset
+        document.querySelectorAll('.avatar-preset-btn').forEach(b => {
+            b.classList.remove('border-secondary', 'ring-2', 'ring-secondary/30');
+            b.classList.add('border-transparent');
+        });
+        e.currentTarget.classList.add('border-secondary', 'ring-2', 'ring-secondary/30');
+        e.currentTarget.classList.remove('border-transparent');
+    });
+});
+
+document.getElementById('btn-close-edit-modal').onclick = closeEditProfileModal;
+document.getElementById('btn-cancel-edit').onclick = closeEditProfileModal;
+editOverlay.onclick = closeEditProfileModal;
+
+document.getElementById('btn-save-profile').onclick = async () => {
+    const name = document.getElementById('edit-name').value;
+    const profession = document.getElementById('edit-profession').value;
+    const category = document.getElementById('edit-category').value;
+    const price = document.getElementById('edit-price').value;
+    const description = document.getElementById('edit-description').value;
+    const avatarUrl = document.getElementById('edit-avatar-url').value;
+
+    if (!name || !profession || !price || !description || !avatarUrl) {
+        alert('Por favor, completa todos los campos.');
+        return;
+    }
+
+    const saveBtn = document.getElementById('btn-save-profile');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerText = 'Guardando...';
+    saveBtn.disabled = true;
+
+    try {
+        const userId = provider.id;
+        const profileData = {
+            name,
+            profession,
+            category,
+            price,
+            description,
+            avatar_url: avatarUrl
+        };
+
+        // 1. Guardar cambios en profiles de Supabase/Local
+        await updateUserProfile(userId, profileData);
+
+        // 2. Si el proveedor está en línea/activo (o es un nuevo proveedor que aún no está offline en providers),
+        // actualizar también en la tabla providers para que el cliente lo vea en el mapa en tiempo real
+        const isOffline = provider && provider.status === 'Fuera de servicio';
+        if (!isOffline) {
+            const activeLat = (provider && provider.lat) || -33.4489;
+            const activeLng = (provider && provider.lng) || -70.6693;
+            await updateProviderAvailability(userId, 'En línea', activeLat, activeLng);
+        }
+
+        alert('¡Perfil actualizado con éxito!');
+        closeEditProfileModal();
+        window.location.reload();
+    } catch(err) {
+        alert('Error al guardar perfil: ' + err.message);
+    } finally {
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
+    }
+};
+
+init();
+</script>
+</body></html>

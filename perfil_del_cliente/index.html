@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Perfil del Cliente - MatchWorking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+            display: none; /* Hide body initially to prevent unauthorized content flash */
+        }
+    </style>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="bg-surface text-on-surface antialiased flex flex-col min-h-screen pb-24">
+    <!-- TopAppBar -->
+    <header class="bg-surface dark:bg-background w-full top-0 sticky border-b border-outline-variant dark:border-on-surface-variant flex justify-between items-center px-gutter py-stack-sm z-40">
+        <a href="javascript:history.back()" class="text-secondary dark:text-secondary-fixed hover:bg-surface-container-low transition-colors active:opacity-80 p-2 rounded-full flex items-center justify-center">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="font-headline-md text-headline-md font-bold text-secondary dark:text-secondary-fixed">
+            MatchWorking
+        </h1>
+        <div class="hover:bg-surface-container-low transition-colors active:opacity-80 p-1 rounded-full cursor-pointer">
+            <img alt="User profile avatar" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI"/>
+        </div>
+    </header>
+
+    <!-- Main Content Canvas -->
+    <main class="flex-1 max-w-3xl mx-auto w-full px-container-margin-mobile md:px-container-margin-desktop py-stack-lg flex flex-col gap-stack-lg">
+        
+        <!-- Profile Identity Card -->
+        <div class="bg-surface-container-lowest border border-outline-variant shadow-sm rounded-xl p-stack-lg flex flex-col items-center text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-primary-fixed to-surface-container-lowest opacity-50 z-0"></div>
+            <img alt="Customer Photo" class="w-32 h-32 rounded-full border-4 border-surface-container-lowest shadow-sm object-cover relative z-10 mb-stack-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI"/>
+            <div class="relative z-10 flex flex-col items-center w-full">
+                <div id="name-display-container" class="flex flex-col items-center">
+                    <h2 id="profile-name" class="font-headline-lg text-headline-lg text-on-surface mb-1">Rodrigo Sepúlveda</h2>
+                    <div class="flex gap-4 mt-1">
+                        <button id="edit-name-btn" class="text-secondary hover:text-secondary-fixed text-label-md flex items-center gap-1 transition-colors">
+                            <span class="material-symbols-outlined text-[16px]">edit</span> Editar Nombre
+                        </button>
+                        <button id="edit-photo-btn" class="text-secondary hover:text-secondary-fixed text-label-md flex items-center gap-1 transition-colors">
+                            <span class="material-symbols-outlined text-[16px]">photo_camera</span> Editar Foto
+                        </button>
+                    </div>
+                </div>
+                <div id="name-edit-container" class="hidden flex flex-col items-center gap-2 mt-2 w-full max-w-xs">
+                    <input id="name-edit-input" type="text" class="w-full text-center px-4 py-2 border border-outline rounded-xl focus:ring-2 focus:ring-secondary text-body-md text-on-surface bg-surface-container-low" />
+                    <div class="flex gap-2 w-full mt-1">
+                        <button id="save-name-btn" class="flex-1 bg-secondary text-on-secondary font-label-md py-1.5 rounded-lg hover:bg-secondary/90 transition-colors shadow-sm">Guardar</button>
+                        <button id="cancel-name-btn" class="flex-1 bg-surface-container-lowest border border-outline text-on-surface font-label-md py-1.5 rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+                    </div>
+                </div>
+                <div id="photo-edit-container" class="hidden flex flex-col items-center gap-2 mt-2 w-full max-w-xs">
+                    <input id="photo-edit-input" type="text" placeholder="Pega la URL de tu imagen" class="w-full text-center px-4 py-2 border border-outline rounded-xl focus:ring-2 focus:ring-secondary text-body-md text-on-surface bg-surface-container-low" />
+                    <div class="flex gap-2 w-full mt-1">
+                        <button id="save-photo-btn" class="flex-1 bg-secondary text-on-secondary font-label-md py-1.5 rounded-lg hover:bg-secondary/90 transition-colors shadow-sm">Guardar</button>
+                        <button id="cancel-photo-btn" class="flex-1 bg-surface-container-lowest border border-outline text-on-surface font-label-md py-1.5 rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
+                    </div>
+                </div>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-2 mb-3">rodrigo.sepulveda@ejemplo.cl</p>
+            </div>
+            
+            <div class="w-full grid grid-cols-3 gap-4 border-t border-outline-variant pt-stack-md mt-4">
+                <div class="flex flex-col items-center">
+                    <span class="font-headline-md text-headline-md text-secondary">12</span>
+                    <span class="font-label-md text-label-md text-on-surface-variant mt-1 text-center">Solicitudes</span>
+                </div>
+                <div class="flex flex-col items-center border-l border-r border-outline-variant">
+                    <span class="font-headline-md text-headline-md text-secondary">5</span>
+                    <span class="font-label-md text-label-md text-on-surface-variant mt-1 text-center">Guardados</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="font-headline-md text-headline-md text-secondary">2</span>
+                    <span class="font-label-md text-label-md text-on-surface-variant mt-1 text-center">Activos</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direcciones Guardadas -->
+        <div class="bg-surface-container-lowest border border-outline-variant shadow-sm rounded-xl overflow-hidden">
+            <div class="px-stack-md py-stack-sm border-b border-outline-variant bg-surface flex justify-between items-center">
+                <h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary">location_on</span>
+                    Direcciones Guardadas
+                </h3>
+                <button class="text-secondary hover:bg-secondary-container hover:text-on-secondary-container p-1 rounded-full transition-colors">
+                    <span class="material-symbols-outlined">add</span>
+                </button>
+            </div>
+            <div class="flex flex-col">
+                <div class="p-stack-md border-b border-outline-variant flex justify-between items-center hover:bg-surface-bright cursor-pointer">
+                    <div class="flex flex-col">
+                        <span class="font-label-lg text-label-lg text-on-surface">Casa</span>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Av. Providencia 1234, Depto 502</span>
+                    </div>
+                    <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+                </div>
+                <div class="p-stack-md flex justify-between items-center hover:bg-surface-bright cursor-pointer">
+                    <div class="flex flex-col">
+                        <span class="font-label-lg text-label-lg text-on-surface">Oficina</span>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Av. Apoquindo 5678, Piso 12</span>
+                    </div>
+                    <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Configuración y Cerrar Sesión -->
+        <div class="flex flex-col gap-2 mt-2">
+            <button id="account-settings-btn" class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-bright font-label-lg text-label-lg rounded-xl py-4 px-4 flex items-center justify-between shadow-sm transition-colors">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-on-surface-variant">settings</span>
+                    Configuración de la Cuenta
+                </div>
+                <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+            </button>
+            <button onclick="signOut()" class="w-full bg-error-container text-on-error-container hover:bg-error hover:text-on-error font-label-lg text-label-lg rounded-xl py-4 px-4 flex items-center justify-center gap-2 shadow-sm transition-colors mt-4">
+                <span class="material-symbols-outlined">logout</span>
+                Cerrar Sesión
+            </button>
+        </div>
+
+        <!-- Modal: Configuración de la Cuenta -->
+        <div id="settings-modal" class="fixed inset-0 bg-black/50 z-[9999] hidden items-center justify-center p-4 pointer-events-auto">
+          <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-2xl p-6 w-full max-w-sm flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-outline-variant pb-3">
+              <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold font-semibold">Configuración de la Cuenta</h3>
+              <button id="close-settings-modal" class="text-on-surface-variant hover:text-on-surface flex items-center justify-center">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+            <div class="flex flex-col gap-3 my-2">
+              <div class="flex flex-col gap-1">
+                <label class="font-label-md text-label-md text-on-surface font-semibold" for="modal-name-input">Nombre Completo</label>
+                <input class="bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="modal-name-input" type="text"/>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="font-label-md text-label-md text-on-surface font-semibold" for="modal-photo-input">URL de Foto de Perfil</label>
+                <input class="bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="modal-photo-input" type="text"/>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <button id="cancel-settings-btn" class="flex-1 bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-lg text-label-lg py-3 rounded-lg transition-colors">
+                Cancelar
+              </button>
+              <button id="save-settings-btn" class="flex-1 bg-secondary text-on-secondary font-label-lg text-label-lg py-3 rounded-lg hover:opacity-90 active:scale-98 transition-all">
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+
+    </main>
+
+    <!-- Barra de Navegación Inferior (Visible en Móvil) -->
+    <nav class="md:hidden fixed bottom-0 w-full z-50 shadow-[0_-4px_12px_0px_rgba(0,0,0,0.04)] bg-surface-container-lowest flex justify-around items-center h-16 px-2 pb-safe border-t border-outline-variant">
+        <a href="/mapa_de_b_squeda_cliente/index.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 w-[72px]">
+            <span class="material-symbols-outlined">map</span>
+            <span class="font-label-md text-label-md mt-1">Explorar</span>
+        </a>
+        <a href="/centro_de_mensajer_a/index.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 w-[72px]">
+            <span class="material-symbols-outlined">chat</span>
+            <span class="font-label-md text-label-md mt-1">Mensajes</span>
+        </a>
+        <a href="/perfil_del_cliente/index.html" class="flex flex-col items-center justify-center text-on-secondary-container bg-secondary-container rounded-xl px-4 py-1 active:scale-95 transition-transform duration-150 w-[72px]">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+            <span class="font-label-md text-label-md font-bold mt-1">Perfil</span>
+        </a>
+    </nav>
+
+    <script type="module">
+        import { supabase } from '/src/supabase.js';
+        import { getUserProfile, updateUserProfile } from '/src/data.js';
+
+        // Auth Guard to prevent unauthorized access
+        const checkAuth = async () => {
+            let authorized = false;
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    authorized = true;
+                    const userRole = session.user.user_metadata.role || 'customer';
+                    localStorage.setItem('user_role', userRole);
+                } else {
+                    if (localStorage.getItem('user_role')) {
+                        authorized = true;
+                    }
+                }
+            } catch (_) {
+                if (localStorage.getItem('user_role')) authorized = true;
+            }
+
+            if (!authorized) {
+                window.location.replace('/index.html');
+            } else {
+                document.body.style.display = 'flex';
+            }
+        };
+        await checkAuth();
+
+        let activeUserId = null;
+
+        // DOM Elements
+        const avatarImg = document.querySelector('img[alt="User profile avatar"]');
+        const photoImg = document.querySelector('img[alt="Customer Photo"]');
+        const nameText = document.getElementById('profile-name');
+        const emailText = document.querySelector('.font-body-md.text-on-surface-variant');
+
+        const nameDisplayContainer = document.getElementById('name-display-container');
+        const nameEditContainer = document.getElementById('name-edit-container');
+        const nameEditInput = document.getElementById('name-edit-input');
+        const editNameBtn = document.getElementById('edit-name-btn');
+        const saveNameBtn = document.getElementById('save-name-btn');
+        const cancelNameBtn = document.getElementById('cancel-name-btn');
+
+        const photoEditContainer = document.getElementById('photo-edit-container');
+        const photoEditInput = document.getElementById('photo-edit-input');
+        const editPhotoBtn = document.getElementById('edit-photo-btn');
+        const savePhotoBtn = document.getElementById('save-photo-btn');
+        const cancelPhotoBtn = document.getElementById('cancel-photo-btn');
+
+        async function loadProfile() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    activeUserId = user.id;
+                    
+                    const profile = await getUserProfile(user.id);
+                    if (profile) {
+                        if (avatarImg) avatarImg.src = profile.avatar_url;
+                        if (photoImg) photoImg.src = profile.avatar_url;
+                        if (nameText) nameText.innerText = profile.name;
+                        if (emailText) emailText.innerText = profile.email;
+                        if (nameEditInput) nameEditInput.value = profile.name;
+                        if (photoEditInput) photoEditInput.value = profile.avatar_url;
+                    }
+                } else {
+                    throw new Error("No active user session");
+                }
+            } catch (e) {
+                console.warn("Using local profile fallback:", e.message);
+                activeUserId = '201'; // Fallback user ID
+                const profile = await getUserProfile(activeUserId);
+                if (profile) {
+                    if (avatarImg) avatarImg.src = profile.avatar_url;
+                    if (photoImg) photoImg.src = profile.avatar_url;
+                    if (nameText) nameText.innerText = profile.name;
+                    if (emailText) emailText.innerText = profile.email;
+                    if (nameEditInput) nameEditInput.value = profile.name;
+                    if (photoEditInput) photoEditInput.value = profile.avatar_url;
+                }
+            }
+        }
+
+        // Inline edit handlers
+        if (editNameBtn) {
+            editNameBtn.addEventListener('click', () => {
+                nameDisplayContainer.classList.add('hidden');
+                nameEditContainer.classList.remove('hidden');
+                nameEditInput.focus();
+            });
+        }
+
+        if (cancelNameBtn) {
+            cancelNameBtn.addEventListener('click', () => {
+                nameEditContainer.classList.add('hidden');
+                nameDisplayContainer.classList.remove('hidden');
+                if (nameText) nameEditInput.value = nameText.innerText;
+            });
+        }
+
+        if (saveNameBtn) {
+            saveNameBtn.addEventListener('click', async () => {
+                const newName = nameEditInput.value.trim();
+                if (!newName) {
+                    alert("El nombre no puede estar vacío.");
+                    return;
+                }
+                
+                try {
+                    await updateUserProfile(activeUserId, { name: newName });
+                    if (nameText) nameText.innerText = newName;
+                    
+                    nameEditContainer.classList.add('hidden');
+                    nameDisplayContainer.classList.remove('hidden');
+                } catch (err) {
+                    console.error("Error al actualizar perfil:", err);
+                    alert("Hubo un error al actualizar el nombre.");
+                }
+            });
+        }
+        if (editPhotoBtn) {
+            editPhotoBtn.addEventListener('click', () => {
+                nameDisplayContainer.classList.add('hidden');
+                photoEditContainer.classList.remove('hidden');
+                photoEditInput.focus();
+            });
+        }
+
+        if (cancelPhotoBtn) {
+            cancelPhotoBtn.addEventListener('click', () => {
+                photoEditContainer.classList.add('hidden');
+                nameDisplayContainer.classList.remove('hidden');
+                if (photoImg) photoEditInput.value = photoImg.src;
+            });
+        }
+
+        if (savePhotoBtn) {
+            savePhotoBtn.addEventListener('click', async () => {
+                const newPhotoUrl = photoEditInput.value.trim();
+                if (!newPhotoUrl) {
+                    alert("La URL de la foto no puede estar vacía.");
+                    return;
+                }
+                
+                try {
+                    await updateUserProfile(activeUserId, { avatar_url: newPhotoUrl });
+                    if (photoImg) photoImg.src = newPhotoUrl;
+                    if (avatarImg) avatarImg.src = newPhotoUrl;
+                    
+                    photoEditContainer.classList.add('hidden');
+                    nameDisplayContainer.classList.remove('hidden');
+                } catch (err) {
+                    console.error("Error al actualizar foto:", err);
+                    alert("Hubo un error al actualizar la foto de perfil.");
+                }
+            });
+        }
+
+
+        // Sign out function bound globally
+        window.signOut = async () => {
+            try {
+                await supabase.auth.signOut();
+            } catch (e) {
+                console.log("Error de Supabase Auth signOut, procediendo localmente");
+            }
+            localStorage.removeItem('user_role');
+            window.location.href = '/bienvenida_y_registro/index.html';
+        };
+
+        // Account Settings Modal Handlers
+        const settingsModal = document.getElementById('settings-modal');
+        const accountSettingsBtn = document.getElementById('account-settings-btn');
+        const closeSettingsModalBtn = document.getElementById('close-settings-modal');
+        const cancelSettingsBtn = document.getElementById('cancel-settings-btn');
+        const saveSettingsBtn = document.getElementById('save-settings-btn');
+        const modalNameInput = document.getElementById('modal-name-input');
+        const modalPhotoInput = document.getElementById('modal-photo-input');
+
+        if (accountSettingsBtn && settingsModal) {
+            accountSettingsBtn.addEventListener('click', () => {
+                if (modalNameInput && nameText) modalNameInput.value = nameText.innerText;
+                if (modalPhotoInput && photoImg) modalPhotoInput.value = photoImg.src;
+                
+                settingsModal.classList.remove('hidden');
+                settingsModal.classList.add('flex');
+            });
+        }
+
+        const hideSettingsModal = () => {
+            if (settingsModal) {
+                settingsModal.classList.remove('flex');
+                settingsModal.classList.add('hidden');
+            }
+        };
+
+        if (closeSettingsModalBtn) closeSettingsModalBtn.addEventListener('click', hideSettingsModal);
+        if (cancelSettingsBtn) cancelSettingsBtn.addEventListener('click', hideSettingsModal);
+        
+        if (settingsModal) {
+            settingsModal.addEventListener('click', (e) => {
+                if (e.target === settingsModal) hideSettingsModal();
+            });
+        }
+
+        if (saveSettingsBtn) {
+            saveSettingsBtn.addEventListener('click', async () => {
+                const newName = modalNameInput.value.trim();
+                const newPhotoUrl = modalPhotoInput.value.trim();
+                
+                if (!newName) {
+                    alert("El nombre no puede estar vacío.");
+                    return;
+                }
+                if (!newPhotoUrl) {
+                    alert("La URL de la foto no puede estar vacía.");
+                    return;
+                }
+
+                saveSettingsBtn.innerText = "Guardando...";
+                saveSettingsBtn.disabled = true;
+
+                try {
+                    await updateUserProfile(activeUserId, { 
+                        name: newName,
+                        avatar_url: newPhotoUrl
+                    });
+                    
+                    if (nameText) nameText.innerText = newName;
+                    if (photoImg) photoImg.src = newPhotoUrl;
+                    if (avatarImg) avatarImg.src = newPhotoUrl;
+                    
+                    hideSettingsModal();
+                    alert("¡Configuración de la cuenta guardada con éxito!");
+                } catch (err) {
+                    console.error("Error al actualizar configuración:", err);
+                    alert("Hubo un error al guardar la configuración.");
+                } finally {
+                    saveSettingsBtn.innerText = "Guardar";
+                    saveSettingsBtn.disabled = false;
+                }
+            });
+        }
+
+        // Initialize
+        loadProfile();
+    </script>
+</body>
+</html>

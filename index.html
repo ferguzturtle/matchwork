@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bienvenida - MatchWorking</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+      display: none; /* Hide body initially to prevent unauthorized content flash */
+    }
+  </style>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex items-center justify-center p-container-margin-mobile md:p-container-margin-desktop relative overflow-y-auto py-8">
+<div class="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-secondary-fixed-dim/20 to-transparent pointer-events-none"></div>
+<main class="w-full max-w-md bg-surface-container-lowest rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-surface-variant p-6 md:p-8 z-10 flex flex-col gap-6">
+<header class="text-center flex flex-col items-center gap-2">
+<div class="w-full max-w-[180px] mb-2">
+<img src="/logo.png" alt="MatchWorking Logo" class="w-full h-auto object-contain">
+</div>
+<h1 id="auth-title" class="font-headline-md text-headline-md text-on-surface">Únete a MatchWorking</h1>
+<p id="auth-subtitle" class="font-body-sm text-body-sm text-on-surface-variant">Selecciona tu tipo de cuenta para comenzar.</p>
+</header>
+<div id="role-selection" class="grid grid-cols-2 gap-gutter">
+<label class="relative flex flex-col items-start p-4 border-2 border-secondary bg-surface-container-lowest rounded-xl cursor-pointer shadow-sm transition-all">
+<input checked="" class="sr-only" name="user_role" type="radio" value="customer"/>
+<div class="flex justify-between w-full mb-3">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">person_search</span>
+<div class="w-5 h-5 rounded-full border-2 border-secondary flex items-center justify-center">
+<div class="w-2.5 h-2.5 rounded-full bg-secondary"></div>
+</div>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface mb-1">Cliente</span>
+<span class="font-body-sm text-label-md text-on-surface-variant leading-tight">Encuentra expertos locales</span>
+</label>
+<label class="relative flex flex-col items-start p-4 border-2 border-transparent ring-1 ring-outline-variant bg-surface-container-lowest rounded-xl cursor-pointer hover:bg-surface-container-low transition-all">
+<input class="sr-only" name="user_role" type="radio" value="provider"/>
+<div class="flex justify-between w-full mb-3">
+<span class="material-symbols-outlined text-on-surface-variant">home_repair_service</span>
+<div class="w-5 h-5 rounded-full border border-outline-variant"></div>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface mb-1">Prestador</span>
+<span class="font-body-sm text-label-md text-on-surface-variant leading-tight">Ofrece tus servicios</span>
+</label>
+</div>
+<form class="flex flex-col gap-stack-md">
+<div id="field-name" class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface" for="name">Nombre Completo</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">person</span>
+<input class="w-full bg-surface-container-low border-2 border-transparent text-on-surface font-body-md text-body-md rounded-lg py-3 pl-10 pr-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="name" placeholder="Ej. Fernando" required="" type="text"/>
+</div>
+</div>
+<div id="field-category" class="flex flex-col gap-1.5" style="display: none;">
+<label class="font-label-md text-label-md text-on-surface" for="category">Categoría de Servicio</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">category</span>
+<select class="w-full bg-surface-container-low border-2 border-transparent text-on-surface font-body-md text-body-md rounded-lg py-3 pl-10 pr-10 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors cursor-pointer appearance-none" id="category">
+<option value="gasfiteria">Gasfitería</option>
+<option value="electricidad">Electricidad</option>
+<option value="limpieza">Limpieza</option>
+<option value="climatizacion">Climatización</option>
+<option value="transporte">Fletes y Transporte</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface" for="email">Correo Electrónico</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">mail</span>
+<input class="w-full bg-surface-container-low border-2 border-transparent text-on-surface font-body-md text-body-md rounded-lg py-3 pl-10 pr-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="email" placeholder="nombre@ejemplo.com" required="" type="email"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface" for="password">Contraseña</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
+<input class="w-full bg-surface-container-low border-2 border-transparent text-on-surface font-body-md text-body-md rounded-lg py-3 pl-10 pr-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<button id="create-account-btn" class="w-full bg-secondary text-on-secondary font-label-lg text-label-lg rounded-lg py-3 mt-2 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2" type="button">
+                Crear Cuenta
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</form>
+<script type="module">
+    import { supabase } from '/src/supabase.js';
+
+    // Reverse Auth Guard to redirect already logged in users
+    const checkSessionAndRedirect = async () => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                const role = session.user.user_metadata.role || 'customer';
+                localStorage.setItem('user_role', role);
+                if (role === 'customer') {
+                    window.location.replace('/mapa_de_b_squeda_cliente/index.html');
+                    return;
+                } else {
+                    window.location.replace('/panel_del_prestador/index.html');
+                    return;
+                }
+            }
+        } catch (_) {}
+        document.body.style.display = 'flex'; // Unhide body to show login form
+    };
+    await checkSessionAndRedirect();
+
+    let isLoginMode = false;
+
+    const title = document.getElementById('auth-title');
+    const subtitle = document.getElementById('auth-subtitle');
+    const roleSelection = document.getElementById('role-selection');
+    const submitBtn = document.getElementById('create-account-btn');
+    const togglePrompt = document.getElementById('toggle-prompt');
+    const toggleLink = document.getElementById('toggle-link');
+
+    toggleLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        isLoginMode = !isLoginMode;
+        
+        if (isLoginMode) {
+            title.innerText = 'Iniciar Sesión';
+            subtitle.innerText = 'Ingresa tus credenciales para continuar.';
+            roleSelection.style.display = 'none'; // Ocultar selección de rol al iniciar sesión
+            submitBtn.innerHTML = `
+                Iniciar Sesión
+                <span class="material-symbols-outlined text-[18px]">login</span>
+            `;
+            togglePrompt.innerText = '¿No tienes una cuenta?';
+            toggleLink.innerText = 'Crear cuenta';
+
+            // Ocultar campos de registro
+            document.getElementById('field-name').style.display = 'none';
+            document.getElementById('field-category').style.display = 'none';
+        } else {
+            title.innerText = 'Únete a MatchWorking';
+            subtitle.innerText = 'Selecciona tu tipo de cuenta para comenzar.';
+            roleSelection.style.display = 'grid'; // Mostrar selección de rol
+            submitBtn.innerHTML = `
+                Crear Cuenta
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            `;
+            togglePrompt.innerText = '¿Ya tienes una cuenta?';
+            toggleLink.innerText = 'Iniciar sesión';
+
+            // Mostrar campos de registro
+            document.getElementById('field-name').style.display = 'flex';
+            const selectedRole = document.querySelector('input[name="user_role"]:checked').value;
+            document.getElementById('field-category').style.display = selectedRole === 'provider' ? 'flex' : 'none';
+        }
+    });
+
+    submitBtn.addEventListener('click', async () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        let role = 'customer'; // Default role
+        
+        if (!isLoginMode) {
+            role = document.querySelector('input[name="user_role"]:checked').value;
+        }
+
+        if (!email || !password) {
+            alert('Por favor, ingresa tu correo electrónico y contraseña.');
+            return;
+        }
+
+        let name = "";
+        let category = "";
+        if (!isLoginMode) {
+            name = document.getElementById('name').value;
+            if (!name) {
+                alert('Por favor, ingresa tu nombre completo.');
+                return;
+            }
+            if (role === 'provider') {
+                category = document.getElementById('category').value;
+            }
+        }
+
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = 'Procesando...';
+        submitBtn.disabled = true;
+
+        try {
+            let authResponse;
+            if (isLoginMode) {
+                // Iniciar Sesión
+                authResponse = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+                if (authResponse.error) throw authResponse.error;
+                
+                // Extraer el rol guardado en los metadatos del usuario
+                role = authResponse.data.user.user_metadata.role || 'customer';
+                alert('¡Inicio de sesión exitoso!');
+            } else {
+                // Crear Cuenta
+                authResponse = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            role: role
+                        }
+                    }
+                });
+                if (authResponse.error) throw authResponse.error;
+                
+                // Si la sesión es null (confirmación de email activada o user ya existe), avisar al usuario.
+                if (!authResponse.data.session) {
+                    alert('Revisa tu correo para confirmar tu cuenta (o este correo ya está registrado).');
+                    return; // Detener flujo si no hay sesión
+                } else {
+                    const user = authResponse.data.user;
+                    if (user) {
+                        const professionMap = {
+                            "gasfiteria": "Especialista en Gasfitería",
+                            "electricidad": "Electricista Autorizado",
+                            "limpieza": "Especialista en Limpieza",
+                            "climatizacion": "Técnico en Climatización",
+                            "transporte": "Servicios de Fletes y Transporte"
+                        };
+                        const profession = role === 'customer' ? "" : (professionMap[category] || "Nuevo Prestador");
+
+                        // 1. Guardar en la tabla profiles
+                        const { error: profileErr } = await supabase.from('profiles').upsert({
+                            id: user.id,
+                            name: name,
+                            email: email,
+                            role: role,
+                            avatar_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
+                            profession: role === 'customer' ? "" : profession,
+                            category: role === 'customer' ? "" : category,
+                            description: role === 'customer' ? "" : "Sin descripción disponible.",
+                            price: role === 'customer' ? "" : "$0"
+                        });
+                        if (profileErr) {
+                            console.error("Error al crear perfil en registro:", profileErr.message);
+                        }
+
+                        // 2. Guardar en localStorage para offline profile fallback
+                        const offlineProfile = {
+                            id: user.id,
+                            name: name,
+                            email: email,
+                            role: role,
+                            avatar_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
+                            profession: role === 'customer' ? "" : profession,
+                            category: role === 'customer' ? "" : category,
+                            description: role === 'customer' ? "" : "Sin descripción disponible.",
+                            price: role === 'customer' ? "" : "$0"
+                        };
+                        localStorage.setItem(`prolink_profile_${user.id}`, JSON.stringify(offlineProfile));
+
+                        // 3. Si es Prestador, insertar inmediatamente en la tabla providers para visibilidad instantánea
+                        if (role === 'provider') {
+                            const iconMap = {
+                                "gasfiteria": "plumbing",
+                                "electricidad": "bolt",
+                                "limpieza": "cleaning_services",
+                                "climatizacion": "ac_unit",
+                                "transporte": "local_shipping"
+                            };
+                            const providerData = {
+                                id: user.id,
+                                name: name,
+                                image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
+                                profession: profession,
+                                category: category,
+                                rating: 4.9,
+                                status: 'En línea',
+                                lat: -33.4489,
+                                lng: -70.6693,
+                                icon: iconMap[category] || 'plumbing'
+                            };
+
+                            const { error: providerErr } = await supabase.from('providers').upsert(providerData);
+                            if (providerErr) {
+                                console.error("Error al registrar disponibilidad en providers:", providerErr.message);
+                            }
+
+                            // Guardar en localStorage para sincronización instantánea de pestañas abiertas
+                            try {
+                                const localUpdates = JSON.parse(localStorage.getItem('prolink_providers_updates') || '{}');
+                                localUpdates[user.id] = providerData;
+                                localStorage.setItem('prolink_providers_updates', JSON.stringify(localUpdates));
+                                // Disparar evento storage para sincronización inmediata
+                                window.dispatchEvent(new Event('storage'));
+                            } catch (err) {
+                                console.warn("Error guardando actualización local de proveedor al registrarse:", err);
+                            }
+                        }
+                    }
+                    alert('¡Cuenta creada exitosamente!');
+                }
+            }
+            
+            // Guardamos el rol en localStorage temporalmente para compatibilidad con las otras páginas
+            localStorage.setItem('user_role', role);
+
+            // Redirigir según el rol
+            if (role === 'customer') {
+                window.location.href = '/mapa_de_b_squeda_cliente/index.html';
+            } else {
+                window.location.href = '/panel_del_prestador/index.html';
+            }
+
+        } catch (error) {
+            let errorMsg = error.message;
+            if (errorMsg.includes('security purposes')) {
+                errorMsg = 'Por razones de seguridad y límites de velocidad de Supabase, solo puedes realizar solicitudes cada ciertos segundos. Por favor, espera medio minuto e intenta nuevamente.';
+            } else if (errorMsg.toLowerCase().includes('email not confirmed')) {
+                errorMsg = 'El correo electrónico no ha sido confirmado aún. Revisa tu bandeja de entrada o desactiva "Confirm Email" en el panel de Supabase.';
+            } else if (errorMsg.toLowerCase().includes('invalid login credentials')) {
+                errorMsg = 'Credenciales inválidas. Por favor, verifica el correo y la contraseña ingresados.';
+            } else if (errorMsg.toLowerCase().includes('signup') && errorMsg.toLowerCase().includes('disabled')) {
+                errorMsg = 'Los registros están desactivados en tu Supabase. Ve a Authentication -> Providers -> Email en tu Dashboard de Supabase y activa la opción "Allow new users to sign up".';
+            }
+            alert(isLoginMode ? 'Error al iniciar sesión: ' + errorMsg : 'Error al crear cuenta: ' + errorMsg);
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Handle visual selection state for the role radio buttons
+    document.querySelectorAll('input[name="user_role"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            // Reset both labels
+            document.querySelectorAll('input[name="user_role"]').forEach(input => {
+                const label = input.closest('label');
+                // Set default "unselected" state
+                label.className = "relative flex flex-col items-start p-4 border-2 border-transparent ring-1 ring-outline-variant bg-surface-container-lowest rounded-xl cursor-pointer hover:bg-surface-container-low transition-all";
+                
+                const circle = label.querySelector('div.rounded-full.border, div.rounded-full.border-2');
+                if (circle) {
+                    circle.className = "w-5 h-5 rounded-full border border-outline-variant";
+                    circle.innerHTML = "";
+                }
+            });
+            
+            // Set active styles to the checked one
+            const activeLabel = e.target.closest('label');
+            activeLabel.className = "relative flex flex-col items-start p-4 border-2 border-secondary bg-surface-container-lowest rounded-xl cursor-pointer shadow-sm transition-all";
+            
+            const circle = activeLabel.querySelector('div.rounded-full.border, div.rounded-full.border-2');
+            if (circle) {
+                circle.className = "w-5 h-5 rounded-full border-2 border-secondary flex items-center justify-center";
+                circle.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-secondary"></div>`;
+            }
+
+            // Alternar reactivamente el selector de categorías si no está en inicio de sesión
+            if (!isLoginMode) {
+                const selectedRole = e.target.value;
+                document.getElementById('field-category').style.display = selectedRole === 'provider' ? 'flex' : 'none';
+            }
+        });
+    });
+
+    // Acceso Rápido Demo
+    const demoCustomerBtn = document.getElementById('demo-customer-btn');
+    const demoProviderBtn = document.getElementById('demo-provider-btn');
+
+    if (demoCustomerBtn) {
+        demoCustomerBtn.addEventListener('click', () => {
+            localStorage.setItem('user_role', 'customer');
+            
+            // Perfil de prueba cliente
+            const mockClient = {
+                id: "00000000-0000-0000-0000-000000000000",
+                name: "Rodrigo Demo",
+                email: "cliente_demo@matchworking.cl",
+                role: "customer",
+                avatar_url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkkUwOuvyN2Qm4vmOiICtijtED3CJu4s_rWpmOyynM4l801tEL6X3P_Jnr2IcpevBIYD4BSbXAPRUX2AMCBP8C5k_9XtGS38PGXsVoaf30OkmuoOH1-NpV9avYaTU5tjbgLhRGTa8Y5KeSeBg1dMPTM9SnJLZSiAOb3S3am7yhuZGkkS1GljZv7wprS8rV-uwaf6C96yBq8oywa5GT9o_AHsvRQnNRgE1GlSjXCa1b0-qJOwT0wK_lP8Z1AL7t0M3nAKYbJgL9kn0"
+            };
+            localStorage.setItem('prolink_profile_00000000-0000-0000-0000-000000000000', JSON.stringify(mockClient));
+            
+            window.location.href = '/mapa_de_b_squeda_cliente/index.html';
+        });
+    }
+
+    if (demoProviderBtn) {
+        demoProviderBtn.addEventListener('click', () => {
+            localStorage.setItem('user_role', 'provider');
+            
+            // Perfil de prueba transportista
+            const mockProvider = {
+                id: "11111111-1111-1111-1111-111111111111",
+                name: "Carlos Mendoza (Demo)",
+                email: "carlos_demo@matchworking.cl",
+                role: "provider",
+                avatar_url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBX-KmXfHIjVb7JHEf1pifVUCMhUSzU0CKsNGpek6wiAOoi6GNjsG34f0IgeZosy9X43RoDme6BsKQ1JF2H08sM5kdNgMWv5QFBWBIb5XZQya-COp1W7C0MqhEG0qYJE9bat9exBgFlf4iNg7YP6uRFRXVEmyHO5cxHtWVLxHe7WsEVvZ5HfVyU_9mXS_S7-ea_FMvI2TstyPw-jxcZHe2Wt_cy8__UXWDC7_bpWDaxIqx-RIhRAMXjflaGgH7WY932QbEneKM6_Ls",
+                profession: "Servicios de Fletes y Transporte",
+                category: "transporte",
+                description: "Mudanzas, traslados y fletes económicos de retorno. Cobertura regional.",
+                price: "$45.000"
+            };
+            localStorage.setItem('prolink_profile_11111111-1111-1111-1111-111111111111', JSON.stringify(mockProvider));
+            
+            // Habilitar disponibilidad del transportista localmente para que aparezca al tiro
+            const localUpdates = JSON.parse(localStorage.getItem('prolink_providers_updates') || '{}');
+            localUpdates[mockProvider.id] = {
+                id: mockProvider.id,
+                name: mockProvider.name,
+                image: mockProvider.avatar_url,
+                profession: mockProvider.profession,
+                category: mockProvider.category,
+                status: 'En línea',
+                lat: -33.0472, // Origen en Valparaíso
+                lng: -71.6127,
+                rating: 4.9,
+                icon: 'local_shipping'
+            };
+            localStorage.setItem('prolink_providers_updates', JSON.stringify(localUpdates));
+            
+            window.location.href = '/panel_del_prestador/index.html';
+        });
+    }
+</script>
+
+<div class="text-center mt-2">
+<span id="toggle-prompt" class="font-body-sm text-body-sm text-on-surface-variant">¿Ya tienes una cuenta?</span>
+<a id="toggle-link" class="font-label-lg text-label-lg text-secondary hover:underline ml-1" href="#">Iniciar sesión</a>
+</div>
+
+<div class="relative flex py-2 items-center">
+    <div class="flex-grow border-t border-outline-variant"></div>
+    <span class="flex-shrink mx-4 text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider font-semibold">Modo Demo</span>
+    <div class="flex-grow border-t border-outline-variant"></div>
+</div>
+
+<div class="flex flex-col gap-2.5">
+    <button id="demo-customer-btn" class="w-full bg-surface-container-high border border-outline-variant text-on-surface hover:bg-surface-bright active:scale-98 transition-all font-semibold rounded-lg py-2.5 flex justify-center items-center gap-2 font-label-lg text-label-md" type="button">
+        <span class="material-symbols-outlined text-[18px] text-secondary">explore</span>
+        Entrar como Cliente Demo
+    </button>
+    <button id="demo-provider-btn" class="w-full bg-surface-container-high border border-outline-variant text-on-surface hover:bg-surface-bright active:scale-98 transition-all font-semibold rounded-lg py-2.5 flex justify-center items-center gap-2 font-label-lg text-label-md" type="button">
+        <span class="material-symbols-outlined text-[18px] text-emerald-600">local_shipping</span>
+        Entrar como Transportista Demo
+    </button>
+</div>
+</main>
+</body></html>

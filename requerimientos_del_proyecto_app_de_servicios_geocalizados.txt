@@ -1,0 +1,10 @@
+DESCRIPCIÓN GENERAL DEL PROYECTO
+Se plantea el desarrollo de una aplicación móvil y plataforma digital basada en geolocalización, cuyo propósito será permitir que los usuarios puedan encontrar y contactar con prestadores de servicios cercanos disponibles en tiempo real.
+
+Funcionalidades principales:
+1. Registro de usuarios (Cliente, Prestador, o ambos).
+2. Perfil de prestador (Servicios, disponibilidad, mapa, solicitudes, chat, multimedia, reseñas).
+3. Perfil de cliente (Búsqueda, mapa interactivo, filtros, match, chat, reseñas).
+4. Sistema de geolocalización en tiempo real.
+5. Sistema de match (Solicitud, aceptación/rechazo, chat privado).
+6. Chat interno para coordinación.
