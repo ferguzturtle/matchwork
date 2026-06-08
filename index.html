@@ -64,11 +64,21 @@
 <div class="relative">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">category</span>
 <select class="w-full bg-surface-container-low border-2 border-transparent text-on-surface font-body-md text-body-md rounded-lg py-3 pl-10 pr-10 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors cursor-pointer appearance-none" id="category">
-<option value="gasfiteria">Gasfitería</option>
-<option value="electricidad">Electricidad</option>
-<option value="limpieza">Limpieza</option>
-<option value="climatizacion">Climatización</option>
-<option value="transporte">Fletes y Transporte</option>
+<option value="construccion">Construcción y Reformas</option>
+<option value="salud">Servicios de Salud y Cuidado</option>
+<option value="instalaciones">Instalaciones y Electricidad</option>
+<option value="mantenimiento">Mantenimiento y Limpieza</option>
+<option value="profesionales">Servicios Profesionales</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+</div>
+</div>
+<div id="field-subcategory" class="flex flex-col gap-1.5" style="display: none;">
+<label class="font-label-md text-label-md text-on-surface" for="subcategory">Subcategoría de Servicio</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">construction</span>
+<select class="w-full bg-surface-container-low border-2 border-transparent text-on-surface font-body-md text-body-md rounded-lg py-3 pl-10 pr-10 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors cursor-pointer appearance-none" id="subcategory">
+<!-- Loaded dynamically by JS -->
 </select>
 <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">arrow_drop_down</span>
 </div>
@@ -94,6 +104,7 @@
 </form>
 <script type="module">
     import { supabase } from '/src/supabase.js';
+    import { CATEGORIES, getSubcategoryIcon } from '/src/data.js';
 
     // Reverse Auth Guard to redirect already logged in users
     const checkSessionAndRedirect = async () => {
@@ -124,6 +135,31 @@
     const togglePrompt = document.getElementById('toggle-prompt');
     const toggleLink = document.getElementById('toggle-link');
 
+    const categorySelect = document.getElementById('category');
+    const subcategorySelect = document.getElementById('subcategory');
+    const subcategoryField = document.getElementById('field-subcategory');
+
+    const updateSubcategoryOptions = () => {
+        const catKey = categorySelect.value;
+        if (!catKey || !CATEGORIES[catKey]) {
+            subcategorySelect.innerHTML = '';
+            subcategoryField.style.display = 'none';
+            return;
+        }
+        
+        const subcats = CATEGORIES[catKey].subcategories;
+        let html = '';
+        for (const key in subcats) {
+            html += `<option value="${key}">${subcats[key].label}</option>`;
+        }
+        subcategorySelect.innerHTML = html;
+        
+        const selectedRole = document.querySelector('input[name="user_role"]:checked').value;
+        subcategoryField.style.display = selectedRole === 'provider' ? 'flex' : 'none';
+    };
+
+    categorySelect.addEventListener('change', updateSubcategoryOptions);
+
     toggleLink.addEventListener('click', (e) => {
         e.preventDefault();
         isLoginMode = !isLoginMode;
@@ -142,6 +178,7 @@
             // Ocultar campos de registro
             document.getElementById('field-name').style.display = 'none';
             document.getElementById('field-category').style.display = 'none';
+            subcategoryField.style.display = 'none';
         } else {
             title.innerText = 'Únete a MatchWorking';
             subtitle.innerText = 'Selecciona tu tipo de cuenta para comenzar.';
@@ -157,6 +194,7 @@
             document.getElementById('field-name').style.display = 'flex';
             const selectedRole = document.querySelector('input[name="user_role"]:checked').value;
             document.getElementById('field-category').style.display = selectedRole === 'provider' ? 'flex' : 'none';
+            updateSubcategoryOptions();
         }
     });
 
@@ -176,6 +214,7 @@
 
         let name = "";
         let category = "";
+        let subcategory = "";
         if (!isLoginMode) {
             name = document.getElementById('name').value;
             if (!name) {
@@ -184,6 +223,7 @@
             }
             if (role === 'provider') {
                 category = document.getElementById('category').value;
+                subcategory = document.getElementById('subcategory').value;
             }
         }
 
@@ -224,14 +264,14 @@
                 } else {
                     const user = authResponse.data.user;
                     if (user) {
-                        const professionMap = {
-                            "gasfiteria": "Especialista en Gasfitería",
-                            "electricidad": "Electricista Autorizado",
-                            "limpieza": "Especialista en Limpieza",
-                            "climatizacion": "Técnico en Climatización",
-                            "transporte": "Servicios de Fletes y Transporte"
-                        };
-                        const profession = role === 'customer' ? "" : (professionMap[category] || "Nuevo Prestador");
+                        let profession = "Prestador General";
+                        for (const catKey in CATEGORIES) {
+                            if (CATEGORIES[catKey].subcategories[subcategory]) {
+                                profession = "Especialista en " + CATEGORIES[catKey].subcategories[subcategory].label;
+                                break;
+                            }
+                        }
+                        if (role === 'customer') profession = "";
 
                         // 1. Guardar en la tabla profiles
                         const { error: profileErr } = await supabase.from('profiles').upsert({
@@ -242,6 +282,7 @@
                             avatar_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
                             profession: role === 'customer' ? "" : profession,
                             category: role === 'customer' ? "" : category,
+                            subcategory: role === 'customer' ? "" : subcategory,
                             description: role === 'customer' ? "" : "Sin descripción disponible.",
                             price: role === 'customer' ? "" : "$0"
                         });
@@ -258,6 +299,7 @@
                             avatar_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
                             profession: role === 'customer' ? "" : profession,
                             category: role === 'customer' ? "" : category,
+                            subcategory: role === 'customer' ? "" : subcategory,
                             description: role === 'customer' ? "" : "Sin descripción disponible.",
                             price: role === 'customer' ? "" : "$0"
                         };
@@ -265,24 +307,18 @@
 
                         // 3. Si es Prestador, insertar inmediatamente en la tabla providers para visibilidad instantánea
                         if (role === 'provider') {
-                            const iconMap = {
-                                "gasfiteria": "plumbing",
-                                "electricidad": "bolt",
-                                "limpieza": "cleaning_services",
-                                "climatizacion": "ac_unit",
-                                "transporte": "local_shipping"
-                            };
                             const providerData = {
                                 id: user.id,
                                 name: name,
                                 image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
                                 profession: profession,
                                 category: category,
+                                subcategory: subcategory,
                                 rating: 4.9,
                                 status: 'En línea',
                                 lat: -33.4489,
                                 lng: -70.6693,
-                                icon: iconMap[category] || 'plumbing'
+                                icon: getSubcategoryIcon(subcategory)
                             };
 
                             const { error: providerErr } = await supabase.from('providers').upsert(providerData);
@@ -364,69 +400,12 @@
             if (!isLoginMode) {
                 const selectedRole = e.target.value;
                 document.getElementById('field-category').style.display = selectedRole === 'provider' ? 'flex' : 'none';
+                updateSubcategoryOptions();
             }
         });
     });
 
-    // Acceso Rápido Demo
-    const demoCustomerBtn = document.getElementById('demo-customer-btn');
-    const demoProviderBtn = document.getElementById('demo-provider-btn');
 
-    if (demoCustomerBtn) {
-        demoCustomerBtn.addEventListener('click', () => {
-            localStorage.setItem('user_role', 'customer');
-            
-            // Perfil de prueba cliente
-            const mockClient = {
-                id: "00000000-0000-0000-0000-000000000000",
-                name: "Rodrigo Demo",
-                email: "cliente_demo@matchworking.cl",
-                role: "customer",
-                avatar_url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkkUwOuvyN2Qm4vmOiICtijtED3CJu4s_rWpmOyynM4l801tEL6X3P_Jnr2IcpevBIYD4BSbXAPRUX2AMCBP8C5k_9XtGS38PGXsVoaf30OkmuoOH1-NpV9avYaTU5tjbgLhRGTa8Y5KeSeBg1dMPTM9SnJLZSiAOb3S3am7yhuZGkkS1GljZv7wprS8rV-uwaf6C96yBq8oywa5GT9o_AHsvRQnNRgE1GlSjXCa1b0-qJOwT0wK_lP8Z1AL7t0M3nAKYbJgL9kn0"
-            };
-            localStorage.setItem('prolink_profile_00000000-0000-0000-0000-000000000000', JSON.stringify(mockClient));
-            
-            window.location.href = '/mapa_de_b_squeda_cliente/index.html';
-        });
-    }
-
-    if (demoProviderBtn) {
-        demoProviderBtn.addEventListener('click', () => {
-            localStorage.setItem('user_role', 'provider');
-            
-            // Perfil de prueba transportista
-            const mockProvider = {
-                id: "11111111-1111-1111-1111-111111111111",
-                name: "Carlos Mendoza (Demo)",
-                email: "carlos_demo@matchworking.cl",
-                role: "provider",
-                avatar_url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBX-KmXfHIjVb7JHEf1pifVUCMhUSzU0CKsNGpek6wiAOoi6GNjsG34f0IgeZosy9X43RoDme6BsKQ1JF2H08sM5kdNgMWv5QFBWBIb5XZQya-COp1W7C0MqhEG0qYJE9bat9exBgFlf4iNg7YP6uRFRXVEmyHO5cxHtWVLxHe7WsEVvZ5HfVyU_9mXS_S7-ea_FMvI2TstyPw-jxcZHe2Wt_cy8__UXWDC7_bpWDaxIqx-RIhRAMXjflaGgH7WY932QbEneKM6_Ls",
-                profession: "Servicios de Fletes y Transporte",
-                category: "transporte",
-                description: "Mudanzas, traslados y fletes económicos de retorno. Cobertura regional.",
-                price: "$45.000"
-            };
-            localStorage.setItem('prolink_profile_11111111-1111-1111-1111-111111111111', JSON.stringify(mockProvider));
-            
-            // Habilitar disponibilidad del transportista localmente para que aparezca al tiro
-            const localUpdates = JSON.parse(localStorage.getItem('prolink_providers_updates') || '{}');
-            localUpdates[mockProvider.id] = {
-                id: mockProvider.id,
-                name: mockProvider.name,
-                image: mockProvider.avatar_url,
-                profession: mockProvider.profession,
-                category: mockProvider.category,
-                status: 'En línea',
-                lat: -33.0472, // Origen en Valparaíso
-                lng: -71.6127,
-                rating: 4.9,
-                icon: 'local_shipping'
-            };
-            localStorage.setItem('prolink_providers_updates', JSON.stringify(localUpdates));
-            
-            window.location.href = '/panel_del_prestador/index.html';
-        });
-    }
 </script>
 
 <div class="text-center mt-2">
@@ -434,21 +413,6 @@
 <a id="toggle-link" class="font-label-lg text-label-lg text-secondary hover:underline ml-1" href="#">Iniciar sesión</a>
 </div>
 
-<div class="relative flex py-2 items-center">
-    <div class="flex-grow border-t border-outline-variant"></div>
-    <span class="flex-shrink mx-4 text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider font-semibold">Modo Demo</span>
-    <div class="flex-grow border-t border-outline-variant"></div>
-</div>
 
-<div class="flex flex-col gap-2.5">
-    <button id="demo-customer-btn" class="w-full bg-surface-container-high border border-outline-variant text-on-surface hover:bg-surface-bright active:scale-98 transition-all font-semibold rounded-lg py-2.5 flex justify-center items-center gap-2 font-label-lg text-label-md" type="button">
-        <span class="material-symbols-outlined text-[18px] text-secondary">explore</span>
-        Entrar como Cliente Demo
-    </button>
-    <button id="demo-provider-btn" class="w-full bg-surface-container-high border border-outline-variant text-on-surface hover:bg-surface-bright active:scale-98 transition-all font-semibold rounded-lg py-2.5 flex justify-center items-center gap-2 font-label-lg text-label-md" type="button">
-        <span class="material-symbols-outlined text-[18px] text-emerald-600">local_shipping</span>
-        Entrar como Transportista Demo
-    </button>
-</div>
 </main>
 </body></html>

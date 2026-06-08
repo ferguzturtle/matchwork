@@ -1,82 +1,79 @@
 import { supabase } from './supabase.js';
 
-export let providers = [
-  {
-    id: "11111111-1111-1111-1111-111111111111",
-    name: "Carlos Mendoza",
-    profession: "Maestro Gasfitero Autorizado",
-    category: "gasfiteria",
-    rating: 4.9,
-    distance: "1.2 km",
-    status: "En línea",
-    lat: -33.4489,
-    lng: -70.6693,
-    icon: "plumbing",
-    price: "$150",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBX-KmXfHIjVb7JHEf1pifVUCMhUSzU0CKsNGpek6wiAOoi6GNjsG34f0IgeZosy9X43RoDme6BsKQ1JF2H08sM5kdNgMWv5QFBWBIb5XZQya-COp1W7C0MqhEG0qYJE9bat9exBgFlf4iNg7YP6uRFRXVEmyHO5cxHtWVLxHe7WsEVvZ5HfVyU_9mXS_S7-ea_FMvI2TstyPw-jxcZHe2Wt_cy8__UXWDC7_bpWDaxIqx-RIhRAMXjflaGgH7WY932QbEneKM6_Ls",
-    description: "Con más de 10 años de experiencia, ofrezco servicios de gasfitería certificados y garantizados. Especialista en urgencias, fugas y reparaciones completas. Respuesta rápida en toda la zona metropolitana."
-  },
-  {
-    id: "22222222-2222-2222-2222-222222222222",
-    name: "Francisco Javier",
-    profession: "Electricista Certificado SEC",
-    category: "electricidad",
-    rating: 4.8,
-    distance: "3.4 km",
-    status: "Online",
-    lat: -33.4350,
-    lng: -70.6500,
-    icon: "bolt",
-    price: "$85",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkkUwOuvyN2Qm4vmOiICtijtED3CJu4s_rWpmOyynM4l801tEL6X3P_Jnr2IcpevBIYD4BSbXAPRUX2AMCBP8C5k_9XtGS38PGXsVoaf30OkmuoOH1-NpV9avYaTU5tjbgLhRGTa8Y5KeSeBg1dMPTM9SnJLZSiAOb3S3am7yhuZGkkS1GljZv7wprS8rV-uwaf6C96yBq8oywa5GT9o_AHsvRQnNRgE1GlSjXCa1b0-qJOwT0wK_lP8Z1AL7t0M3nAKYbJgL9kn0",
-    description: "Instalaciones eléctricas residenciales y comerciales. Evaluación de tableros, aumento de capacidad y certificaciones TE1. Seguridad y profesionalismo en cada trabajo."
-  },
-  {
-    id: "33333333-3333-3333-3333-333333333333",
-    name: "Ana Silva",
-    profession: "Especialista en Limpieza Profunda",
-    category: "limpieza",
-    rating: 5.0,
-    distance: "2.1 km",
-    status: "Ocupado",
-    lat: -33.4500,
-    lng: -70.6400,
-    icon: "cleaning_services",
-    price: "$50",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
-    description: "Servicio de limpieza profunda para casas y departamentos post-construcción o mudanza. Utilizo productos de alta gama y amigables con el medio ambiente."
-  },
-  {
-    id: "44444444-4444-4444-4444-444444444444",
-    name: "Roberto Rojas",
-    profession: "Gasfiter Urgencias 24/7",
-    category: "gasfiteria",
-    rating: 4.7,
-    distance: "0.8 km",
-    status: "Online",
-    lat: -33.4480,
-    lng: -70.6680,
-    icon: "plumbing",
-    price: "$120",
-    image: "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=150&q=80",
-    description: "Reparación de filtraciones, destapes y mantención de calefont. Servicio rápido y eficiente."
-  },
-  {
-    id: "55555555-5555-5555-5555-555555555555",
-    name: "Luis Soto",
-    profession: "Gasfiter Instalador SEC",
-    category: "gasfiteria",
-    rating: 4.9,
-    distance: "2.5 km",
-    status: "Busy",
-    lat: -33.4520,
-    lng: -70.6710,
-    icon: "plumbing",
-    price: "$180",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
-    description: "Instalación de redes de gas y agua potable. Tramitación de certificados SEC."
-  }
-];
+export const CATEGORIES = {
+    construccion: {
+        label: "Construcción y Reformas",
+        icon: "construction",
+        subcategories: {
+            albanileria: { label: "Albañilería", icon: "construction" },
+            pintura: { label: "Pintura", icon: "format_paint" },
+            carpinteria: { label: "Carpintería", icon: "handyman" },
+            gasfiteria: { label: "Gasfitería", icon: "plumbing" }
+        }
+    },
+    salud: {
+        label: "Servicios de Salud y Cuidado",
+        icon: "medical_services",
+        subcategories: {
+            enfermeria: { label: "Enfermería", icon: "medical_services" },
+            kinesiologia: { label: "Kinesiología", icon: "physical_therapy" },
+            adulto_mayor: { label: "Cuidado de Adulto Mayor", icon: "elderly" },
+            ninos: { label: "Cuidado de Niños", icon: "child_care" }
+        }
+    },
+    instalaciones: {
+        label: "Instalaciones y Electricidad",
+        icon: "engineering",
+        subcategories: {
+            electricidad: { label: "Electricidad Residencial", icon: "bolt" },
+            climatizacion: { label: "Climatización", icon: "ac_unit" },
+            redes: { label: "Redes y Telecomunicaciones", icon: "router" }
+        }
+    },
+    mantenimiento: {
+        label: "Mantenimiento y Limpieza",
+        icon: "cleaning_services",
+        subcategories: {
+            limpieza_hogar: { label: "Limpieza de Hogar", icon: "cleaning_services" },
+            fumigacion: { label: "Fumigación", icon: "pest_control" },
+            jardineria: { label: "Jardinería", icon: "yard" },
+            piscinas: { label: "Limpieza de Piscinas", icon: "pool" }
+        }
+    },
+    profesionales: {
+        label: "Servicios Profesionales",
+        icon: "support_agent",
+        subcategories: {
+            tutorias: { label: "Tutorías / Clases", icon: "school" },
+            asistencia_tec: { label: "Asistencia Tecnológica", icon: "computer" },
+            mudanzas: { label: "Mudanzas y Desembalaje", icon: "local_shipping" }
+        }
+    }
+};
+
+export const getSubcategoryIcon = (subcat) => {
+    for (const catKey in CATEGORIES) {
+        if (CATEGORIES[catKey].subcategories[subcat]) {
+            return CATEGORIES[catKey].subcategories[subcat].icon;
+        }
+    }
+    return 'plumbing'; // default fallback icon
+};
+
+export const getSubcategoryLabel = (subcat) => {
+    for (const catKey in CATEGORIES) {
+        if (CATEGORIES[catKey].subcategories[subcat]) {
+            return CATEGORIES[catKey].subcategories[subcat].label;
+        }
+    }
+    return subcat;
+};
+
+export const getCategoryLabel = (catKey) => {
+    return CATEGORIES[catKey]?.label || catKey;
+};
+
+export let providers = [];
 
 export const getProviders = async () => {
     let usingRealDb = false;
@@ -108,7 +105,8 @@ export const getProviders = async () => {
                     name: up.name || p.name,
                     image: up.image || p.image,
                     profession: up.profession || p.profession,
-                    category: up.category || p.category
+                    category: up.category || p.category,
+                    subcategory: up.subcategory || p.subcategory
                 };
             }
             return p;
@@ -123,6 +121,7 @@ export const getProviders = async () => {
                     name: up.name,
                     profession: up.profession,
                     category: up.category,
+                    subcategory: up.subcategory || '',
                     rating: up.rating || 4.9,
                     status: up.status,
                     lat: up.lat !== null ? up.lat : -33.4489,
@@ -201,11 +200,32 @@ export const getRequestsForProvider = async (providerId) => {
     } catch (e) {
         console.log("Fallback: obteniendo solicitudes de localStorage", e.message);
         const requests = JSON.parse(localStorage.getItem('prolink_requests') || '[]');
-        return requests.filter(req => req.providerId == providerId);
+        return requests.filter(req => req.providerId == providerId).map(req => ({
+            id: req.id,
+            providerId: req.providerId,
+            customerId: req.userId || req.customerId,
+            userId: req.userId || req.customerId,
+            message: req.message,
+            status: req.status,
+            userName: req.userName || 'Cliente de MatchWorking',
+            timestamp: req.timestamp
+        }));
     }
 };
 
 export const updateRequestStatus = async (requestId, status) => {
+    // ALWAYS update localStorage first to ensure consistency for offline/fallback/demo mode
+    try {
+        const requests = JSON.parse(localStorage.getItem('prolink_requests') || '[]');
+        const index = requests.findIndex(req => req.id == requestId);
+        if (index !== -1) {
+            requests[index].status = status;
+            localStorage.setItem('prolink_requests', JSON.stringify(requests));
+        }
+    } catch (localErr) {
+        console.warn("Error updating request status in localStorage", localErr);
+    }
+
     try {
         const { data, error } = await supabase
             .from('service_requests')
@@ -214,13 +234,7 @@ export const updateRequestStatus = async (requestId, status) => {
         if (error) throw error;
         return data;
     } catch (e) {
-        console.log("Fallback: actualizando solicitud en localStorage", e.message);
-        const requests = JSON.parse(localStorage.getItem('prolink_requests') || '[]');
-        const index = requests.findIndex(req => req.id == requestId);
-        if (index !== -1) {
-            requests[index].status = status;
-            localStorage.setItem('prolink_requests', JSON.stringify(requests));
-        }
+        console.log("Fallback: actualizando solicitud en localStorage falló en Supabase", e.message);
     }
 };
 
@@ -297,7 +311,8 @@ export const getUserProfile = async (userId) => {
                         role: role,
                         avatar_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
                         profession: role === 'customer' ? "" : "Nuevo Prestador",
-                        category: role === 'customer' ? "" : "gasfiteria",
+                        category: role === 'customer' ? "" : "construccion",
+                        subcategory: role === 'customer' ? "" : "gasfiteria",
                         description: role === 'customer' ? "" : "Sin descripción disponible.",
                         price: role === 'customer' ? "" : "$0"
                     };
@@ -311,7 +326,8 @@ export const getUserProfile = async (userId) => {
                     if (!insertError && insertedData) {
                         return insertedData;
                     } else {
-                        console.error("Error al auto-crear perfil:", insertError);
+                        console.warn("Error al auto-crear perfil (quizás falta esquema), usando perfil local en memoria:", insertError);
+                        return newProfile;
                     }
                 }
             }
@@ -331,7 +347,8 @@ export const getUserProfile = async (userId) => {
             role: role,
             avatar_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
             profession: role === 'customer' ? "" : "Nuevo Prestador",
-            category: role === 'customer' ? "" : "gasfiteria",
+            category: role === 'customer' ? "" : "construccion",
+            subcategory: role === 'customer' ? "" : "gasfiteria",
             description: role === 'customer' ? "" : "Sin descripción disponible.",
             price: role === 'customer' ? "" : "$0"
         };
@@ -359,7 +376,8 @@ export const updateProviderAvailability = async (providerId, status, lat = null,
     // Intentar obtener el perfil del usuario para tener los datos reales (nombre, avatar) en local
     let name = "Prestador General";
     let image = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
-    let category = "gasfiteria"; // Categoría por defecto para que aparezca en el mapa cuando se filtre
+    let category = "construccion"; 
+    let subcategory = "gasfiteria"; 
     let profession = "Prestador General";
 
     try {
@@ -369,6 +387,7 @@ export const updateProviderAvailability = async (providerId, status, lat = null,
             image = profile.avatar_url || image;
             if (profile.profession) profession = profile.profession;
             if (profile.category) category = profile.category;
+            if (profile.subcategory) subcategory = profile.subcategory;
         }
     } catch (e) {
         console.warn("No se pudo obtener perfil para la actualización local:", e);
@@ -383,11 +402,12 @@ export const updateProviderAvailability = async (providerId, status, lat = null,
             image,
             profession,
             category,
+            subcategory,
             status, 
             lat, 
             lng,
             rating: 4.9, // Valor por defecto
-            icon: category === 'electricidad' ? 'bolt' : (category === 'limpieza' ? 'cleaning_services' : (category === 'climatizacion' ? 'ac_unit' : 'plumbing'))
+            icon: getSubcategoryIcon(subcategory)
         };
         localStorage.setItem('prolink_providers_updates', JSON.stringify(localUpdates));
     } catch (err) {
@@ -402,8 +422,9 @@ export const updateProviderAvailability = async (providerId, status, lat = null,
             image,
             profession,
             category,
+            subcategory,
             rating: 4.9, // Valor por defecto
-            icon: category === 'electricidad' ? 'bolt' : (category === 'limpieza' ? 'cleaning_services' : (category === 'climatizacion' ? 'ac_unit' : 'plumbing'))
+            icon: getSubcategoryIcon(subcategory)
         };
         if (lat !== null && lng !== null) {
             updateData.lat = lat;
@@ -414,7 +435,7 @@ export const updateProviderAvailability = async (providerId, status, lat = null,
         try {
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('name, avatar_url, profession, category')
+                .select('name, avatar_url, profession, category, subcategory')
                 .eq('id', providerId)
                 .single();
 
@@ -422,9 +443,10 @@ export const updateProviderAvailability = async (providerId, status, lat = null,
                 updateData.name = profile.name || updateData.name;
                 updateData.image = profile.avatar_url || updateData.image;
                 if (profile.profession) updateData.profession = profile.profession;
-                if (profile.category) {
-                    updateData.category = profile.category;
-                    updateData.icon = profile.category === 'electricidad' ? 'bolt' : (profile.category === 'limpieza' ? 'cleaning_services' : (profile.category === 'climatizacion' ? 'ac_unit' : 'plumbing'));
+                if (profile.category) updateData.category = profile.category;
+                if (profile.subcategory) {
+                    updateData.subcategory = profile.subcategory;
+                    updateData.icon = getSubcategoryIcon(profile.subcategory);
                 }
             }
         } catch (profileErr) {
@@ -465,7 +487,8 @@ export const getUserLocations = async (userId) => {
             localStorage.setItem('prolink_locations', JSON.stringify(defaults));
             return defaults;
         }
-        return locs.filter(l => l.user_id === userId);
+        const filtered = locs.filter(l => String(l.user_id) === String(userId));
+        return filtered.length > 0 ? filtered : locs;
     }
 };
 
@@ -512,146 +535,33 @@ export const deleteUserLocation = async (id) => {
     }
 };
 
-// --- FUNCIONALIDADES DE FASE 3: TRANSPORTE CON RETORNO VACÍO ---
-
-export const getTrips = async () => {
+export const updateUserLocation = async (id, label, address, lat, lng) => {
     try {
         const { data, error } = await supabase
-            .from('trips')
-            .select(`
-                id,
-                provider_id,
-                origin_name,
-                dest_name,
-                origin_lat,
-                origin_lng,
-                dest_lat,
-                dest_lng,
-                price,
-                departure_time,
-                status,
-                profiles:provider_id ( name, avatar_url, profession, category )
-            `)
-            .eq('status', 'disponible');
-        if (error) throw error;
-        return (data || []).map(t => ({
-            id: t.id,
-            provider_id: t.provider_id,
-            origin_name: t.origin_name,
-            dest_name: t.dest_name,
-            origin_lat: parseFloat(t.origin_lat),
-            origin_lng: parseFloat(t.origin_lng),
-            dest_lat: parseFloat(t.dest_lat),
-            dest_lng: parseFloat(t.dest_lng),
-            price: t.price,
-            departure_time: t.departure_time,
-            status: t.status,
-            provider_name: t.profiles ? t.profiles.name : 'Transportista',
-            provider_avatar: t.profiles ? t.profiles.avatar_url : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
-            provider_profession: t.profiles ? t.profiles.profession : 'Chofer de Fletes',
-            provider_category: t.profiles ? t.profiles.category : 'transporte'
-        }));
-    } catch (e) {
-        console.log("Fallback: obteniendo viajes de localStorage", e.message);
-        let trips = JSON.parse(localStorage.getItem('prolink_trips') || '[]');
-        if (trips.length === 0) {
-            trips = [
-                {
-                    id: 901,
-                    provider_id: "11111111-1111-1111-1111-111111111111",
-                    origin_name: "Valparaíso (Puerto)",
-                    dest_name: "Santiago Centro",
-                    origin_lat: -33.0472,
-                    origin_lng: -71.6127,
-                    dest_lat: -33.4489,
-                    dest_lng: -70.6693,
-                    price: "$45.000",
-                    departure_time: "Hoy a las 18:30 hrs",
-                    status: "disponible",
-                    provider_name: "Carlos Mendoza",
-                    provider_avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBX-KmXfHIjVb7JHEf1pifVUCMhUSzU0CKsNGpek6wiAOoi6GNjsG34f0IgeZosy9X43RoDme6BsKQ1JF2H08sM5kdNgMWv5QFBWBIb5XZQya-COp1W7C0MqhEG0qYJE9bat9exBgFlf4iNg7YP6uRFRXVEmyHO5cxHtWVLxHe7WsEVvZ5HfVyU_9mXS_S7-ea_FMvI2TstyPw-jxcZHe2Wt_cy8__UXWDC7_bpWDaxIqx-RIhRAMXjflaGgH7WY932QbEneKM6_Ls",
-                    provider_profession: "Especialista en Transporte y Fletes",
-                    provider_category: "transporte"
-                },
-                {
-                    id: 902,
-                    provider_id: "22222222-2222-2222-2222-222222222222",
-                    origin_name: "Viña del Mar (Reñaca)",
-                    dest_name: "Providencia, Santiago",
-                    origin_lat: -32.9745,
-                    origin_lng: -71.5318,
-                    dest_lat: -33.4312,
-                    dest_lng: -70.6124,
-                    price: "$55.000",
-                    departure_time: "Mañana a las 09:00 hrs",
-                    status: "disponible",
-                    provider_name: "Francisco Javier",
-                    provider_avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkkUwOuvyN2Qm4vmOiICtijtED3CJu4s_rWpmOyynM4l801tEL6X3P_Jnr2IcpevBIYD4BSbXAPRUX2AMCBP8C5k_9XtGS38PGXsVoaf30OkmuoOH1-NpV9avYaTU5tjbgLhRGTa8Y5KeSeBg1dMPTM9SnJLZSiAOb3S3am7yhuZGkkS1GljZv7wprS8rV-uwaf6C96yBq8oywa5GT9o_AHsvRQnNRgE1GlSjXCa1b0-qJOwT0wK_lP8Z1AL7t0M3nAKYbJgL9kn0",
-                    provider_profession: "Mudanzas y Fletes Retorno",
-                    provider_category: "transporte"
-                }
-            ];
-            localStorage.setItem('prolink_trips', JSON.stringify(trips));
-        }
-        return trips.filter(t => t.status === 'disponible');
-    }
-};
-
-export const publishTrip = async (providerId, tripData) => {
-    try {
-        const { data, error } = await supabase
-            .from('trips')
-            .insert([{
-                provider_id: providerId,
-                origin_name: tripData.origin_name,
-                dest_name: tripData.dest_name,
-                origin_lat: parseFloat(tripData.origin_lat),
-                origin_lng: parseFloat(tripData.origin_lng),
-                dest_lat: parseFloat(tripData.dest_lat),
-                dest_lng: parseFloat(tripData.dest_lng),
-                price: tripData.price,
-                departure_time: tripData.departure_time,
-                status: 'disponible'
-            }])
+            .from('user_locations')
+            .update({ label, address, lat, lng })
+            .eq('id', id)
             .select();
         if (error) throw error;
         return data;
     } catch (e) {
-        console.log("Fallback: guardando viaje en localStorage", e.message);
-        const trips = JSON.parse(localStorage.getItem('prolink_trips') || '[]');
-        
-        // Obtener detalles del perfil local del proveedor
-        let providerName = "Transportista Asociado";
-        let providerAvatar = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
-        try {
-            const profile = JSON.parse(localStorage.getItem(`prolink_profile_${providerId}`) || '{}');
-            providerName = profile.name || providerName;
-            providerAvatar = profile.avatar_url || providerAvatar;
-        } catch (_) {}
-
-        const newTrip = {
-            id: Date.now(),
-            provider_id: providerId,
-            origin_name: tripData.origin_name,
-            dest_name: tripData.dest_name,
-            origin_lat: parseFloat(tripData.origin_lat),
-            origin_lng: parseFloat(tripData.origin_lng),
-            dest_lat: parseFloat(tripData.dest_lat),
-            dest_lng: parseFloat(tripData.dest_lng),
-            price: tripData.price,
-            departure_time: tripData.departure_time,
-            status: 'disponible',
-            provider_name: providerName,
-            provider_avatar: providerAvatar,
-            provider_profession: 'Fletes y Mudanzas Retorno',
-            provider_category: 'transporte',
-            created_at: new Date().toISOString()
-        };
-        trips.push(newTrip);
-        localStorage.setItem('prolink_trips', JSON.stringify(trips));
-        return [newTrip];
+        console.log("Fallback: actualizando ubicación en localStorage", e.message);
+        const locs = JSON.parse(localStorage.getItem('prolink_locations') || '[]');
+        const idx = locs.findIndex(l => l.id == id);
+        if (idx !== -1) {
+            locs[idx].label = label;
+            locs[idx].address = address;
+            if (lat !== undefined) locs[idx].lat = parseFloat(lat);
+            if (lng !== undefined) locs[idx].lng = parseFloat(lng);
+            localStorage.setItem('prolink_locations', JSON.stringify(locs));
+            return [locs[idx]];
+        }
+        return null;
     }
 };
+
+// --- FUNCIONALIDADES DE FASE 3: ELIMINADO ---
+
 
 export const relocateProviders = (lat, lng, forceRelocateReal = false) => {
     // Relocalizar los proveedores mock estáticos cerca de la ubicación del cliente
@@ -677,4 +587,148 @@ export const relocateProviders = (lat, lng, forceRelocateReal = false) => {
             }
         }
     });
+};
+
+export const submitAppFeedback = async (comment) => {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user ? user.id : null;
+        
+        const { data, error } = await supabase
+            .from('app_feedback')
+            .insert([{ user_id: userId, comment }]);
+            
+        if (error) {
+            console.error("Error guardando feedback en Supabase:", error);
+            throw error;
+        }
+        return data;
+    } catch (e) {
+        console.log("Simulando envío de feedback (offline/error)", e.message);
+        // Fallback local
+        const saved = JSON.parse(localStorage.getItem('prolink_feedback') || '[]');
+        saved.push({ comment, created_at: new Date().toISOString() });
+        localStorage.setItem('prolink_feedback', JSON.stringify(saved));
+        return saved;
+    }
+};
+
+// --- FUNCIONALIDADES DE FAVORITOS (SERVICIOS GUARDADOS) ---
+export const getSavedProviders = (userId) => {
+    if (!userId) return [];
+    try {
+        const saved = JSON.parse(localStorage.getItem(`prolink_favorites_${userId}`) || '[]');
+        return saved;
+    } catch (e) {
+        return [];
+    }
+};
+
+export const toggleSavedProvider = (userId, provider) => {
+    if (!userId) return false;
+    try {
+        let saved = JSON.parse(localStorage.getItem(`prolink_favorites_${userId}`) || '[]');
+        const exists = saved.findIndex(p => p.id === provider.id);
+        let isSaved = false;
+        
+        if (exists >= 0) {
+            saved.splice(exists, 1);
+        } else {
+            saved.push({
+                id: provider.id,
+                name: provider.name,
+                image: provider.image || provider.avatar_url,
+                profession: provider.profession,
+                category: provider.category,
+                subcategory: provider.subcategory,
+                rating: provider.rating || 4.9,
+                lat: provider.lat,
+                lng: provider.lng
+            });
+            isSaved = true;
+        }
+        
+        localStorage.setItem(`prolink_favorites_${userId}`, JSON.stringify(saved));
+        return isSaved;
+    } catch (e) {
+        console.error("Error toggling favorite", e);
+        return false;
+    }
+};
+
+// --- LOGICA DE SOLICITUDES Y MATCH (FASE 3) ---
+
+export const createServiceRequest = async (providerId, customerId, message = "") => {
+    try {
+        const { data, error } = await supabase
+            .from('service_requests')
+            .insert([{ provider_id: providerId, customer_id: customerId, message: message, status: 'pendiente' }])
+            .select();
+        if (error) throw error;
+        return data[0];
+    } catch (e) {
+        console.error("Error creating service request:", e);
+        return null;
+    }
+};
+
+export const getProviderRequests = async (providerId) => {
+    try {
+        const { data, error } = await supabase
+            .from('service_requests')
+            .select('*, profiles!service_requests_customer_id_fkey(name, avatar_url)')
+            .eq('provider_id', providerId)
+            .eq('status', 'pendiente')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        return data || [];
+    } catch (e) {
+        console.error("Error getting provider requests:", e);
+        return [];
+    }
+};
+
+export const acceptServiceRequest = async (requestId) => {
+    try {
+        const { data, error } = await supabase
+            .from('service_requests')
+            .update({ status: 'aceptada' })
+            .eq('id', requestId)
+            .select();
+        if (error) throw error;
+        return data[0];
+    } catch (e) {
+        console.error("Error accepting service request:", e);
+        return null;
+    }
+};
+
+export const rejectServiceRequest = async (requestId) => {
+    try {
+        const { data, error } = await supabase
+            .from('service_requests')
+            .update({ status: 'rechazada' })
+            .eq('id', requestId);
+        if (error) throw error;
+        return true;
+    } catch (e) {
+        console.error("Error rejecting service request:", e);
+        return false;
+    }
+};
+
+export const checkIfMatched = async (providerId, customerId) => {
+    try {
+        const { data, error } = await supabase
+            .from('service_requests')
+            .select('*')
+            .eq('provider_id', providerId)
+            .eq('customer_id', customerId)
+            .eq('status', 'aceptada');
+        if (error) throw error;
+        return data && data.length > 0;
+    } catch (e) {
+        console.error("Error checking match status:", e);
+        return false;
+    }
 };

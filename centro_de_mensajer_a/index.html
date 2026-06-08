@@ -16,6 +16,7 @@
     }
   </style>
     <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/src/theme.js"></script>
 </head>
 <body class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:flex-row overflow-hidden">
 <!-- Mobile TopAppBar / Hidden on Desktop -->
@@ -74,9 +75,10 @@
 <span class="font-body-md text-body-md">Servicios Guardados</span>
 </a>
 
-<a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="font-body-md text-body-md">Configuración</span>
+
+<a id="theme-toggle-btn" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" id="theme-toggle-icon" data-icon="dark_mode">dark_mode</span>
+<span class="font-body-md text-body-md" id="theme-toggle-text">Modo Oscuro</span>
 </a>
 <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
 <span class="material-symbols-outlined" data-icon="help">help</span>
@@ -121,7 +123,11 @@
 </span>
 </div>
 </div>
-<div class="flex items-center gap-2">
+<div class="flex items-center gap-2" id="chat-header-actions">
+<button id="btn-directions" class="hidden text-secondary bg-secondary-container hover:bg-secondary-container-high px-3 py-1.5 rounded-lg flex items-center gap-2 transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[18px]">directions</span>
+<span class="font-label-md hidden md:inline">Cómo llegar</span>
+</button>
 <button class="p-2 text-on-surface-variant hover:text-secondary hover:bg-surface-container-low rounded-full transition-colors">
 <span class="material-symbols-outlined" data-icon="call">call</span>
 </button>
@@ -195,7 +201,7 @@ const checkAuth = async () => {
             authorized = true;
             // Sync current user role to localStorage
             const userRole = session.user.user_metadata.role || 'customer';
-            localStorage.setItem('user_role', userRole);
+            if (!localStorage.getItem('user_role')) { localStorage.setItem('user_role', userRole); }
         } else {
             // Check for mock session role
             if (localStorage.getItem('user_role')) {
@@ -624,6 +630,19 @@ function selectConversation(contact) {
         badge.className = `inline-flex items-center gap-1 font-label-md text-label-md text-on-surface-variant ${contact.status === 'En línea' ? 'bg-[#10B981]/10' : 'bg-[#94A3B8]/10'} px-2 py-0.5 rounded-full mt-0.5`;
     }
     
+    // GPS Navigation logic for Providers
+    const btnDirections = document.getElementById('btn-directions');
+    if (btnDirections) {
+        if (role === 'provider') {
+            btnDirections.classList.remove('hidden');
+            btnDirections.onclick = () => {
+                alert(`Abriendo ruta hacia la ubicación de ${contact.name}...\\n(En producción esto abriría el navegador GPS o Waze con las coordenadas de la solicitud)`);
+            };
+        } else {
+            btnDirections.classList.add('hidden');
+        }
+    }
+    
     loadAndRenderMessages();
     setupRealtimeSubscription();
 }
@@ -757,10 +776,25 @@ const switchText = document.getElementById('switch-role-text');
 if (switchBtn && switchText) {
     if (role === 'customer') {
         switchText.innerText = 'Cambiar a Prestador';
-        switchBtn.addEventListener('click', (e) => {
+        switchBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            localStorage.setItem('user_role', 'provider');
-            window.location.href = '/panel_del_prestador/index.html';
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return;
+                
+                const profile = await getUserProfile(user.id);
+                if (!profile.category || profile.category === "") {
+                    alert("Para ofrecer servicios debes completar tu perfil profesional. Por favor, hazlo desde la pantalla de Explorar (Mapa).");
+                    window.location.href = '/mapa_de_b_squeda_cliente/index.html';
+                } else {
+                    localStorage.setItem('user_role', 'provider');
+                    window.location.href = '/panel_del_prestador/index.html';
+                }
+            } catch (err) {
+                console.error(err);
+                localStorage.setItem('user_role', 'provider');
+                window.location.href = '/panel_del_prestador/index.html';
+            }
         });
     } else {
         switchText.innerText = 'Cambiar a Cliente';
@@ -849,7 +883,15 @@ window.addEventListener('storage', async (e) => {
     }
 });
 
-// Initialize conversations
-loadConversations();
+// Initialize conversations and check for auto-opening chat param
+await loadConversations();
+const urlParams = new URLSearchParams(window.location.search);
+const chatContactId = urlParams.get('chat');
+if (chatContactId) {
+    const contact = conversations.find(c => c.id === chatContactId);
+    if (contact) {
+        selectConversation(contact);
+    }
+}
 </script>
 </body></html>

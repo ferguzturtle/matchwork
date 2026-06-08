@@ -17,7 +17,7 @@
   </style>
     <link rel="stylesheet" href="/style.css" />
 </head>
-<body class="bg-surface text-on-surface antialiased flex flex-col min-h-screen pb-24">
+<body class="bg-surface dark:bg-background text-on-surface dark:text-on-background antialiased flex flex-col min-h-screen pb-24">
 <!-- TopAppBar -->
 <header class="bg-surface dark:bg-background w-full top-0 sticky border-b border-outline-variant dark:border-on-surface-variant flex justify-between items-center px-gutter py-stack-sm z-40">
 <a href="javascript:history.back()" class="text-secondary dark:text-secondary-fixed hover:bg-surface-container-low transition-colors active:opacity-80 p-2 rounded-full flex items-center justify-center">
@@ -202,11 +202,19 @@
             <div class="flex flex-col gap-1">
                 <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-category">Categoría de Servicio</label>
                 <select class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors cursor-pointer" id="edit-category">
-                    <option value="gasfiteria">Gasfitería</option>
-                    <option value="electricidad">Electricidad</option>
-                    <option value="limpieza">Limpieza</option>
-                    <option value="climatizacion">Climatización</option>
-                    <option value="transporte">Fletes y Transporte</option>
+                    <option value="construccion">Construcción y Reformas</option>
+                    <option value="salud">Servicios de Salud y Cuidado</option>
+                    <option value="instalaciones">Instalaciones y Electricidad</option>
+                    <option value="mantenimiento">Mantenimiento y Limpieza</option>
+                    <option value="profesionales">Servicios Profesionales</option>
+                </select>
+            </div>
+            
+            <!-- Subcategoría -->
+            <div class="flex flex-col gap-1">
+                <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-subcategory">Subcategoría de Servicio</label>
+                <select class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors cursor-pointer" id="edit-subcategory">
+                    <!-- Loaded dynamically -->
                 </select>
             </div>
             
@@ -250,10 +258,10 @@
                     </button>
                 </div>
                 
-                <!-- URL de Imagen Personalizada -->
+                <!-- Sube una Imagen Personalizada -->
                 <div class="flex flex-col gap-1 mt-2">
-                    <span class="font-label-md text-label-md text-on-surface-variant">O ingresa una URL de foto personalizada:</span>
-                    <input class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="edit-avatar-url" placeholder="https://ejemplo.com/mi-foto.jpg" type="text"/>
+                    <span class="font-label-md text-label-md text-on-surface-variant">O sube una imagen desde tu galería:</span>
+                    <input class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors cursor-pointer" id="edit-avatar-file" accept="image/*" type="file"/>
                 </div>
             </div>
         </form>
@@ -272,7 +280,7 @@
 </div>
 
 <script type="module">
-import { getProviders, requestService, getUserProfile, updateUserProfile, updateProviderAvailability } from '/src/data.js';
+import { getProviders, requestService, getUserProfile, updateUserProfile, updateProviderAvailability, CATEGORIES } from '/src/data.js';
 import { supabase } from '/src/supabase.js';
 
 // Auth Guard to prevent unauthorized access
@@ -283,7 +291,7 @@ const checkAuth = async () => {
         if (session) {
             authorized = true;
             const userRole = session.user.user_metadata.role || 'customer';
-            localStorage.setItem('user_role', userRole);
+            if (!localStorage.getItem('user_role')) { localStorage.setItem('user_role', userRole); }
         } else {
             if (localStorage.getItem('user_role')) {
                 authorized = true;
@@ -381,6 +389,8 @@ async function init() {
         
         const actionContainer = document.getElementById('action-buttons-container');
         if (actionContainer) {
+            const userRole = localStorage.getItem('user_role') || 'customer';
+            
             if (currentUserId && provider.id === currentUserId) {
                 // Si el dueño del perfil lo está viendo, mostrar dos botones: "Editar Perfil" e "Ir a mi Panel"
                 actionContainer.innerHTML = `
@@ -401,7 +411,7 @@ async function init() {
                     e.preventDefault();
                     openEditProfileModal();
                 };
-            } else {
+            } else if (userRole === 'customer') {
                 actionContainer.innerHTML = `
                     <button id="btn-request" class="w-full md:w-auto bg-secondary hover:bg-on-secondary-fixed-variant text-on-secondary font-label-lg text-label-lg rounded-lg py-3 px-8 flex items-center justify-center gap-2 shadow-sm transition-colors active:scale-95 duration-150">
                         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">handshake</span>
@@ -415,6 +425,13 @@ async function init() {
                     alert('¡Solicitud de Match enviada a ' + provider.name + '!');
                     window.location.href = '/mapa_de_b_squeda_cliente/index.html';
                 };
+            } else {
+                actionContainer.innerHTML = `
+                    <div class="flex items-center gap-2 text-on-surface-variant font-body-sm bg-surface-container-high px-4 py-2.5 rounded-xl border border-outline-variant shadow-sm">
+                        <span class="material-symbols-outlined text-[18px]">info</span>
+                        <span>Como prestador, no puedes solicitar matches con otros profesionales.</span>
+                    </div>
+                `;
             }
         }
     }
@@ -425,14 +442,39 @@ const modal = document.getElementById('edit-profile-modal');
 const modalContainer = modal.querySelector('.relative.w-full.max-w-lg');
 const editOverlay = document.getElementById('edit-profile-overlay');
 
+const categorySelect = document.getElementById('edit-category');
+const subcategorySelect = document.getElementById('edit-subcategory');
+
+const updateEditSubcategories = (selectedSubcatVal = null) => {
+    const catKey = categorySelect.value;
+    if (!catKey || !CATEGORIES[catKey]) {
+        subcategorySelect.innerHTML = '';
+        return;
+    }
+    const subcats = CATEGORIES[catKey].subcategories;
+    let html = '';
+    for (const key in subcats) {
+        html += `<option value="${key}">${subcats[key].label}</option>`;
+    }
+    subcategorySelect.innerHTML = html;
+    if (selectedSubcatVal) {
+        subcategorySelect.value = selectedSubcatVal;
+    }
+};
+
+categorySelect.addEventListener('change', () => updateEditSubcategories());
+
 function openEditProfileModal() {
     if (!provider) return;
     document.getElementById('edit-name').value = provider.name || '';
     document.getElementById('edit-profession').value = provider.profession || '';
-    document.getElementById('edit-category').value = provider.category || 'gasfiteria';
+    document.getElementById('edit-category').value = provider.category || 'construccion';
+    
+    updateEditSubcategories(provider.subcategory || 'gasfiteria');
+    
     document.getElementById('edit-price').value = provider.price || '$0';
     document.getElementById('edit-description').value = provider.description || '';
-    document.getElementById('edit-avatar-url').value = provider.image || provider.avatar_url || '';
+    document.getElementById('edit-avatar-file').value = '';
     
     // Set visual selection state on presets
     const currentAvatar = provider.image || provider.avatar_url || '';
@@ -467,8 +509,7 @@ function closeEditProfileModal() {
 // Add event listeners for preset buttons
 document.querySelectorAll('.avatar-preset-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-        const url = e.currentTarget.getAttribute('data-avatar');
-        document.getElementById('edit-avatar-url').value = url;
+        document.getElementById('edit-avatar-file').value = '';
         
         // Highlight active preset
         document.querySelectorAll('.avatar-preset-btn').forEach(b => {
@@ -480,6 +521,14 @@ document.querySelectorAll('.avatar-preset-btn').forEach(btn => {
     });
 });
 
+document.getElementById('edit-avatar-file').addEventListener('change', () => {
+    // Si el usuario selecciona un archivo, desmarcamos los presets
+    document.querySelectorAll('.avatar-preset-btn').forEach(b => {
+        b.classList.remove('border-secondary', 'ring-2', 'ring-secondary/30');
+        b.classList.add('border-transparent');
+    });
+});
+
 document.getElementById('btn-close-edit-modal').onclick = closeEditProfileModal;
 document.getElementById('btn-cancel-edit').onclick = closeEditProfileModal;
 editOverlay.onclick = closeEditProfileModal;
@@ -488,12 +537,39 @@ document.getElementById('btn-save-profile').onclick = async () => {
     const name = document.getElementById('edit-name').value;
     const profession = document.getElementById('edit-profession').value;
     const category = document.getElementById('edit-category').value;
+    const subcategory = document.getElementById('edit-subcategory').value;
     const price = document.getElementById('edit-price').value;
     const description = document.getElementById('edit-description').value;
-    const avatarUrl = document.getElementById('edit-avatar-url').value;
+    const fileInput = document.getElementById('edit-avatar-file');
+    const file = fileInput.files[0];
+    let avatarUrl = '';
+    
+    const activePreset = document.querySelector('.avatar-preset-btn.border-secondary');
+    if (activePreset && !file) {
+        avatarUrl = activePreset.getAttribute('data-avatar');
+    } else if (file) {
+        if (!file.type.startsWith('image/')) {
+            alert("Por favor selecciona un archivo de imagen válido (JPG, PNG, etc).");
+            return;
+        }
+        try {
+            avatarUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        } catch (err) {
+            alert("Hubo un error al leer la imagen.");
+            return;
+        }
+    } else {
+        // Fallback to existing avatar if no preset is active and no file selected
+        avatarUrl = provider.image || provider.avatar_url;
+    }
 
     if (!name || !profession || !price || !description || !avatarUrl) {
-        alert('Por favor, completa todos los campos.');
+        alert('Por favor, completa todos los campos y selecciona una imagen.');
         return;
     }
 
@@ -508,6 +584,7 @@ document.getElementById('btn-save-profile').onclick = async () => {
             name,
             profession,
             category,
+            subcategory,
             price,
             description,
             avatar_url: avatarUrl

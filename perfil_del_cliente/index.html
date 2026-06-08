@@ -13,6 +13,7 @@
         }
     </style>
     <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/src/theme.js"></script>
 </head>
 <body class="bg-surface text-on-surface antialiased flex flex-col min-h-screen pb-24">
     <!-- TopAppBar -->
@@ -55,7 +56,7 @@
                     </div>
                 </div>
                 <div id="photo-edit-container" class="hidden flex flex-col items-center gap-2 mt-2 w-full max-w-xs">
-                    <input id="photo-edit-input" type="text" placeholder="Pega la URL de tu imagen" class="w-full text-center px-4 py-2 border border-outline rounded-xl focus:ring-2 focus:ring-secondary text-body-md text-on-surface bg-surface-container-low" />
+                    <input id="photo-edit-input" type="file" accept="image/*" class="w-full text-center px-4 py-2 border border-outline rounded-xl focus:ring-2 focus:ring-secondary text-body-md text-on-surface bg-surface-container-low cursor-pointer" />
                     <div class="flex gap-2 w-full mt-1">
                         <button id="save-photo-btn" class="flex-1 bg-secondary text-on-secondary font-label-md py-1.5 rounded-lg hover:bg-secondary/90 transition-colors shadow-sm">Guardar</button>
                         <button id="cancel-photo-btn" class="flex-1 bg-surface-container-lowest border border-outline text-on-surface font-label-md py-1.5 rounded-lg hover:bg-surface-container-low transition-colors">Cancelar</button>
@@ -64,19 +65,7 @@
                 <p class="font-body-md text-body-md text-on-surface-variant mt-2 mb-3">rodrigo.sepulveda@ejemplo.cl</p>
             </div>
             
-            <div class="w-full grid grid-cols-3 gap-4 border-t border-outline-variant pt-stack-md mt-4">
-                <div class="flex flex-col items-center">
-                    <span class="font-headline-md text-headline-md text-secondary">12</span>
-                    <span class="font-label-md text-label-md text-on-surface-variant mt-1 text-center">Solicitudes</span>
-                </div>
-                <div class="flex flex-col items-center border-l border-r border-outline-variant">
-                    <span class="font-headline-md text-headline-md text-secondary">5</span>
-                    <span class="font-label-md text-label-md text-on-surface-variant mt-1 text-center">Guardados</span>
-                </div>
-                <div class="flex flex-col items-center">
-                    <span class="font-headline-md text-headline-md text-secondary">2</span>
-                    <span class="font-label-md text-label-md text-on-surface-variant mt-1 text-center">Activos</span>
-                </div>
+            <div class="hidden w-full grid grid-cols-3 gap-4 border-t border-outline-variant pt-stack-md mt-4">
             </div>
         </div>
 
@@ -91,68 +80,58 @@
                     <span class="material-symbols-outlined">add</span>
                 </button>
             </div>
-            <div class="flex flex-col">
-                <div class="p-stack-md border-b border-outline-variant flex justify-between items-center hover:bg-surface-bright cursor-pointer">
-                    <div class="flex flex-col">
-                        <span class="font-label-lg text-label-lg text-on-surface">Casa</span>
-                        <span class="font-body-sm text-body-sm text-on-surface-variant">Av. Providencia 1234, Depto 502</span>
-                    </div>
-                    <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
-                </div>
-                <div class="p-stack-md flex justify-between items-center hover:bg-surface-bright cursor-pointer">
-                    <div class="flex flex-col">
-                        <span class="font-label-lg text-label-lg text-on-surface">Oficina</span>
-                        <span class="font-body-sm text-body-sm text-on-surface-variant">Av. Apoquindo 5678, Piso 12</span>
-                    </div>
-                    <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
-                </div>
+            <div id="saved-locations-container" class="flex flex-col">
+            </div>
+        </div>
+
+        <!-- Servicios Guardados -->
+        <div class="bg-surface-container-lowest border border-outline-variant shadow-sm rounded-xl overflow-hidden mt-4">
+            <div class="px-stack-md py-stack-sm border-b border-outline-variant bg-surface flex justify-between items-center">
+                <h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary">bookmark</span>
+                    Servicios Guardados
+                </h3>
+            </div>
+            <div id="saved-services-container" class="flex flex-col">
+                <!-- Injected via JS -->
             </div>
         </div>
 
 
 
-        <!-- Configuración y Cerrar Sesión -->
+        <!-- Cerrar Sesión -->
         <div class="flex flex-col gap-2 mt-2">
-            <button id="account-settings-btn" class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-bright font-label-lg text-label-lg rounded-xl py-4 px-4 flex items-center justify-between shadow-sm transition-colors">
-                <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-on-surface-variant">settings</span>
-                    Configuración de la Cuenta
-                </div>
-                <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
-            </button>
             <button onclick="signOut()" class="w-full bg-error-container text-on-error-container hover:bg-error hover:text-on-error font-label-lg text-label-lg rounded-xl py-4 px-4 flex items-center justify-center gap-2 shadow-sm transition-colors mt-4">
                 <span class="material-symbols-outlined">logout</span>
                 Cerrar Sesión
             </button>
         </div>
 
-        <!-- Modal: Configuración de la Cuenta -->
-        <div id="settings-modal" class="fixed inset-0 bg-black/50 z-[9999] hidden items-center justify-center p-4 pointer-events-auto">
-          <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-2xl p-6 w-full max-w-sm flex flex-col gap-4">
-            <div class="flex justify-between items-center border-b border-outline-variant pb-3">
-              <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold font-semibold">Configuración de la Cuenta</h3>
-              <button id="close-settings-modal" class="text-on-surface-variant hover:text-on-surface flex items-center justify-center">
+
+
+        <!-- Modal: Editar Ubicación -->
+        <div id="edit-location-modal" class="fixed inset-0 bg-black/50 z-[9999] hidden items-center justify-center p-4 pointer-events-auto transition-opacity opacity-0 duration-300">
+          <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-2xl p-6 w-full max-w-sm flex flex-col gap-4 transform scale-95 transition-transform duration-300" id="edit-location-content">
+            <div class="flex justify-between items-center border-b border-outline-variant pb-3 shrink-0">
+              <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Editar Ubicación</h3>
+              <button id="close-edit-location" class="text-on-surface-variant hover:text-on-surface flex items-center justify-center bg-surface-container-high rounded-full p-1">
                 <span class="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
-            <div class="flex flex-col gap-3 my-2">
+            <div class="flex flex-col gap-3">
+              <input type="hidden" id="edit-location-id" />
               <div class="flex flex-col gap-1">
-                <label class="font-label-md text-label-md text-on-surface font-semibold" for="modal-name-input">Nombre Completo</label>
-                <input class="bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="modal-name-input" type="text"/>
+                <label class="font-label-md text-on-surface">Nombre (ej. Casa, Trabajo)</label>
+                <input id="edit-location-label" type="text" class="w-full border border-outline-variant rounded-lg p-2 bg-surface-container-lowest text-on-surface focus:outline-none focus:border-secondary">
               </div>
               <div class="flex flex-col gap-1">
-                <label class="font-label-md text-label-md text-on-surface font-semibold" for="modal-photo-input">URL de Foto de Perfil</label>
-                <input class="bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg py-2.5 px-3 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors" id="modal-photo-input" type="text"/>
+                <label class="font-label-md text-on-surface">Dirección</label>
+                <input id="edit-location-address" type="text" class="w-full border border-outline-variant rounded-lg p-2 bg-surface-container-lowest text-on-surface focus:outline-none focus:border-secondary">
               </div>
             </div>
-            <div class="flex gap-3">
-              <button id="cancel-settings-btn" class="flex-1 bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-lg text-label-lg py-3 rounded-lg transition-colors">
-                Cancelar
-              </button>
-              <button id="save-settings-btn" class="flex-1 bg-secondary text-on-secondary font-label-lg text-label-lg py-3 rounded-lg hover:opacity-90 active:scale-98 transition-all">
-                Guardar
-              </button>
-            </div>
+            <button id="save-edit-location-btn" class="w-full bg-secondary text-on-secondary font-label-lg py-3 rounded-lg hover:opacity-90 active:scale-98 transition-all font-semibold mt-2">
+              Guardar Cambios
+            </button>
           </div>
         </div>
 
@@ -176,7 +155,7 @@
 
     <script type="module">
         import { supabase } from '/src/supabase.js';
-        import { getUserProfile, updateUserProfile } from '/src/data.js';
+        import { getUserProfile, updateUserProfile, getUserLocations, deleteUserLocation, updateUserLocation, getSavedProviders, toggleSavedProvider } from '/src/data.js';
 
         // Auth Guard to prevent unauthorized access
         const checkAuth = async () => {
@@ -186,7 +165,7 @@
                 if (session) {
                     authorized = true;
                     const userRole = session.user.user_metadata.role || 'customer';
-                    localStorage.setItem('user_role', userRole);
+                    if (!localStorage.getItem('user_role')) { localStorage.setItem('user_role', userRole); }
                 } else {
                     if (localStorage.getItem('user_role')) {
                         authorized = true;
@@ -238,7 +217,7 @@
                         if (nameText) nameText.innerText = profile.name;
                         if (emailText) emailText.innerText = profile.email;
                         if (nameEditInput) nameEditInput.value = profile.name;
-                        if (photoEditInput) photoEditInput.value = profile.avatar_url;
+                        // Cannot set .value of type="file" programmatically
                     }
                 } else {
                     throw new Error("No active user session");
@@ -246,14 +225,23 @@
             } catch (e) {
                 console.warn("Using local profile fallback:", e.message);
                 activeUserId = '201'; // Fallback user ID
-                const profile = await getUserProfile(activeUserId);
-                if (profile) {
-                    if (avatarImg) avatarImg.src = profile.avatar_url;
-                    if (photoImg) photoImg.src = profile.avatar_url;
-                    if (nameText) nameText.innerText = profile.name;
-                    if (emailText) emailText.innerText = profile.email;
-                    if (nameEditInput) nameEditInput.value = profile.name;
-                    if (photoEditInput) photoEditInput.value = profile.avatar_url;
+                try {
+                    const profile = await getUserProfile(activeUserId);
+                    if (profile) {
+                        if (avatarImg) avatarImg.src = profile.avatar_url;
+                        if (photoImg) photoImg.src = profile.avatar_url;
+                        if (nameText) nameText.innerText = profile.name;
+                        if (emailText) emailText.innerText = profile.email;
+                        if (nameEditInput) nameEditInput.value = profile.name;
+                        // Cannot set .value of type="file" programmatically for security reasons
+                    }
+                } catch (fallbackErr) {
+                    console.error("Error cargando perfil de fallback:", fallbackErr);
+                    // Set default hardcoded values if even the fallback throws
+                    if (avatarImg) avatarImg.src = 'https://i.pravatar.cc/150?u=201';
+                    if (photoImg) photoImg.src = 'https://i.pravatar.cc/150?u=201';
+                    if (nameText) nameText.innerText = 'Cliente de Prueba';
+                    if (emailText) emailText.innerText = 'cliente@ejemplo.cl';
                 }
             }
         }
@@ -311,15 +299,30 @@
             });
         }
 
+        const fileToDataUrl = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        };
+
         if (savePhotoBtn) {
             savePhotoBtn.addEventListener('click', async () => {
-                const newPhotoUrl = photoEditInput.value.trim();
-                if (!newPhotoUrl) {
-                    alert("La URL de la foto no puede estar vacía.");
+                const file = photoEditInput.files[0];
+                if (!file) {
+                    alert("Por favor selecciona una imagen de tu galería.");
+                    return;
+                }
+
+                if (!file.type.startsWith('image/')) {
+                    alert("Por seguridad, solo se permiten archivos de imagen (JPG, PNG, etc).");
                     return;
                 }
                 
                 try {
+                    const newPhotoUrl = await fileToDataUrl(file);
                     await updateUserProfile(activeUserId, { avatar_url: newPhotoUrl });
                     if (photoImg) photoImg.src = newPhotoUrl;
                     if (avatarImg) avatarImg.src = newPhotoUrl;
@@ -383,14 +386,15 @@
         if (saveSettingsBtn) {
             saveSettingsBtn.addEventListener('click', async () => {
                 const newName = modalNameInput.value.trim();
-                const newPhotoUrl = modalPhotoInput.value.trim();
+                const file = modalPhotoInput.files[0];
                 
                 if (!newName) {
                     alert("El nombre no puede estar vacío.");
                     return;
                 }
-                if (!newPhotoUrl) {
-                    alert("La URL de la foto no puede estar vacía.");
+
+                if (file && !file.type.startsWith('image/')) {
+                    alert("Por seguridad, solo se permiten archivos de imagen (JPG, PNG, etc).");
                     return;
                 }
 
@@ -398,14 +402,20 @@
                 saveSettingsBtn.disabled = true;
 
                 try {
-                    await updateUserProfile(activeUserId, { 
-                        name: newName,
-                        avatar_url: newPhotoUrl
-                    });
+                    const updates = { name: newName };
+                    let newPhotoUrl = null;
+                    if (file) {
+                        newPhotoUrl = await fileToDataUrl(file);
+                        updates.avatar_url = newPhotoUrl;
+                    }
+                    
+                    await updateUserProfile(activeUserId, updates);
                     
                     if (nameText) nameText.innerText = newName;
-                    if (photoImg) photoImg.src = newPhotoUrl;
-                    if (avatarImg) avatarImg.src = newPhotoUrl;
+                    if (newPhotoUrl) {
+                        if (photoImg) photoImg.src = newPhotoUrl;
+                        if (avatarImg) avatarImg.src = newPhotoUrl;
+                    }
                     
                     hideSettingsModal();
                     alert("¡Configuración de la cuenta guardada con éxito!");
@@ -419,8 +429,190 @@
             });
         }
 
+        // --- Locations Logic ---
+        const locationsContainer = document.getElementById('saved-locations-container');
+        let profileLocations = [];
+        
+        async function renderSavedLocations() {
+            if (!activeUserId) {
+                locationsContainer.innerHTML = '<div class="p-4 text-center text-error font-body-md">Error: activeUserId is null</div>';
+                return;
+            }
+            try {
+                profileLocations = await getUserLocations(activeUserId);
+                if (!Array.isArray(profileLocations)) {
+                    locationsContainer.innerHTML = '<div class="p-4 text-center text-error font-body-md">Error: profileLocations no es un array (' + typeof profileLocations + ')</div>';
+                    return;
+                }
+                if (profileLocations.length === 0) {
+                    locationsContainer.innerHTML = '<div class="p-4 text-center text-on-surface-variant font-body-md">No tienes direcciones guardadas.</div>';
+                    return;
+                }
+                
+                let html = '';
+                profileLocations.forEach(loc => {
+                    html += `
+                        <div class="p-stack-md border-b border-outline-variant flex justify-between items-center hover:bg-surface-bright group">
+                            <div class="flex flex-col flex-1">
+                                <span class="font-label-lg text-label-lg text-on-surface">${loc.label || 'Sin nombre'}</span>
+                                <span class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">${loc.address || 'Sin dirección'}</span>
+                            </div>
+                            <div class="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="editLoc(${loc.id})" class="text-on-surface-variant hover:text-secondary p-2 rounded-full transition-colors">
+                                    <span class="material-symbols-outlined text-[20px]">edit</span>
+                                </button>
+                                <button onclick="delLoc(${loc.id})" class="text-on-surface-variant hover:text-error p-2 rounded-full transition-colors">
+                                    <span class="material-symbols-outlined text-[20px]">delete</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                locationsContainer.innerHTML = html;
+            } catch (err) {
+                locationsContainer.innerHTML = '<div class="p-4 text-center text-error font-body-md">Error crítico cargando direcciones: ' + err.message + '</div>';
+                console.error("Error loading locations", err);
+            }
+        }
+
+        window.delLoc = async (id) => {
+            if (confirm("¿Estás seguro de que deseas eliminar esta dirección?")) {
+                await deleteUserLocation(id);
+                await renderSavedLocations();
+            }
+        };
+
+        const editModal = document.getElementById('edit-location-modal');
+        const editContent = document.getElementById('edit-location-content');
+        const editIdInput = document.getElementById('edit-location-id');
+        const editLabelInput = document.getElementById('edit-location-label');
+        const editAddressInput = document.getElementById('edit-location-address');
+        const saveEditBtn = document.getElementById('save-edit-location-btn');
+        
+        window.editLoc = (id) => {
+            const loc = profileLocations.find(l => l.id == id);
+            if (!loc) return;
+            
+            editIdInput.value = loc.id;
+            editLabelInput.value = loc.label;
+            editAddressInput.value = loc.address;
+            
+            editModal.classList.remove('hidden');
+            editModal.classList.add('flex');
+            setTimeout(() => {
+                editModal.classList.remove('opacity-0');
+                editContent.classList.remove('scale-95');
+                editContent.classList.add('scale-100');
+            }, 10);
+        };
+
+        const closeEditLocModal = () => {
+            editModal.classList.add('opacity-0');
+            editContent.classList.remove('scale-100');
+            editContent.classList.add('scale-95');
+            setTimeout(() => {
+                editModal.classList.add('hidden');
+                editModal.classList.remove('flex');
+            }, 300);
+        };
+        
+        document.getElementById('close-edit-location').addEventListener('click', closeEditLocModal);
+
+        saveEditBtn.addEventListener('click', async () => {
+            const id = editIdInput.value;
+            const label = editLabelInput.value.trim();
+            const address = editAddressInput.value.trim();
+            
+            if (!label || !address) {
+                alert("Completa todos los campos");
+                return;
+            }
+            
+            saveEditBtn.innerText = "Buscando dirección...";
+            saveEditBtn.disabled = true;
+            
+            try {
+                // Geo-search for new coordinates if address changed (simplified logic)
+                const query = encodeURIComponent(address + ', Chile');
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`);
+                const data = await res.json();
+                
+                let lat, lng;
+                if (data && data.length > 0) {
+                    lat = parseFloat(data[0].lat);
+                    lng = parseFloat(data[0].lon);
+                } else {
+                    alert("Ubicación aproximada guardada.");
+                    lat = -33.4489 + (Math.random()-0.5)*0.05;
+                    lng = -70.6693 + (Math.random()-0.5)*0.05;
+                }
+                
+                await updateUserLocation(id, label, address, lat, lng);
+                await renderSavedLocations();
+                closeEditLocModal();
+            } catch (err) {
+                alert("Error guardando la dirección");
+            } finally {
+                saveEditBtn.innerText = "Guardar Cambios";
+                saveEditBtn.disabled = false;
+            }
+        });
+
+        // --- Saved Services Logic ---
+        const savedServicesContainer = document.getElementById('saved-services-container');
+        
+        async function renderSavedServices() {
+            if (!activeUserId) return;
+            try {
+                const savedProviders = getSavedProviders(activeUserId);
+                if (!savedProviders || savedProviders.length === 0) {
+                    savedServicesContainer.innerHTML = '<div class="p-4 text-center text-on-surface-variant font-body-md">No tienes servicios guardados.</div>';
+                    return;
+                }
+                
+                let html = '';
+                savedProviders.forEach(provider => {
+                    html += `
+                        <div class="p-stack-md border-b border-outline-variant flex justify-between items-center hover:bg-surface-bright group">
+                            <div class="flex items-center gap-3">
+                                <img src="${provider.image}" alt="${provider.name}" class="w-12 h-12 rounded-full object-cover">
+                                <div class="flex flex-col">
+                                    <span class="font-label-lg text-label-lg text-on-surface">${provider.name}</span>
+                                    <span class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">${provider.profession}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="window.location.href='/perfil_del_prestador/index.html?id=${provider.id}'" class="text-secondary hover:text-secondary-fixed p-2 rounded-full transition-colors" title="Ver Perfil">
+                                    <span class="material-symbols-outlined text-[20px]">person_search</span>
+                                </button>
+                                <button onclick="removeSavedProvider('${provider.id}')" class="text-secondary hover:text-error p-2 rounded-full transition-colors" title="Quitar Guardado">
+                                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                savedServicesContainer.innerHTML = html;
+            } catch (err) {
+                savedServicesContainer.innerHTML = '<div class="p-4 text-center text-error font-body-md">Error cargando servicios guardados: ' + err.message + '</div>';
+                console.error("Error loading saved services", err);
+            }
+        }
+
+        window.removeSavedProvider = (providerId) => {
+            const savedProviders = getSavedProviders(activeUserId);
+            const provider = savedProviders.find(p => p.id === providerId);
+            if (provider) {
+                toggleSavedProvider(activeUserId, provider);
+                renderSavedServices();
+            }
+        };
+
         // Initialize
-        loadProfile();
+        loadProfile().then(() => {
+            renderSavedLocations();
+            renderSavedServices();
+        });
     </script>
 </body>
 </html>

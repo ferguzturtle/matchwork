@@ -27,7 +27,7 @@
 <img src="/logo.png" alt="MatchWorking Logo" class="w-full h-auto object-contain">
 </div>
 <h1 id="auth-title" class="font-headline-md text-headline-md text-on-surface">Únete a MatchWorking</h1>
-<p id="auth-subtitle" class="font-body-sm text-body-sm text-on-surface-variant">Selecciona tu tipo de cuenta para comenzar.</p>
+<p id="auth-subtitle" class="font-body-sm text-body-sm text-on-surface-variant">Selecciona cómo quieres iniciar en MatchAPP (podrás cambiar de vista más adelante).</p>
 </header>
 <div id="role-selection" class="grid grid-cols-2 gap-gutter">
 <label class="relative flex flex-col items-start p-4 border-2 border-secondary bg-surface-container-lowest rounded-xl cursor-pointer shadow-sm transition-all">
@@ -64,10 +64,21 @@
 <div class="relative">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">category</span>
 <select class="w-full bg-surface-container-low border-2 border-transparent text-on-surface font-body-md text-body-md rounded-lg py-3 pl-10 pr-10 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors cursor-pointer appearance-none" id="category">
-<option value="gasfiteria">Gasfitería</option>
-<option value="electricidad">Electricidad</option>
-<option value="limpieza">Limpieza</option>
-<option value="climatizacion">Climatización</option>
+<option value="construccion">Construcción y Reformas</option>
+<option value="salud">Servicios de Salud y Cuidado</option>
+<option value="instalaciones">Instalaciones y Electricidad</option>
+<option value="mantenimiento">Mantenimiento y Limpieza</option>
+<option value="profesionales">Servicios Profesionales</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+</div>
+</div>
+<div id="field-subcategory" class="flex flex-col gap-1.5" style="display: none;">
+<label class="font-label-md text-label-md text-on-surface" for="subcategory">Subcategoría de Servicio</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">construction</span>
+<select class="w-full bg-surface-container-low border-2 border-transparent text-on-surface font-body-md text-body-md rounded-lg py-3 pl-10 pr-10 focus:bg-surface-container-lowest focus:border-secondary focus:outline-none transition-colors cursor-pointer appearance-none" id="subcategory">
+<!-- Loaded dynamically by JS -->
 </select>
 <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">arrow_drop_down</span>
 </div>
@@ -99,6 +110,7 @@
 </main>
 <script type="module">
     import { supabase } from '/src/supabase.js';
+    import { CATEGORIES, getSubcategoryIcon } from '/src/data.js';
 
     // Reverse Auth Guard to redirect already logged in users
     const checkSessionAndRedirect = async () => {
@@ -129,6 +141,31 @@
     const togglePrompt = document.getElementById('toggle-prompt');
     const toggleLink = document.getElementById('toggle-link');
 
+    const categorySelect = document.getElementById('category');
+    const subcategorySelect = document.getElementById('subcategory');
+    const subcategoryField = document.getElementById('field-subcategory');
+
+    const updateSubcategoryOptions = () => {
+        const catKey = categorySelect.value;
+        if (!catKey || !CATEGORIES[catKey]) {
+            subcategorySelect.innerHTML = '';
+            subcategoryField.style.display = 'none';
+            return;
+        }
+        
+        const subcats = CATEGORIES[catKey].subcategories;
+        let html = '';
+        for (const key in subcats) {
+            html += `<option value="${key}">${subcats[key].label}</option>`;
+        }
+        subcategorySelect.innerHTML = html;
+        
+        const selectedRole = document.querySelector('input[name="user_role"]:checked').value;
+        subcategoryField.style.display = selectedRole === 'provider' ? 'flex' : 'none';
+    };
+
+    categorySelect.addEventListener('change', updateSubcategoryOptions);
+
     toggleLink.addEventListener('click', (e) => {
         e.preventDefault();
         isLoginMode = !isLoginMode;
@@ -147,9 +184,10 @@
             // Ocultar campos de registro
             document.getElementById('field-name').style.display = 'none';
             document.getElementById('field-category').style.display = 'none';
+            subcategoryField.style.display = 'none';
         } else {
             title.innerText = 'Únete a MatchWorking';
-            subtitle.innerText = 'Selecciona tu tipo de cuenta para comenzar.';
+            subtitle.innerText = 'Selecciona cómo quieres iniciar en MatchAPP (podrás cambiar de vista más adelante).';
             roleSelection.style.display = 'grid';
             submitBtn.innerHTML = `
                 Crear Cuenta
@@ -162,6 +200,7 @@
             document.getElementById('field-name').style.display = 'flex';
             const selectedRole = document.querySelector('input[name="user_role"]:checked').value;
             document.getElementById('field-category').style.display = selectedRole === 'provider' ? 'flex' : 'none';
+            updateSubcategoryOptions();
         }
     });
 
@@ -181,6 +220,7 @@
 
         let name = "";
         let category = "";
+        let subcategory = "";
         if (!isLoginMode) {
             name = document.getElementById('name').value;
             if (!name) {
@@ -189,6 +229,7 @@
             }
             if (role === 'provider') {
                 category = document.getElementById('category').value;
+                subcategory = document.getElementById('subcategory').value;
             }
         }
 
@@ -225,13 +266,14 @@
                 } else {
                     const user = authResponse.data.user;
                     if (user) {
-                        const professionMap = {
-                            "gasfiteria": "Especialista en Gasfitería",
-                            "electricidad": "Electricista Autorizado",
-                            "limpieza": "Especialista en Limpieza",
-                            "climatizacion": "Técnico en Climatización"
-                        };
-                        const profession = role === 'customer' ? "" : (professionMap[category] || "Nuevo Prestador");
+                        let profession = "Prestador General";
+                        for (const catKey in CATEGORIES) {
+                            if (CATEGORIES[catKey].subcategories[subcategory]) {
+                                profession = "Especialista en " + CATEGORIES[catKey].subcategories[subcategory].label;
+                                break;
+                            }
+                        }
+                        if (role === 'customer') profession = "";
 
                         // 1. Guardar en la tabla profiles
                         const { error: profileErr } = await supabase.from('profiles').upsert({
@@ -242,6 +284,7 @@
                             avatar_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
                             profession: role === 'customer' ? "" : profession,
                             category: role === 'customer' ? "" : category,
+                            subcategory: role === 'customer' ? "" : subcategory,
                             description: role === 'customer' ? "" : "Sin descripción disponible.",
                             price: role === 'customer' ? "" : "$0"
                         });
@@ -258,6 +301,7 @@
                             avatar_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
                             profession: role === 'customer' ? "" : profession,
                             category: role === 'customer' ? "" : category,
+                            subcategory: role === 'customer' ? "" : subcategory,
                             description: role === 'customer' ? "" : "Sin descripción disponible.",
                             price: role === 'customer' ? "" : "$0"
                         };
@@ -265,23 +309,18 @@
 
                         // 3. Si es Prestador, insertar inmediatamente en la tabla providers para visibilidad instantánea
                         if (role === 'provider') {
-                            const iconMap = {
-                                "gasfiteria": "plumbing",
-                                "electricidad": "bolt",
-                                "limpieza": "cleaning_services",
-                                "climatizacion": "ac_unit"
-                            };
                             const providerData = {
                                 id: user.id,
                                 name: name,
                                 image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
                                 profession: profession,
                                 category: category,
+                                subcategory: subcategory,
                                 rating: 4.9,
                                 status: 'En línea',
                                 lat: -33.4489,
                                 lng: -70.6693,
-                                icon: iconMap[category] || 'plumbing'
+                                icon: getSubcategoryIcon(subcategory)
                             };
 
                             const { error: providerErr } = await supabase.from('providers').upsert(providerData);
@@ -294,7 +333,6 @@
                                 const localUpdates = JSON.parse(localStorage.getItem('prolink_providers_updates') || '{}');
                                 localUpdates[user.id] = providerData;
                                 localStorage.setItem('prolink_providers_updates', JSON.stringify(localUpdates));
-                                // Disparar evento storage para sincronización inmediata
                                 window.dispatchEvent(new Event('storage'));
                             } catch (err) {
                                 console.warn("Error guardando actualización local de proveedor al registrarse:", err);
@@ -358,6 +396,7 @@
             if (!isLoginMode) {
                 const selectedRole = e.target.value;
                 document.getElementById('field-category').style.display = selectedRole === 'provider' ? 'flex' : 'none';
+                updateSubcategoryOptions();
             }
         });
     });

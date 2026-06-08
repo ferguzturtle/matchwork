@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     avatar_url TEXT,
     profession TEXT,
     category TEXT,
+    subcategory TEXT,
     description TEXT,
     price TEXT DEFAULT '$0',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS public.providers (
     image TEXT,
     profession TEXT,
     category TEXT,
+    subcategory TEXT,
     rating NUMERIC DEFAULT 4.9,
     status TEXT DEFAULT 'En línea',
     lat NUMERIC,
@@ -58,41 +60,7 @@ ALTER TABLE public.providers DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.service_requests DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages DISABLE ROW LEVEL SECURITY;
 
--- 5. Insertar proveedores por defecto (Seed Data)
-INSERT INTO public.profiles (id, name, email, role, avatar_url, profession, category, description, price)
-VALUES 
-('11111111-1111-1111-1111-111111111111', 'Carlos Mendoza', 'carlos@matchworking.cl', 'provider', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBX-KmXfHIjVb7JHEf1pifVUCMhUSzU0CKsNGpek6wiAOoi6GNjsG34f0IgeZosy9X43RoDme6BsKQ1JF2H08sM5kdNgMWv5QFBWBIb5XZQya-COp1W7C0MqhEG0qYJE9bat9exBgFlf4iNg7YP6uRFRXVEmyHO5cxHtWVLxHe7WsEVvZ5HfVyU_9mXS_S7-ea_FMvI2TstyPw-jxcZHe2Wt_cy8__UXWDC7_bpWDaxIqx-RIhRAMXjflaGgH7WY932QbEneKM6_Ls', 'Maestro Gasfitero Autorizado', 'gasfiteria', 'Con más de 10 años de experiencia, ofrezco servicios de gasfitería certificados y garantizados. Especialista en urgencias, fugas y reparaciones completas. Respuesta rápida en toda la zona metropolitana.', '$150'),
-('22222222-2222-2222-2222-222222222222', 'Francisco Javier', 'francisco@matchworking.cl', 'provider', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCkkUwOuvyN2Qm4vmOiICtijtED3CJu4s_rWpmOyynM4l801tEL6X3P_Jnr2IcpevBIYD4BSbXAPRUX2AMCBP8C5k_9XtGS38PGXsVoaf30OkmuoOH1-NpV9avYaTU5tjbgLhRGTa8Y5KeSeBg1dMPTM9SnJLZSiAOb3S3am7yhuZGkkS1GljZv7wprS8rV-uwaf6C96yBq8oywa5GT9o_AHsvRQnNRgE1GlSjXCa1b0-qJOwT0wK_lP8Z1AL7t0M3nAKYbJgL9kn0', 'Electricista Certificado SEC', 'electricidad', 'Instalaciones eléctricas residenciales y comerciales. Evaluación de tableros, aumento de capacidad y certificaciones TE1. Seguridad y profesionalismo en cada trabajo.', '$85'),
-('33333333-3333-3333-3333-333333333333', 'Ana Silva', 'ana@matchworking.cl', 'provider', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80', 'Especialista en Limpieza Profunda', 'limpieza', 'Servicio de limpieza profunda para casas y departamentos post-construcción o mudanza. Utilizo productos de alta gama y amigables con el medio ambiente.', '$50'),
-('44444444-4444-4444-4444-444444444444', 'Roberto Rojas', 'roberto@matchworking.cl', 'provider', 'https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=150&q=80', 'Gasfiter Urgencias 24/7', 'gasfiteria', 'Reparación de filtraciones, destapes y mantención de calefont. Servicio rápido y eficiente.', '$120'),
-('55555555-5555-5555-5555-555555555555', 'Luis Soto', 'luis@matchworking.cl', 'provider', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80', 'Gasfiter Instalador SEC', 'gasfiteria', 'Instalación de redes de gas y agua potable. Tramitación de certificados SEC.', '$180')
-ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    email = EXCLUDED.email,
-    role = EXCLUDED.role,
-    avatar_url = EXCLUDED.avatar_url,
-    profession = EXCLUDED.profession,
-    category = EXCLUDED.category,
-    description = EXCLUDED.description,
-    price = EXCLUDED.price;
 
-INSERT INTO public.providers (id, name, image, profession, category, rating, status, lat, lng, icon)
-VALUES
-('11111111-1111-1111-1111-111111111111', 'Carlos Mendoza', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBX-KmXfHIjVb7JHEf1pifVUCMhUSzU0CKsNGpek6wiAOoi6GNjsG34f0IgeZosy9X43RoDme6BsKQ1JF2H08sM5kdNgMWv5QFBWBIb5XZQya-COp1W7C0MqhEG0qYJE9bat9exBgFlf4iNg7YP6uRFRXVEmyHO5cxHtWVLxHe7WsEVvZ5HfVyU_9mXS_S7-ea_FMvI2TstyPw-jxcZHe2Wt_cy8__UXWDC7_bpWDaxIqx-RIhRAMXjflaGgH7WY932QbEneKM6_Ls', 'Maestro Gasfitero Autorizado', 'gasfiteria', 4.9, 'En línea', -33.4489, -70.6693, 'plumbing'),
-('22222222-2222-2222-2222-222222222222', 'Francisco Javier', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCkkUwOuvyN2Qm4vmOiICtijtED3CJu4s_rWpmOyynM4l801tEL6X3P_Jnr2IcpevBIYD4BSbXAPRUX2AMCBP8C5k_9XtGS38PGXsVoaf30OkmuoOH1-NpV9avYaTU5tjbgLhRGTa8Y5KeSeBg1dMPTM9SnJLZSiAOb3S3am7yhuZGkkS1GljZv7wprS8rV-uwaf6C96yBq8oywa5GT9o_AHsvRQnNRgE1GlSjXCa1b0-qJOwT0wK_lP8Z1AL7t0M3nAKYbJgL9kn0', 'Electricista Certificado SEC', 'electricidad', 4.8, 'En línea', -33.4350, -70.6500, 'bolt'),
-('33333333-3333-3333-3333-333333333333', 'Ana Silva', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80', 'Especialista en Limpieza Profunda', 'limpieza', 5.0, 'Ocupado', -33.4500, -70.6400, 'cleaning_services'),
-('44444444-4444-4444-4444-444444444444', 'Roberto Rojas', 'https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=150&q=80', 'Gasfiter Urgencias 24/7', 'gasfiteria', 4.7, 'En línea', -33.4480, -70.6680, 'plumbing'),
-('55555555-5555-5555-5555-555555555555', 'Luis Soto', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80', 'Gasfiter Instalador SEC', 'gasfiteria', 4.9, 'Ocupado', -33.4520, -70.6710, 'plumbing')
-ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    image = EXCLUDED.image,
-    profession = EXCLUDED.profession,
-    category = EXCLUDED.category,
-    rating = EXCLUDED.rating,
-    status = EXCLUDED.status,
-    lat = EXCLUDED.lat,
-    lng = EXCLUDED.lng,
-    icon = EXCLUDED.icon;
 
 -- 6. Crear tabla para ubicaciones guardadas de usuarios (Fase 2)
 CREATE TABLE IF NOT EXISTS public.user_locations (
@@ -104,31 +72,16 @@ CREATE TABLE IF NOT EXISTS public.user_locations (
     lng NUMERIC NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
-
--- 7. Crear tabla para viajes de transportistas en retorno vacío (Fase 3)
-CREATE TABLE IF NOT EXISTS public.trips (
-    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
-    provider_id UUID NOT NULL,
-    origin_name TEXT NOT NULL,
-    dest_name TEXT NOT NULL,
-    origin_lat NUMERIC NOT NULL,
-    origin_lng NUMERIC NOT NULL,
-    dest_lat NUMERIC NOT NULL,
-    dest_lng NUMERIC NOT NULL,
-    price TEXT,
-    departure_time TEXT, -- Guardar como texto para facilitar
-    status TEXT DEFAULT 'disponible', -- 'disponible', 'completado'
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
 -- Desactivar Row Level Security (RLS)
 ALTER TABLE public.user_locations DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.trips DISABLE ROW LEVEL SECURITY;
 
--- Insertar ubicaciones por defecto para el usuario invitado
-INSERT INTO public.user_locations (user_id, label, address, lat, lng)
-VALUES
-('00000000-0000-0000-0000-000000000000', 'Mi Casa (Santiago)', 'Santiago Centro, Chile', -33.4489, -70.6693),
-('00000000-0000-0000-0000-000000000000', 'Casa de Mamá (Providencia)', 'Providencia, Santiago, Chile', -33.4312, -70.6124),
-('00000000-0000-0000-0000-000000000000', 'Casa de Playa (Viña)', 'Viña del Mar, Valparaíso, Chile', -33.0245, -71.5518);
-
+-- 7. Crear tabla para sugerencias y quejas de los usuarios (Fase 2)
+CREATE TABLE IF NOT EXISTS public.app_feedback (
+    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    user_id UUID,
+    comment TEXT NOT NULL,
+    status TEXT DEFAULT 'nuevo',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+-- Desactivar Row Level Security (RLS)
+ALTER TABLE public.app_feedback DISABLE ROW LEVEL SECURITY;
