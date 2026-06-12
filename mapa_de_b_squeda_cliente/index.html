@@ -187,7 +187,7 @@ Ver Perfil
 <div class="flex flex-col gap-2">
 <a id="switch-role-btn" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
 <span class="material-symbols-outlined" data-icon="switch_account">switch_account</span>
-<span id="switch-role-text" class="font-body-md text-body-md">Cambiar a Prestador</span>
+<span id="switch-role-text" class="font-body-md text-body-md">Cambiar a Perfil de Trabajador</span>
 </a>
 <a id="nav-saved-services-btn" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
 <span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
@@ -255,7 +255,7 @@ Ver Perfil
     <div class="flex flex-col items-center justify-center text-center gap-3">
       <span class="material-symbols-outlined text-[48px] text-secondary">handshake</span>
       <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Solicitar Servicio</h3>
-      <p class="font-body-md text-on-surface-variant">¿Deseas solicitar los servicios de este prestador? Se le notificará para que acepte tu solicitud y puedan chatear.</p>
+      <p class="font-body-md text-on-surface-variant">¿Desea solicitar los servicios de este trabajador profesional? Se le notificará para que evalúe su solicitud y puedan conectarse.</p>
     </div>
     <div class="flex gap-2 mt-4">
       <button id="cancel-request-btn" class="flex-1 bg-surface-container-high text-on-surface-variant font-label-lg py-2.5 rounded-lg font-semibold hover:bg-surface-container-highest active:scale-95 transition-all">Cancelar</button>
@@ -425,9 +425,12 @@ const loadUserProfile = async () => {
                 const nameEl = document.querySelector('#main-drawer span.font-headline-sm');
                 if (nameEl) nameEl.innerText = profile.name;
             }
+        } else {
+            globalUserId = '201';
         }
     } catch (e) {
         console.warn("Error loading user profile:", e);
+        globalUserId = '201';
     }
 };
 
@@ -507,6 +510,11 @@ const map = L.map('map', {zoomControl: false}).setView([currentLat, currentLng],
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
 }).addTo(map);
+
+// FIX: Ensure map resizes correctly after body display change
+setTimeout(() => {
+    map.invalidateSize();
+}, 200);
 
 let selectedProviderId = null;
 let routingControl = null;
@@ -824,7 +832,7 @@ const showSecureContextWarningBanner = () => {
             <div>
                 <h4 class="font-bold font-headline-sm text-white">Conexión Insegura (Simulación Activa)</h4>
                 <p class="mt-1 text-[13px] text-white/90">Los navegadores modernos bloquean el GPS en conexiones HTTP que no sean <b>localhost</b>. Para probar GPS real, usa localhost o un servidor seguro HTTPS.</p>
-                <p class="mt-1 text-[12px] text-white/80">Hemos activado una <b>ubicación GPS simulada en Santiago de Chile</b> para que puedas probar el mapa y la interacción con prestadores perfectamente.</p>
+                <p class="mt-1 text-[12px] text-white/80">Hemos activado una <b>ubicación GPS simulada en Santiago de Chile</b> para que pueda probar el mapa y la interacción perfectamente con los trabajadores.</p>
             </div>
         </div>
         <div class="flex justify-end gap-2 mt-1">
@@ -847,12 +855,12 @@ const showGpsAlertBanner = () => {
             <span class="material-symbols-outlined text-[24px] text-white">gpp_maybe</span>
             <div>
                 <h4 class="font-bold font-headline-sm text-white">Ubicación GPS Bloqueada</h4>
-                <p class="mt-1 text-[13px] text-white/90">Para que MatchWorking funcione correctamente y puedas ver los prestadores cercanos en tu área, por favor sigue estos pasos:</p>
+                <p class="mt-1 text-[13px] text-white/90">Para que MatchWorking funcione correctamente y pueda visualizar a los trabajadores cercanos en su área, por favor siga estos pasos:</p>
                 <ol class="list-decimal list-inside mt-2 flex flex-col gap-1 text-[13px] text-white/95">
-                    <li>Haz clic en el ícono del <b>candado</b> <span class="material-symbols-outlined text-[14px] align-middle">lock</span> al lado de la barra de direcciones de tu navegador.</li>
-                    <li>Busca el permiso de <b>Ubicación</b>.</li>
-                    <li>Cámbialo a <b>"Permitir"</b>.</li>
-                    <li>Haz clic en el botón <b>"Probar de nuevo"</b> de abajo.</li>
+                    <li>Haga clic en el ícono del <b>candado</b> <span class="material-symbols-outlined text-[14px] align-middle">lock</span> al lado de la barra de direcciones de su navegador.</li>
+                    <li>Busque el permiso de <b>Ubicación</b>.</li>
+                    <li>Cámbielo a <b>"Permitir"</b>.</li>
+                    <li>Haga clic en el botón <b>"Probar de nuevo"</b> de abajo.</li>
                 </ol>
             </div>
         </div>
@@ -1187,7 +1195,7 @@ const switchBtn = document.getElementById('switch-role-btn');
 const switchText = document.getElementById('switch-role-text');
 if (switchBtn && switchText) {
     if (role === 'customer') {
-        switchText.innerText = 'Cambiar a Prestador';
+        switchText.innerText = 'Cambiar a Perfil de Trabajador';
         switchBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             try {
@@ -1573,8 +1581,8 @@ const renderSavedServices = () => {
         savedServicesList.innerHTML = `
             <div class="flex flex-col items-center justify-center h-full text-center p-6 opacity-60">
                 <span class="material-symbols-outlined text-[48px] mb-4">bookmark_border</span>
-                <p class="font-body-lg text-on-surface">Aún no tienes servicios guardados.</p>
-                <p class="font-body-sm text-on-surface-variant mt-2">Explora el mapa y presiona el ícono de corazón para guardar a tus prestadores favoritos.</p>
+                <p class="font-body-lg text-on-surface">Aún no tiene servicios guardados.</p>
+                <p class="font-body-sm text-on-surface-variant mt-2">Explore el mapa y presione el ícono de corazón para guardar a sus trabajadores favoritos.</p>
             </div>
         `;
         return;
@@ -1691,7 +1699,7 @@ if(confirmReqBtn) confirmReqBtn.addEventListener('click', async () => {
                 <span class="material-symbols-outlined text-[18px]">schedule</span>
                 Esperando...
             `;
-            btnRequest.onclick = (e) => { e.stopPropagation(); alert("El prestador ya fue notificado. Espera a que acepte para poder chatear."); };
+            btnRequest.onclick = (e) => { e.stopPropagation(); alert("El trabajador ya fue notificado. Por favor, espere a que evalúe su solicitud para poder conversar."); };
         }
         
         setTimeout(() => {

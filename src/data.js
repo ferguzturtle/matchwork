@@ -140,65 +140,42 @@ export const getProviders = async () => {
     return providers;
 };
 
-export const requestService = async (providerId, userId, message) => {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const customer_id = user ? user.id : "00000000-0000-0000-0000-000000000000";
-
-        const { data, error } = await supabase.from('service_requests').insert([
-            {
-                provider_id: providerId,
-                customer_id: customer_id,
-                message: message,
-                status: 'pendiente'
-            }
-        ]);
-        if (error) throw error;
-        return data;
-    } catch (e) {
-        console.log("Fallback: guardando solicitud en localStorage", e.message);
-        const requests = JSON.parse(localStorage.getItem('prolink_requests') || '[]');
-        requests.push({
-            id: Date.now().toString(),
-            providerId: providerId,
-            userId: userId,
-            message: message,
-            status: 'pendiente',
-            timestamp: new Date().toISOString()
-        });
-        localStorage.setItem('prolink_requests', JSON.stringify(requests));
-    }
-};
 
 export const getRequestsForProvider = async (providerId) => {
     try {
-        // Obtenemos las solicitudes unidas a los perfiles para obtener el nombre del cliente
         const { data, error } = await supabase
             .from('service_requests')
-            .select(`
-                id,
-                provider_id,
-                customer_id,
-                message,
-                status,
-                created_at,
-                profiles:customer_id ( name )
-            `)
+            .select('id, provider_id, customer_id, message, status, created_at')
             .eq('provider_id', providerId);
+            
         if (error) throw error;
         
-        // Mapear para uniformar la respuesta
-        return (data || []).map(req => ({
-            id: req.id,
-            providerId: req.provider_id,
-            customerId: req.customer_id,
-            message: req.message,
-            status: req.status,
-            userName: req.profiles ? req.profiles.name : 'Cliente de MatchWorking',
-            timestamp: req.created_at
-        }));
+        let profiles = [];
+        if (data && data.length > 0) {
+            const customerIds = data.map(req => req.customer_id).filter(id => id && id !== '00000000-0000-0000-0000-000000000000');
+            if (customerIds.length > 0) {
+                const { data: profilesData } = await supabase
+                    .from('profiles')
+                    .select('id, name')
+                    .in('id', customerIds);
+                if (profilesData) profiles = profilesData;
+            }
+        }
+        
+        return (data || []).map(req => {
+            const profile = profiles.find(p => p.id === req.customer_id);
+            return {
+                id: req.id,
+                providerId: req.provider_id,
+                customerId: req.customer_id,
+                message: req.message,
+                status: req.status,
+                userName: profile ? profile.name : 'Cliente de MatchWorking',
+                timestamp: req.created_at
+            };
+        });
     } catch (e) {
-        console.log("Fallback: obteniendo solicitudes de localStorage", e.message);
+        console.log('Fallback: obteniendo solicitudes de localStorage', e.message);
         const requests = JSON.parse(localStorage.getItem('prolink_requests') || '[]');
         return requests.filter(req => req.providerId == providerId).map(req => ({
             id: req.id,
@@ -589,6 +566,38 @@ export const relocateProviders = (lat, lng, forceRelocateReal = false) => {
     });
 };
 
+export const requestService = async (providerId, userId, message) => {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const customer_id = user ? user.id : "00000000-0000-0000-0000-000000000000";
+
+        const { data, error } = await supabase.from('service_requests').insert([
+            {
+                provider_id: providerId,
+                customer_id: customer_id,
+                message: message,
+                status: 'pendiente'
+            }
+        ]).select();
+        if (error) throw error;
+        return data;
+    } catch (e) {
+        console.log("Fallback: guardando solicitud en localStorage", e.message);
+        const requests = JSON.parse(localStorage.getItem('prolink_requests') || '[]');
+        const newReq = {
+            id: Date.now().toString(),
+            providerId: providerId,
+            userId: userId,
+            message: message,
+            status: 'pendiente',
+            timestamp: new Date().toISOString()
+        };
+        requests.push(newReq);
+        localStorage.setItem('prolink_requests', JSON.stringify(requests));
+        return [newReq];
+    }
+};
+
 export const submitAppFeedback = async (comment) => {
     try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -659,44 +668,19 @@ export const toggleSavedProvider = (userId, provider) => {
 // --- LOGICA DE SOLICITUDES Y MATCH (FASE 3) ---
 
 export const createServiceRequest = async (providerId, customerId, message = "") => {
-    try {
-        const { data, error } = await supabase
-            .from('service_requests')
-            .insert([{ provider_id: providerId, customer_id: customerId, message: message, status: 'pendiente' }])
-            .select();
-        if (error) throw error;
-        return data[0];
-    } catch (e) {
-        console.error("Error creating service request:", e);
-        return null;
-    }
+    // Reutilizamos requestService para consistencia
+    return await requestService(providerId, customerId, message);
 };
 
 export const getProviderRequests = async (providerId) => {
-    try {
-        const { data, error } = await supabase
-            .from('service_requests')
-            .select('*, profiles!service_requests_customer_id_fkey(name, avatar_url)')
-            .eq('provider_id', providerId)
-            .eq('status', 'pendiente')
-            .order('created_at', { ascending: false });
-        if (error) throw error;
-        return data || [];
-    } catch (e) {
-        console.error("Error getting provider requests:", e);
-        return [];
-    }
+    // Reutilizamos getRequestsForProvider que formatea correctamente los nombres y tiene fallback
+    return await getRequestsForProvider(providerId);
 };
 
 export const acceptServiceRequest = async (requestId) => {
     try {
-        const { data, error } = await supabase
-            .from('service_requests')
-            .update({ status: 'aceptada' })
-            .eq('id', requestId)
-            .select();
-        if (error) throw error;
-        return data[0];
+        await updateRequestStatus(requestId, 'aceptado');
+        return true;
     } catch (e) {
         console.error("Error accepting service request:", e);
         return null;
@@ -705,11 +689,7 @@ export const acceptServiceRequest = async (requestId) => {
 
 export const rejectServiceRequest = async (requestId) => {
     try {
-        const { data, error } = await supabase
-            .from('service_requests')
-            .update({ status: 'rechazada' })
-            .eq('id', requestId);
-        if (error) throw error;
+        await updateRequestStatus(requestId, 'rechazado');
         return true;
     } catch (e) {
         console.error("Error rejecting service request:", e);
@@ -724,11 +704,16 @@ export const checkIfMatched = async (providerId, customerId) => {
             .select('*')
             .eq('provider_id', providerId)
             .eq('customer_id', customerId)
-            .eq('status', 'aceptada');
+            .eq('status', 'aceptado');
         if (error) throw error;
-        return data && data.length > 0;
+        if (data && data.length > 0) return true;
+        
+        // Fallback local
+        const requests = JSON.parse(localStorage.getItem('prolink_requests') || '[]');
+        return requests.some(r => r.providerId == providerId && (r.customerId == customerId || r.userId == customerId) && r.status === 'aceptado');
     } catch (e) {
-        console.error("Error checking match status:", e);
-        return false;
+        console.error("Error checking match status, using local fallback:", e);
+        const requests = JSON.parse(localStorage.getItem('prolink_requests') || '[]');
+        return requests.some(r => r.providerId == providerId && (r.customerId == customerId || r.userId == customerId) && r.status === 'aceptado');
     }
 };

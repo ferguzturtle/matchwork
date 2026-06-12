@@ -68,7 +68,7 @@
 <div class="flex flex-col gap-2">
 <a id="switch-role-btn" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
 <span class="material-symbols-outlined" data-icon="switch_account">switch_account</span>
-<span id="switch-role-text" class="font-body-md text-body-md">Cambiar a Prestador</span>
+<span id="switch-role-text" class="font-body-md text-body-md">Cambiar a Perfil de Trabajador</span>
 </a>
 <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
 <span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
@@ -137,7 +137,7 @@
 </div>
 </div>
 <!-- Chat Messages Area -->
-<div id="chat-messages-container" class="flex-1 overflow-y-auto p-gutter pb-20 md:pb-gutter flex flex-col gap-stack-md bg-surface-bright justify-center items-center">
+<div id="chat-messages-container" class="flex-1 overflow-y-auto p-gutter pb-gutter flex flex-col gap-stack-md bg-surface-bright justify-center items-center">
 <div class="flex flex-col items-center justify-center p-8 text-center text-on-surface-variant">
 <span class="material-symbols-outlined text-5xl mb-3 text-secondary animate-bounce" data-icon="chat">chat</span>
 <p class="font-headline-sm text-headline-sm font-semibold">MatchWorking Centro de Mensajería</p>
@@ -145,7 +145,7 @@
 </div>
 </div>
 <!-- Message Input Area -->
-<div class="p-4 bg-surface border-t border-outline-variant shadow-[0_-4px_12px_0px_rgba(0,0,0,0.02)]">
+<div class="p-4 pb-8 md:pb-4 bg-surface border-t border-outline-variant shadow-[0_-4px_12px_0px_rgba(0,0,0,0.02)]">
 <div class="flex items-end gap-2 bg-[#F1F5F9] focus-within:bg-surface-container-lowest focus-within:ring-2 focus-within:ring-secondary rounded-2xl p-2 transition-all">
 <button class="p-2 text-on-surface-variant hover:text-secondary transition-colors shrink-0">
 <span class="material-symbols-outlined" data-icon="add_photo_alternate">add_photo_alternate</span>
@@ -165,7 +165,7 @@ Los mensajes están encriptados de extremo a extremo
 </div>
 </main>
 <!-- Mobile BottomNavBar / Hidden on Desktop -->
-<nav class="md:hidden fixed bottom-0 w-full z-50 shadow-[0_-4px_12px_0px_rgba(0,0,0,0.04)] bg-surface-container-lowest flex justify-around items-center h-16 px-2 pb-safe border-t border-outline-variant">
+<nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 w-full z-50 shadow-[0_-4px_12px_0px_rgba(0,0,0,0.04)] bg-surface-container-lowest flex justify-around items-center h-16 px-2 pb-safe border-t border-outline-variant">
 <a href="/mapa_de_b_squeda_cliente/index.html" class="nav-customer flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 w-16">
 <span class="material-symbols-outlined mb-1" data-icon="map">map</span>
 <span class="font-label-md text-label-md">Explorar</span>
@@ -228,8 +228,30 @@ let activeContact = null;
 let realtimeChannel = null;
 
 // Apply role styling
-document.querySelectorAll('.nav-customer').forEach(el => el.style.display = role === 'customer' ? 'flex' : 'none');
-document.querySelectorAll('.nav-provider').forEach(el => el.style.display = role === 'provider' ? 'flex' : 'none');
+const applyRoleNav = () => {
+    const currentRole = localStorage.getItem('user_role') || 'customer';
+    document.querySelectorAll('.nav-customer').forEach(el => {
+        if (currentRole === 'customer') {
+            el.classList.remove('hidden');
+            el.style.display = 'flex';
+        } else {
+            el.classList.add('hidden');
+            el.style.display = 'none';
+        }
+    });
+    document.querySelectorAll('.nav-provider').forEach(el => {
+        if (currentRole === 'provider') {
+            el.classList.remove('hidden');
+            el.style.display = 'flex';
+        } else {
+            el.classList.add('hidden');
+            el.style.display = 'none';
+        }
+    });
+};
+applyRoleNav();
+setTimeout(applyRoleNav, 100);
+setTimeout(applyRoleNav, 500);
 
 // Mobile Chat Toggle Logic elements
 const chatListView = document.getElementById('chat-list-view');
@@ -312,7 +334,7 @@ async function loadConversations() {
                             name: provData.name,
                             avatar_url: provData.image || provData.avatar_url,
                             status: provData.status || 'En línea',
-                            profession: provData.profession || 'Prestador'
+                            profession: provData.profession || 'Trabajador Profesional'
                         };
                     }
                 }
@@ -330,7 +352,7 @@ async function loadConversations() {
                             name: profData.name,
                             avatar_url: profData.avatar_url,
                             status: 'En línea',
-                            profession: profData.role === 'provider' ? 'Prestador' : 'Cliente'
+                            profession: profData.role === 'provider' ? 'Trabajador Profesional' : 'Cliente'
                         };
                     }
                 }
@@ -607,6 +629,9 @@ function selectConversation(contact) {
         
         chatDetailView.classList.remove('hidden');
         chatDetailView.classList.add('flex');
+        
+        const bNav = document.getElementById('mobile-bottom-nav');
+        if(bNav) bNav.classList.add('hidden');
     } else {
         chatDetailView.classList.remove('hidden');
         chatDetailView.classList.add('flex');
@@ -722,6 +747,9 @@ if (backBtn) {
             
             chatListView.classList.remove('hidden');
             chatListView.classList.add('flex');
+            
+            const bNav = document.getElementById('mobile-bottom-nav');
+            if(bNav) bNav.classList.remove('hidden');
         }
     });
 }
@@ -775,7 +803,7 @@ const switchBtn = document.getElementById('switch-role-btn');
 const switchText = document.getElementById('switch-role-text');
 if (switchBtn && switchText) {
     if (role === 'customer') {
-        switchText.innerText = 'Cambiar a Prestador';
+        switchText.innerText = 'Cambiar a Perfil de Trabajador';
         switchBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             try {

@@ -3,7 +3,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Detalle del Perfil del Prestador</title>
+<title>Detalle del Perfil del Trabajador Profesional</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
@@ -364,7 +364,7 @@ async function init() {
         provider = {
             id: richProfile.id,
             name: richProfile.name,
-            profession: richProfile.profession || "Nuevo Prestador",
+            profession: richProfile.profession || "Nuevo Trabajador Profesional",
             category: richProfile.category || "gasfiteria",
             rating: 5.0,
             status: 'Fuera de servicio',
@@ -429,7 +429,7 @@ async function init() {
                 actionContainer.innerHTML = `
                     <div class="flex items-center gap-2 text-on-surface-variant font-body-sm bg-surface-container-high px-4 py-2.5 rounded-xl border border-outline-variant shadow-sm">
                         <span class="material-symbols-outlined text-[18px]">info</span>
-                        <span>Como prestador, no puedes solicitar matches con otros profesionales.</span>
+                        <span>Como trabajador, no puede solicitar servicios de otros profesionales.</span>
                     </div>
                 `;
             }

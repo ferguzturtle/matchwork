@@ -47,7 +47,7 @@
 <span class="material-symbols-outlined text-on-surface-variant">home_repair_service</span>
 <div class="w-5 h-5 rounded-full border border-outline-variant"></div>
 </div>
-<span class="font-label-lg text-label-lg text-on-surface mb-1">Prestador</span>
+<span class="font-label-lg text-label-lg text-on-surface mb-1">Trabajador Profesional</span>
 <span class="font-body-sm text-label-md text-on-surface-variant leading-tight">Ofrece tus servicios</span>
 </label>
 </div>
@@ -266,7 +266,7 @@
                 } else {
                     const user = authResponse.data.user;
                     if (user) {
-                        let profession = "Prestador General";
+                        let profession = "Trabajador General";
                         for (const catKey in CATEGORIES) {
                             if (CATEGORIES[catKey].subcategories[subcategory]) {
                                 profession = "Especialista en " + CATEGORIES[catKey].subcategories[subcategory].label;

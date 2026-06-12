@@ -3,7 +3,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Panel del Prestador - MatchWorking</title>
+<title>Panel de Control del Trabajador - MatchWorking</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
@@ -425,8 +425,8 @@ function showNewRequestToast(userName) {
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
         </div>
         <div class="flex-1">
-            <h4 class="font-bold font-headline-sm text-primary">¡Nuevo Match!</h4>
-            <p class="text-body-sm text-on-surface-variant mt-0.5"><b>${userName}</b> quiere conectar contigo.</p>
+            <p class="font-headline-sm text-headline-sm text-on-surface">¡Nueva Solicitud de Servicio!</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">${clientName} ha solicitado sus servicios.</p>
         </div>
         <button onclick="this.parentElement.remove()" class="text-on-surface-variant hover:text-on-surface transition-colors shrink-0">
             <span class="material-symbols-outlined text-[18px]">close</span>
@@ -557,7 +557,7 @@ async function renderRequests() {
                             </div>
                             <div class="text-right">
                                 <span class="inline-flex items-center gap-1 font-label-md text-label-md text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full font-semibold">
-                                    ¡Es un Match!
+                                    Solicitud Aceptada
                                 </span>
                             </div>
                         </div>
@@ -580,7 +580,7 @@ async function renderRequests() {
                                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_repair_service</span>
                                 </div>
                                 <div>
-                                    <h4 class="font-headline-sm text-headline-sm text-on-surface leading-tight">${req.userName || 'Solicitud de Match'}</h4>
+                                    <h4 class="font-headline-sm text-headline-sm text-on-surface leading-tight">${req.userName || 'Solicitud de Servicio'}</h4>
                                     <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">${req.message}</p>
                                 </div>
                             </div>
@@ -671,10 +671,10 @@ const detectSession = async () => {
                 window.miniMap.setView([window.currentRealLat, window.currentRealLng], 14);
             }
         } else {
-            // El proveedor es nuevo o no está registrado en la tabla providers.
+            // El trabajador es nuevo o no está registrado en la tabla providers.
             // Para asegurar consistencia absoluta con la UI visual que inicia en "ON" (Disponible para Trabajos),
             // lo registramos de inmediato en la base de datos como "En línea".
-            console.log("Nuevo prestador detectado sin registro en providers. Registrando disponibilidad inicial...");
+            console.log("Nuevo trabajador detectado sin registro en providers. Registrando disponibilidad inicial...");
             const initialLat = window.currentRealLat || -33.4489;
             const initialLng = window.currentRealLng || -70.6693;
             await updateAvailabilityState(true, initialLat, initialLng);
@@ -720,7 +720,7 @@ const switchBtn = document.getElementById('switch-role-btn');
 const switchText = document.getElementById('switch-role-text');
 if (switchBtn && switchText) {
     if (role === 'customer') {
-        switchText.innerText = 'Cambiar a Prestador';
+        switchText.innerText = 'Cambiar a Perfil de Trabajador';
         switchBtn.addEventListener('click', (e) => {
             e.preventDefault();
             localStorage.setItem('user_role', 'provider');
