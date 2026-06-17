@@ -1,464 +1,777 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Messages - MatchWorking</title>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Messages - MatchWorking</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
 
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-      display: none; /* Hide body initially to prevent unauthorized content flash */
-    }
-  </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+        display: none; /* Hide body initially to prevent unauthorized content flash */
+      }
+    </style>
     <link rel="stylesheet" href="/style.css" />
     <script type="module" src="/src/theme.js"></script>
-</head>
-<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:flex-row overflow-hidden">
-<!-- Mobile TopAppBar / Hidden on Desktop -->
-<header class="md:hidden bg-surface dark:bg-background text-secondary dark:text-secondary-fixed w-full top-0 sticky border-b border-outline-variant dark:border-on-surface-variant flex justify-between items-center px-gutter py-stack-sm z-40">
-<button id="mobile-menu-btn" class="hover:bg-surface-container-low transition-colors active:opacity-80 transition-all p-2 rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined text-secondary dark:text-secondary-fixed" data-icon="menu">menu</span>
-</button>
-<h1 class="font-headline-md text-headline-md font-bold text-secondary dark:text-secondary-fixed">MatchWorking</h1>
-<div class="hover:bg-surface-container-low transition-colors active:opacity-80 transition-all rounded-full overflow-hidden w-8 h-8 flex items-center justify-center">
-<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="A close-up portrait of a professional looking directly at the camera, wearing modern corporate attire. The lighting is bright and even, set against a clean, minimal background. The aesthetic is modern and trustworthy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEM124kDo-7bvCZ0Fg3-Sy4I2K3VYPYDNa38pNXT1IwZhUARKcIU_MFdM9PGWAjCW5jrgJ4cU_MwWAXbHgsf5bKfZo58ThuubqzSdnwBt7Y1KrE3C1LEYvVg2lZEaksLPJ2Dcb4WBMN98QTVdFHGh9QNXfmbcokMPXvL5uQPqe5cvhivM6Kawhdk-oeaQLonBFeKgEN8ATZvsv198GYJZcOIVRjJdvN4O-7qCnqtEj9izaHtdEI1ZfdAvUsakc8AzYEKIbGDi3QnQ"/>
-</div>
-</header>
-<!-- Mobile Drawer Overlay -->
-<div id="drawer-overlay" class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300"></div>
-<!-- NavigationDrawer / Responsive Sidebar -->
-<nav id="main-drawer" class="fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out bg-surface dark:bg-background text-secondary dark:text-secondary-fixed h-full w-80 rounded-r-xl border-r border-outline-variant shadow-lg flex flex-col p-stack-md shrink-0 z-50">
-<div class="mb-stack-lg flex items-center gap-4">
-<div class="w-12 h-12 rounded-full overflow-hidden shrink-0">
-<img alt="User avatar" class="w-full h-full object-cover" data-alt="A close-up portrait of a professional looking directly at the camera, wearing modern corporate attire. The lighting is bright and even, set against a clean, minimal background. The aesthetic is modern and trustworthy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI"/>
-</div>
-<div class="flex flex-col">
-<span class="font-headline-sm text-headline-sm text-on-surface">Rodrigo Sepúlveda</span>
-<span class="font-label-md text-label-md text-secondary mt-1">Verificado</span>
-</div>
-</div>
-<div class="flex flex-col gap-2">
-<a href="/mapa_de_b_squeda_cliente/index.html" class="nav-customer flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="explore">explore</span>
-<span class="font-body-md text-body-md">Explorar</span>
-</a>
-<a href="/centro_de_mensajer_a/index.html" class="nav-shared flex items-center gap-3 px-4 py-3 rounded-lg bg-secondary-container text-on-secondary-container font-semibold cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="chat" style="font-variation-settings: 'FILL' 1;">chat</span>
-<span class="font-body-md text-body-md">Mensajes</span>
-</a>
-<a href="/panel_del_prestador/index.html" class="nav-provider flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
-<span class="font-label-md text-label-md">Solicitudes</span>
-</a>
-<a href="/perfil_del_cliente/index.html" class="nav-customer flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="person">person</span>
-<span class="font-body-md text-body-md">Perfil</span>
-</a>
-<a href="/perfil_del_prestador/index.html" class="nav-provider flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="person">person</span>
-<span class="font-body-md text-body-md">Perfil</span>
-</a>
-</div>
-<hr class="my-stack-md border-outline-variant"/>
-<div class="flex flex-col gap-2">
-<a id="switch-role-btn" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="switch_account">switch_account</span>
-<span id="switch-role-text" class="font-body-md text-body-md">Cambiar a Perfil de Trabajador</span>
-</a>
-<a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
-<span class="font-body-md text-body-md">Servicios Guardados</span>
-</a>
+  </head>
+  <body
+    class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:flex-row overflow-hidden"
+  >
+    <!-- Mobile TopAppBar / Hidden on Desktop -->
+    <header
+      class="md:hidden bg-surface dark:bg-background text-secondary dark:text-secondary-fixed w-full top-0 sticky border-b border-outline-variant dark:border-on-surface-variant flex justify-between items-center px-gutter py-stack-sm z-40"
+    >
+      <button
+        id="mobile-menu-btn"
+        class="hover:bg-surface-container-low transition-colors active:opacity-80 transition-all p-2 rounded-full flex items-center justify-center"
+      >
+        <span
+          class="material-symbols-outlined text-secondary dark:text-secondary-fixed"
+          data-icon="menu"
+          >menu</span
+        >
+      </button>
+      <h1
+        class="font-headline-md text-headline-md font-bold text-secondary dark:text-secondary-fixed"
+      >
+        MatchWorking
+      </h1>
+      <div
+        class="hover:bg-surface-container-low transition-colors active:opacity-80 transition-all rounded-full overflow-hidden w-8 h-8 flex items-center justify-center"
+      >
+        <img
+          alt="User profile avatar"
+          class="w-full h-full object-cover"
+          data-alt="A close-up portrait of a professional looking directly at the camera, wearing modern corporate attire. The lighting is bright and even, set against a clean, minimal background. The aesthetic is modern and trustworthy."
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEM124kDo-7bvCZ0Fg3-Sy4I2K3VYPYDNa38pNXT1IwZhUARKcIU_MFdM9PGWAjCW5jrgJ4cU_MwWAXbHgsf5bKfZo58ThuubqzSdnwBt7Y1KrE3C1LEYvVg2lZEaksLPJ2Dcb4WBMN98QTVdFHGh9QNXfmbcokMPXvL5uQPqe5cvhivM6Kawhdk-oeaQLonBFeKgEN8ATZvsv198GYJZcOIVRjJdvN4O-7qCnqtEj9izaHtdEI1ZfdAvUsakc8AzYEKIbGDi3QnQ"
+        />
+      </div>
+    </header>
+    <!-- Mobile Drawer Overlay -->
+    <div
+      id="drawer-overlay"
+      class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300"
+    ></div>
+    <!-- NavigationDrawer / Responsive Sidebar -->
+    <nav
+      id="main-drawer"
+      class="fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out bg-surface dark:bg-background text-secondary dark:text-secondary-fixed h-full w-80 rounded-r-xl border-r border-outline-variant shadow-lg flex flex-col p-stack-md shrink-0 z-50"
+    >
+      <div class="mb-stack-lg flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full overflow-hidden shrink-0">
+          <img
+            alt="User avatar"
+            class="w-full h-full object-cover"
+            data-alt="A close-up portrait of a professional looking directly at the camera, wearing modern corporate attire. The lighting is bright and even, set against a clean, minimal background. The aesthetic is modern and trustworthy."
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI"
+          />
+        </div>
+        <div class="flex flex-col">
+          <span class="font-headline-sm text-headline-sm text-on-surface"
+            >Rodrigo Sepúlveda</span
+          >
+          <span class="font-label-md text-label-md text-secondary mt-1"
+            >Verificado</span
+          >
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <a
+          href="/mapa_de_b_squeda_cliente/index.html"
+          class="nav-customer flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="explore"
+            >explore</span
+          >
+          <span class="font-body-md text-body-md">Explorar</span>
+        </a>
+        <a
+          href="/centro_de_mensajer_a/index.html"
+          class="nav-shared flex items-center gap-3 px-4 py-3 rounded-lg bg-secondary-container text-on-secondary-container font-semibold cursor-pointer transition-colors duration-200"
+        >
+          <span
+            class="material-symbols-outlined"
+            data-icon="chat"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >chat</span
+          >
+          <span class="font-body-md text-body-md">Mensajes</span>
+        </a>
+        <a
+          href="/panel_del_prestador/index.html"
+          class="nav-provider flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="assignment"
+            >assignment</span
+          >
+          <span class="font-label-md text-label-md">Solicitudes</span>
+        </a>
+        <a
+          href="/perfil_del_cliente/index.html"
+          class="nav-customer flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="person"
+            >person</span
+          >
+          <span class="font-body-md text-body-md">Perfil</span>
+        </a>
+        <a
+          href="/perfil_del_prestador/index.html"
+          class="nav-provider flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="person"
+            >person</span
+          >
+          <span class="font-body-md text-body-md">Perfil</span>
+        </a>
+      </div>
+      <hr class="my-stack-md border-outline-variant" />
+      <div class="flex flex-col gap-2">
+        <a
+          id="switch-role-btn"
+          href="#"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="switch_account"
+            >switch_account</span
+          >
+          <span id="switch-role-text" class="font-body-md text-body-md"
+            >Cambiar a Perfil de Trabajador</span
+          >
+        </a>
+        <a
+          href="#"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="bookmark"
+            >bookmark</span
+          >
+          <span class="font-body-md text-body-md">Servicios Guardados</span>
+        </a>
 
+        <a
+          id="theme-toggle-btn"
+          href="#"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span
+            class="material-symbols-outlined"
+            id="theme-toggle-icon"
+            data-icon="dark_mode"
+            >dark_mode</span
+          >
+          <span class="font-body-md text-body-md" id="theme-toggle-text"
+            >Modo Oscuro</span
+          >
+        </a>
+        <a
+          href="#"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="help">help</span>
+          <span class="font-body-md text-body-md">Centro de Ayuda</span>
+        </a>
+      </div>
+    </nav>
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+      <!-- Conversation List -->
+      <div
+        id="chat-list-view"
+        class="w-full md:w-80 lg:w-96 border-r border-outline-variant bg-surface flex flex-col h-full shrink-0"
+      >
+        <div
+          class="p-gutter border-b border-outline-variant bg-surface sticky top-0 z-10"
+        >
+          <h2
+            class="font-headline-md text-headline-md text-on-surface mb-stack-sm"
+          >
+            Mensajes
+          </h2>
+          <div class="relative">
+            <span
+              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
+              data-icon="search"
+              >search</span
+            >
+            <input
+              class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-secondary focus:bg-surface-container-lowest transition-colors"
+              placeholder="Buscar mensajes..."
+              type="text"
+            />
+          </div>
+        </div>
+        <div
+          class="flex-1 overflow-y-auto pb-16 md:pb-0"
+          id="conversations-list"
+        >
+          <!-- Rendered dynamically by script -->
+          <div
+            class="flex flex-col items-center justify-center p-8 text-center h-48 text-on-surface-variant"
+          >
+            <p class="font-body-md text-body-md">Cargando conversaciones...</p>
+          </div>
+        </div>
+      </div>
+      <!-- Chat Detail View -->
+      <div
+        id="chat-detail-view"
+        class="hidden md:flex flex-1 flex-col h-full bg-surface-container-lowest w-full"
+      >
+        <!-- Chat Header -->
+        <div
+          class="px-gutter py-4 border-b border-outline-variant bg-surface flex justify-between items-center sticky top-0 z-10 shadow-sm"
+        >
+          <div class="flex items-center gap-4">
+            <button
+              id="chat-back-btn"
+              class="md:hidden text-on-surface-variant hover:text-on-surface"
+            >
+              <span class="material-symbols-outlined" data-icon="arrow_back"
+                >arrow_back</span
+              >
+            </button>
+            <div class="relative w-10 h-10 shrink-0">
+              <img
+                id="chat-header-avatar"
+                alt="Avatar"
+                class="w-full h-full rounded-full object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI"
+              />
+              <div
+                id="chat-header-status-dot"
+                class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#94A3B8] border border-surface rounded-full"
+              ></div>
+            </div>
+            <div>
+              <h2
+                id="chat-header-name"
+                class="font-headline-sm text-headline-sm text-on-surface"
+              >
+                Selecciona un chat
+              </h2>
+              <span
+                id="chat-header-status-badge"
+                class="inline-flex items-center gap-1 font-label-md text-label-md text-on-surface-variant bg-[#94A3B8]/10 px-2 py-0.5 rounded-full mt-0.5"
+              >
+                <span class="w-1.5 h-1.5 bg-[#94A3B8] rounded-full"></span>
+                Desconectado
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2" id="chat-header-actions">
+            <button
+              id="btn-directions"
+              class="hidden text-secondary bg-secondary-container hover:bg-secondary-container-high px-3 py-1.5 rounded-lg flex items-center gap-2 transition-colors active:scale-95"
+            >
+              <span class="material-symbols-outlined text-[18px]"
+                >directions</span
+              >
+              <span class="font-label-md hidden md:inline">Cómo llegar</span>
+            </button>
+            <button
+              class="p-2 text-on-surface-variant hover:text-secondary hover:bg-surface-container-low rounded-full transition-colors"
+            >
+              <span class="material-symbols-outlined" data-icon="call"
+                >call</span
+              >
+            </button>
+            <button
+              class="p-2 text-on-surface-variant hover:text-secondary hover:bg-surface-container-low rounded-full transition-colors"
+            >
+              <span class="material-symbols-outlined" data-icon="more_vert"
+                >more_vert</span
+              >
+            </button>
+          </div>
+        </div>
+        <!-- Chat Messages Area -->
+        <div
+          id="chat-messages-container"
+          class="flex-1 overflow-y-auto p-gutter pb-gutter flex flex-col gap-stack-md bg-surface-bright justify-center items-center"
+        >
+          <div
+            class="flex flex-col items-center justify-center p-8 text-center text-on-surface-variant"
+          >
+            <span
+              class="material-symbols-outlined text-5xl mb-3 text-secondary animate-bounce"
+              data-icon="chat"
+              >chat</span
+            >
+            <p class="font-headline-sm text-headline-sm font-semibold">
+              MatchWorking Centro de Mensajería
+            </p>
+            <p
+              class="font-body-md text-body-md text-on-surface-variant/80 mt-1 max-w-sm"
+            >
+              Selecciona una conversación a la izquierda para empezar a chatear
+              en tiempo real.
+            </p>
+          </div>
+        </div>
+        <!-- Message Input Area -->
+        <div
+          class="p-4 pb-8 md:pb-4 bg-surface border-t border-outline-variant shadow-[0_-4px_12px_0px_rgba(0,0,0,0.02)]"
+        >
+          <div
+            class="flex items-end gap-2 bg-[#F1F5F9] focus-within:bg-surface-container-lowest focus-within:ring-2 focus-within:ring-secondary rounded-2xl p-2 transition-all"
+          >
+            <button
+              class="p-2 text-on-surface-variant hover:text-secondary transition-colors shrink-0"
+            >
+              <span
+                class="material-symbols-outlined"
+                data-icon="add_photo_alternate"
+                >add_photo_alternate</span
+              >
+            </button>
+            <textarea
+              id="chat-textarea"
+              class="w-full bg-transparent border-none focus:ring-0 resize-none font-body-md text-body-md text-on-surface max-h-32 py-2"
+              placeholder="Escribe un mensaje..."
+              rows="1"
+              style="min-height: 40px"
+            ></textarea>
+            <button
+              id="chat-send-btn"
+              class="p-2 bg-secondary text-on-secondary rounded-xl hover:bg-secondary/90 transition-colors shrink-0 shadow-sm flex items-center justify-center"
+            >
+              <span class="material-symbols-outlined" data-icon="send"
+                >send</span
+              >
+            </button>
+          </div>
+          <div class="text-center mt-2">
+            <span
+              class="font-label-md text-label-md text-on-surface-variant/70 flex items-center justify-center gap-1"
+            >
+              <span
+                class="material-symbols-outlined text-[12px]"
+                data-icon="lock"
+                >lock</span
+              >
+              Los mensajes están encriptados de extremo a extremo
+            </span>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Mobile BottomNavBar / Hidden on Desktop -->
+    <nav
+      id="mobile-bottom-nav"
+      class="md:hidden fixed bottom-0 w-full z-50 shadow-[0_-4px_12px_0px_rgba(0,0,0,0.04)] bg-surface-container-lowest flex justify-around items-center h-16 px-2 pb-safe border-t border-outline-variant"
+    >
+      <a
+        href="/mapa_de_b_squeda_cliente/index.html"
+        class="nav-customer flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 w-16"
+      >
+        <span class="material-symbols-outlined mb-1" data-icon="map">map</span>
+        <span class="font-label-md text-label-md">Explorar</span>
+      </a>
+      <a
+        href="/centro_de_mensajer_a/index.html"
+        class="nav-shared flex flex-col items-center justify-center text-on-secondary-container bg-secondary-container rounded-xl px-4 py-1 hover:text-secondary active:scale-95 transition-transform duration-150 relative"
+      >
+        <span
+          class="material-symbols-outlined mb-1"
+          data-icon="chat"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >chat</span
+        >
+        <span class="font-label-md text-label-md font-bold">Mensajes</span>
+      </a>
+      <a
+        href="/panel_del_prestador/index.html"
+        class="nav-provider flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 w-16"
+      >
+        <span class="material-symbols-outlined mb-1" data-icon="assignment"
+          >assignment</span
+        >
+        <span class="font-label-md text-label-md">Solicitudes</span>
+      </a>
+      <a
+        href="/perfil_del_cliente/index.html"
+        class="nav-customer flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 w-16"
+      >
+        <span class="material-symbols-outlined mb-1" data-icon="person"
+          >person</span
+        >
+        <span class="font-label-md text-label-md">Perfil</span>
+      </a>
+      <a
+        href="/perfil_del_prestador/index.html"
+        class="nav-provider flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 w-16"
+      >
+        <span class="material-symbols-outlined mb-1" data-icon="person"
+          >person</span
+        >
+        <span class="font-label-md text-label-md">Perfil</span>
+      </a>
+    </nav>
 
-<a id="theme-toggle-btn" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" id="theme-toggle-icon" data-icon="dark_mode">dark_mode</span>
-<span class="font-body-md text-body-md" id="theme-toggle-text">Modo Oscuro</span>
-</a>
-<a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="help">help</span>
-<span class="font-body-md text-body-md">Centro de Ayuda</span>
-</a>
-</div>
-</nav>
-<!-- Main Content Area -->
-<main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-<!-- Conversation List -->
-<div id="chat-list-view" class="w-full md:w-80 lg:w-96 border-r border-outline-variant bg-surface flex flex-col h-full shrink-0">
-<div class="p-gutter border-b border-outline-variant bg-surface sticky top-0 z-10">
-<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-sm">Mensajes</h2>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
-<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-secondary focus:bg-surface-container-lowest transition-colors" placeholder="Buscar mensajes..." type="text"/>
-</div>
-</div>
-<div class="flex-1 overflow-y-auto pb-16 md:pb-0" id="conversations-list">
-<!-- Rendered dynamically by script -->
-<div class="flex flex-col items-center justify-center p-8 text-center h-48 text-on-surface-variant">
-<p class="font-body-md text-body-md">Cargando conversaciones...</p>
-</div>
-</div>
-</div>
-<!-- Chat Detail View -->
-<div id="chat-detail-view" class="hidden md:flex flex-1 flex-col h-full bg-surface-container-lowest w-full">
-<!-- Chat Header -->
-<div class="px-gutter py-4 border-b border-outline-variant bg-surface flex justify-between items-center sticky top-0 z-10 shadow-sm">
-<div class="flex items-center gap-4">
-<button id="chat-back-btn" class="md:hidden text-on-surface-variant hover:text-on-surface">
-<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
-</button>
-<div class="relative w-10 h-10 shrink-0">
-<img id="chat-header-avatar" alt="Avatar" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI"/>
-<div id="chat-header-status-dot" class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#94A3B8] border border-surface rounded-full"></div>
-</div>
-<div>
-<h2 id="chat-header-name" class="font-headline-sm text-headline-sm text-on-surface">Selecciona un chat</h2>
-<span id="chat-header-status-badge" class="inline-flex items-center gap-1 font-label-md text-label-md text-on-surface-variant bg-[#94A3B8]/10 px-2 py-0.5 rounded-full mt-0.5">
-<span class="w-1.5 h-1.5 bg-[#94A3B8] rounded-full"></span> Desconectado
-</span>
-</div>
-</div>
-<div class="flex items-center gap-2" id="chat-header-actions">
-<button id="btn-directions" class="hidden text-secondary bg-secondary-container hover:bg-secondary-container-high px-3 py-1.5 rounded-lg flex items-center gap-2 transition-colors active:scale-95">
-<span class="material-symbols-outlined text-[18px]">directions</span>
-<span class="font-label-md hidden md:inline">Cómo llegar</span>
-</button>
-<button class="p-2 text-on-surface-variant hover:text-secondary hover:bg-surface-container-low rounded-full transition-colors">
-<span class="material-symbols-outlined" data-icon="call">call</span>
-</button>
-<button class="p-2 text-on-surface-variant hover:text-secondary hover:bg-surface-container-low rounded-full transition-colors">
-<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
-</button>
-</div>
-</div>
-<!-- Chat Messages Area -->
-<div id="chat-messages-container" class="flex-1 overflow-y-auto p-gutter pb-gutter flex flex-col gap-stack-md bg-surface-bright justify-center items-center">
-<div class="flex flex-col items-center justify-center p-8 text-center text-on-surface-variant">
-<span class="material-symbols-outlined text-5xl mb-3 text-secondary animate-bounce" data-icon="chat">chat</span>
-<p class="font-headline-sm text-headline-sm font-semibold">MatchWorking Centro de Mensajería</p>
-<p class="font-body-md text-body-md text-on-surface-variant/80 mt-1 max-w-sm">Selecciona una conversación a la izquierda para empezar a chatear en tiempo real.</p>
-</div>
-</div>
-<!-- Message Input Area -->
-<div class="p-4 pb-8 md:pb-4 bg-surface border-t border-outline-variant shadow-[0_-4px_12px_0px_rgba(0,0,0,0.02)]">
-<div class="flex items-end gap-2 bg-[#F1F5F9] focus-within:bg-surface-container-lowest focus-within:ring-2 focus-within:ring-secondary rounded-2xl p-2 transition-all">
-<button class="p-2 text-on-surface-variant hover:text-secondary transition-colors shrink-0">
-<span class="material-symbols-outlined" data-icon="add_photo_alternate">add_photo_alternate</span>
-</button>
-<textarea id="chat-textarea" class="w-full bg-transparent border-none focus:ring-0 resize-none font-body-md text-body-md text-on-surface max-h-32 py-2" placeholder="Escribe un mensaje..." rows="1" style="min-height: 40px;"></textarea>
-<button id="chat-send-btn" class="p-2 bg-secondary text-on-secondary rounded-xl hover:bg-secondary/90 transition-colors shrink-0 shadow-sm flex items-center justify-center">
-<span class="material-symbols-outlined" data-icon="send">send</span>
-</button>
-</div>
-<div class="text-center mt-2">
-<span class="font-label-md text-label-md text-on-surface-variant/70 flex items-center justify-center gap-1">
-<span class="material-symbols-outlined text-[12px]" data-icon="lock">lock</span>
-Los mensajes están encriptados de extremo a extremo
-</span>
-</div>
-</div>
-</div>
-</main>
-<!-- Mobile BottomNavBar / Hidden on Desktop -->
-<nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 w-full z-50 shadow-[0_-4px_12px_0px_rgba(0,0,0,0.04)] bg-surface-container-lowest flex justify-around items-center h-16 px-2 pb-safe border-t border-outline-variant">
-<a href="/mapa_de_b_squeda_cliente/index.html" class="nav-customer flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 w-16">
-<span class="material-symbols-outlined mb-1" data-icon="map">map</span>
-<span class="font-label-md text-label-md">Explorar</span>
-</a>
-<a href="/centro_de_mensajer_a/index.html" class="nav-shared flex flex-col items-center justify-center text-on-secondary-container bg-secondary-container rounded-xl px-4 py-1 hover:text-secondary active:scale-95 transition-transform duration-150 relative">
-<span class="material-symbols-outlined mb-1" data-icon="chat" style="font-variation-settings: 'FILL' 1;">chat</span>
-<span class="font-label-md text-label-md font-bold">Mensajes</span>
-</a>
-<a href="/panel_del_prestador/index.html" class="nav-provider flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 w-16">
-<span class="material-symbols-outlined mb-1" data-icon="assignment">assignment</span>
-<span class="font-label-md text-label-md">Solicitudes</span>
-</a>
-<a href="/perfil_del_cliente/index.html" class="nav-customer flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 w-16">
-<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
-<span class="font-label-md text-label-md">Perfil</span>
-</a>
-<a href="/perfil_del_prestador/index.html" class="nav-provider flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 w-16">
-<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
-<span class="font-label-md text-label-md">Perfil</span>
-</a>
-</nav>
+    <!-- Modal: Seleccionar Oficio -->
+    <div id="select-profession-modal" class="fixed inset-0 bg-black/50 z-[9999] hidden items-center justify-center p-4 pointer-events-auto transition-opacity opacity-0 duration-300">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-2xl p-6 w-full max-w-sm flex flex-col gap-4 transform scale-95 transition-transform duration-300" id="select-profession-content">
+        <div class="flex justify-between items-center border-b border-outline-variant pb-3 shrink-0">
+          <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Seleccionar Oficio</h3>
+          <button id="close-select-profession-modal" class="text-on-surface-variant hover:text-on-surface flex items-center justify-center bg-surface-container-high rounded-full p-1">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+        <p class="font-body-sm text-on-surface-variant">Elige con qué oficio deseas conectarte ahora.</p>
+        <div id="professions-list" class="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1 no-scrollbar">
+          <!-- Populated dynamically -->
+        </div>
+        <button id="add-new-profession-btn" class="w-full bg-surface-container-high text-on-surface font-label-md py-3 mt-2 rounded-lg hover:bg-surface-container-highest transition-all flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">add</span> Agregar nuevo oficio
+        </button>
+      </div>
+    </div>
 
-<script type="module">
-import { supabase } from '/src/supabase.js';
-import { getMessages, sendMessage, getUserProfile } from '/src/data.js';
+    <script type="module">
+      import { supabase } from "/src/supabase.js";
+      import { getMessages, sendMessage, getUserProfile, getUserProfessions, saveUserProfession, setActiveProfession, CATEGORIES } from "/src/data.js";
 
-// Auth Guard to prevent unauthorized access
-const checkAuth = async () => {
-    let authorized = false;
-    try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
+      // Auth Guard to prevent unauthorized access
+      const checkAuth = async () => {
+        let authorized = false;
+        try {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          if (session) {
             authorized = true;
             // Sync current user role to localStorage
-            const userRole = session.user.user_metadata.role || 'customer';
-            if (!localStorage.getItem('user_role')) { localStorage.setItem('user_role', userRole); }
-        } else {
-            // Check for mock session role
-            if (localStorage.getItem('user_role')) {
-                authorized = true;
+            const userRole = session.user.user_metadata.role || "customer";
+            if (!localStorage.getItem("user_role")) {
+              localStorage.setItem("user_role", userRole);
             }
+          } else {
+            // Check for mock session role
+            if (localStorage.getItem("user_role")) {
+              authorized = true;
+            }
+          }
+        } catch (_) {
+          if (localStorage.getItem("user_role")) authorized = true;
         }
-    } catch (_) {
-        if (localStorage.getItem('user_role')) authorized = true;
-    }
 
-    if (!authorized) {
-        window.location.replace('/index.html');
-    } else {
-        document.body.style.display = 'flex'; // Unhide body in desktop / mobile flex layouts
-    }
-};
-await checkAuth();
-
-// Globals
-let activeUserId = null;
-const role = localStorage.getItem('user_role') || 'customer';
-let conversations = [];
-let activeContact = null;
-let realtimeChannel = null;
-
-// Apply role styling
-const applyRoleNav = () => {
-    const currentRole = localStorage.getItem('user_role') || 'customer';
-    document.querySelectorAll('.nav-customer').forEach(el => {
-        if (currentRole === 'customer') {
-            el.classList.remove('hidden');
-            el.style.display = 'flex';
+        if (!authorized) {
+          window.location.replace("/index.html");
         } else {
-            el.classList.add('hidden');
-            el.style.display = 'none';
+          document.body.style.display = "flex"; // Unhide body in desktop / mobile flex layouts
         }
-    });
-    document.querySelectorAll('.nav-provider').forEach(el => {
-        if (currentRole === 'provider') {
-            el.classList.remove('hidden');
-            el.style.display = 'flex';
-        } else {
-            el.classList.add('hidden');
-            el.style.display = 'none';
+      };
+      await checkAuth();
+
+      // Globals
+      let activeUserId = null;
+      const role = localStorage.getItem("user_role") || "customer";
+      let conversations = [];
+      let activeContact = null;
+      let realtimeChannel = null;
+
+      // Apply role styling
+      const applyRoleNav = () => {
+        const currentRole = localStorage.getItem("user_role") || "customer";
+        document.querySelectorAll(".nav-customer").forEach((el) => {
+          if (currentRole === "customer") {
+            el.classList.remove("hidden");
+            el.style.display = "flex";
+          } else {
+            el.classList.add("hidden");
+            el.style.display = "none";
+          }
+        });
+        document.querySelectorAll(".nav-provider").forEach((el) => {
+          if (currentRole === "provider") {
+            el.classList.remove("hidden");
+            el.style.display = "flex";
+          } else {
+            el.classList.add("hidden");
+            el.style.display = "none";
+          }
+        });
+      };
+      applyRoleNav();
+      setTimeout(applyRoleNav, 100);
+      setTimeout(applyRoleNav, 500);
+
+      // Mobile Chat Toggle Logic elements
+      const chatListView = document.getElementById("chat-list-view");
+      const chatDetailView = document.getElementById("chat-detail-view");
+      const backBtn = document.getElementById("chat-back-btn");
+
+      function formatMessageTime(isoString) {
+        if (!isoString) return "Recién";
+        const date = new Date(isoString);
+        const now = new Date();
+        if (date.toDateString() === now.toDateString()) {
+          return date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
         }
-    });
-};
-applyRoleNav();
-setTimeout(applyRoleNav, 100);
-setTimeout(applyRoleNav, 500);
+        return date.toLocaleDateString([], { month: "short", day: "numeric" });
+      }
 
-// Mobile Chat Toggle Logic elements
-const chatListView = document.getElementById('chat-list-view');
-const chatDetailView = document.getElementById('chat-detail-view');
-const backBtn = document.getElementById('chat-back-btn');
+      function formatTimeOnly(isoString) {
+        if (!isoString) return "9:41 AM";
+        const date = new Date(isoString);
+        return date.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
 
-function formatMessageTime(isoString) {
-    if (!isoString) return 'Recién';
-    const date = new Date(isoString);
-    const now = new Date();
-    if (date.toDateString() === now.toDateString()) {
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-}
+      function escapeHTML(str) {
+        if (!str) return "";
+        return str.replace(
+          /[&<>'"]/g,
+          (tag) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              "'": "&#39;",
+              '"': "&quot;",
+            })[tag] || tag,
+        );
+      }
 
-function formatTimeOnly(isoString) {
-    if (!isoString) return '9:41 AM';
-    const date = new Date(isoString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function escapeHTML(str) {
-    if (!str) return '';
-    return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-    );
-}
-
-// Render dynamic profiles in navigation header
-const syncNavigationHeader = async (user) => {
-    try {
-        const profile = await getUserProfile(user.id);
-        if (profile) {
-            document.querySelectorAll('img[alt="User profile avatar"]').forEach(img => img.src = profile.avatar_url);
-            document.querySelectorAll('img[alt="User avatar"]').forEach(img => img.src = profile.avatar_url);
-            const titleEl = document.querySelector('#main-drawer span.font-headline-sm');
+      // Render dynamic profiles in navigation header
+      const syncNavigationHeader = async (user) => {
+        try {
+          const profile = await getUserProfile(user.id);
+          if (profile) {
+            document
+              .querySelectorAll('img[alt="User profile avatar"]')
+              .forEach((img) => (img.src = profile.avatar_url));
+            document
+              .querySelectorAll('img[alt="User avatar"]')
+              .forEach((img) => (img.src = profile.avatar_url));
+            const titleEl = document.querySelector(
+              "#main-drawer span.font-headline-sm",
+            );
             if (titleEl) titleEl.innerText = profile.name;
+          }
+        } catch (e) {
+          console.warn("No se pudo sincronizar el header de navegación:", e);
         }
-    } catch (e) {
-        console.warn("No se pudo sincronizar el header de navegación:", e);
-    }
-};
+      };
 
-async function loadConversations() {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
+      async function loadConversations() {
+        try {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          if (user) {
             activeUserId = user.id;
             await syncNavigationHeader(user);
 
             // Fetch service requests status 'aceptado'
             const { data: matches, error } = await supabase
-                .from('service_requests')
-                .select('*')
-                .eq('status', 'aceptado')
-                .or(`customer_id.eq.${user.id},provider_id.eq.${user.id}`);
-            
+              .from("service_requests")
+              .select("*")
+              .eq("status", "aceptado")
+              .or(`customer_id.eq.${user.id},provider_id.eq.${user.id}`);
+
             if (error) throw error;
-            
+
             const contactList = [];
-            for (const match of (matches || [])) {
-                const contactId = match.customer_id === user.id ? match.provider_id : match.customer_id;
-                
-                // Avoid duplicates
-                if (contactList.some(c => c.id === contactId)) continue;
-                
-                let contactProfile = null;
-                
-                if (match.customer_id === user.id) {
-                    // Contact is provider
-                    const { data: provData } = await supabase
-                        .from('providers')
-                        .select('*')
-                        .eq('id', contactId)
-                        .single();
-                    if (provData) {
-                        contactProfile = {
-                            id: contactId,
-                            name: provData.name,
-                            avatar_url: provData.image || provData.avatar_url,
-                            status: provData.status || 'En línea',
-                            profession: provData.profession || 'Trabajador Profesional'
-                        };
-                    }
+            for (const match of matches || []) {
+              const contactId =
+                match.customer_id === user.id
+                  ? match.provider_id
+                  : match.customer_id;
+
+              // Avoid duplicates
+              if (contactList.some((c) => c.id === contactId)) continue;
+
+              let contactProfile = null;
+
+              if (match.customer_id === user.id) {
+                // Contact is provider
+                const { data: provData } = await supabase
+                  .from("providers")
+                  .select("*")
+                  .eq("id", contactId)
+                  .single();
+                if (provData) {
+                  contactProfile = {
+                    id: contactId,
+                    name: provData.name,
+                    avatar_url: provData.image || provData.avatar_url,
+                    status: provData.status || "En línea",
+                    profession: provData.profession || "Trabajador Profesional",
+                  };
                 }
-                
-                if (!contactProfile) {
-                    // Search profiles table
-                    const { data: profData } = await supabase
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', contactId)
-                        .single();
-                    if (profData) {
-                        contactProfile = {
-                            id: contactId,
-                            name: profData.name,
-                            avatar_url: profData.avatar_url,
-                            status: 'En línea',
-                            profession: profData.role === 'provider' ? 'Trabajador Profesional' : 'Cliente'
-                        };
-                    }
+              }
+
+              if (!contactProfile) {
+                // Search profiles table
+                const { data: profData } = await supabase
+                  .from("profiles")
+                  .select("*")
+                  .eq("id", contactId)
+                  .single();
+                if (profData) {
+                  contactProfile = {
+                    id: contactId,
+                    name: profData.name,
+                    avatar_url: profData.avatar_url,
+                    status: "En línea",
+                    profession:
+                      profData.role === "provider"
+                        ? "Trabajador Profesional"
+                        : "Cliente",
+                  };
                 }
-                
-                if (!contactProfile) {
-                    contactProfile = {
-                        id: contactId,
-                        name: 'Usuario MatchWorking',
-                        avatar_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI',
-                        status: 'En línea',
-                        profession: 'Usuario'
-                    };
-                }
-                
-                const lastMsgs = await getMessages(user.id, contactId);
-                const lastMsg = lastMsgs.length > 0 ? lastMsgs[lastMsgs.length - 1] : null;
-                
-                contactList.push({
-                    ...contactProfile,
-                    lastMessage: lastMsg ? lastMsg.text : '¡Match aceptado! Inicia la conversación.',
-                    lastMessageTime: lastMsg ? formatMessageTime(lastMsg.created_at) : 'Recién',
-                    unread: 0
-                });
+              }
+
+              if (!contactProfile) {
+                contactProfile = {
+                  id: contactId,
+                  name: "Usuario MatchWorking",
+                  avatar_url:
+                    "https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI",
+                  status: "En línea",
+                  profession: "Usuario",
+                };
+              }
+
+              const lastMsgs = await getMessages(user.id, contactId);
+              const lastMsg =
+                lastMsgs.length > 0 ? lastMsgs[lastMsgs.length - 1] : null;
+
+              contactList.push({
+                ...contactProfile,
+                lastMessage: lastMsg
+                  ? lastMsg.text
+                  : "¡Match aceptado! Inicia la conversación.",
+                lastMessageTime: lastMsg
+                  ? formatMessageTime(lastMsg.created_at)
+                  : "Recién",
+                unread: 0,
+              });
             }
             conversations = contactList;
-        } else {
+          } else {
             throw new Error("No user session");
-        }
-    } catch (e) {
-        console.warn("Using localStorage fallback for chats:", e.message);
-        
-        activeUserId = role === 'customer' ? '201' : '11111111-1111-1111-1111-111111111111';
-        
-        const requests = JSON.parse(localStorage.getItem('prolink_requests') || '[]');
-        const acceptedRequests = requests.filter(r => r.status === 'aceptado');
-        
-        const localConversations = [];
-        for (const req of acceptedRequests) {
-            const isMeCustomer = role === 'customer';
-            const contactId = isMeCustomer ? req.providerId : req.userId;
-            const contactName = isMeCustomer ? 'Carlos Mendoza' : (req.userName || 'Cliente');
-            const contactAvatar = isMeCustomer 
-                ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuAdPJUTN3AOed0_u2Wle8oeK-WeBTxEG70bSbGByBC0nIvgHRQmXnFKM36074rS5hRy_RMjMWwAJImKPOXqiT8_8xg0JW_bneIG9l2LsD1O8DqSHbGXYccTi9ee0rM2B4_A0Y4jCbR9tW8ePBR8JkvLMaFRiTV4WOqUcI2oKE03yOIg7qahI-s-BJ9EBirAycUfEL9hAe9OP0pzsaeFtQZnpbAMGpnUKDYDD2BXZLindbLkbv5SlUUJ674DVIexV6pjkAX5FPTGQ1o'
-                : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI';
-            
-            const lastMsgs = await getMessages(activeUserId, contactId);
-            const lastMsg = lastMsgs.length > 0 ? lastMsgs[lastMsgs.length - 1] : null;
-            
-            localConversations.push({
-                id: contactId,
-                name: contactName,
-                avatar_url: contactAvatar,
-                status: 'En línea',
-                profession: isMeCustomer ? 'Maestro Gasfitero' : 'Cliente',
-                lastMessage: lastMsg ? lastMsg.text : '¡Match aceptado! Inicia la conversación.',
-                lastMessageTime: lastMsg ? formatMessageTime(lastMsg.created_at) : 'Recién',
-                unread: 0
-            });
-        }
-        
-        // Add dynamic mockups if list empty
-        if (localConversations.length === 0) {
-            localConversations.push(
-                {
-                    id: 'javiera-paz-id',
-                    name: 'Javiera Paz',
-                    avatar_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAwA9NCT_ClbpkD8x_c-dPhc80rko-a28tf2dakB6UbM_ncMJWjcWl9n43FSYSuCyftJRie0olVOCMZFtfpdlZIUpPIUq-tgy7fGwW1bG5C9CXZfU4Nht9gCrK6IuJzeAzrcnR5YGKjNeCmtjaplzH6VuIhZ5Nty7r1BgMD_gfLRlP__grJGQ55-wGl50PhGPYHDbExAHTWvaTMid8gp8-BtuHS1srpZK4gBHktZie_NtKRQtlfm46Bk3KNhgq1Q5l-TS5W2bupFDY',
-                    status: 'En línea',
-                    profession: 'Diseñadora de Interiores',
-                    lastMessage: '¡Estaré ahí en 10 minutos!',
-                    lastMessageTime: 'Recién',
-                    unread: 0
-                },
-                {
-                    id: 'francisco-javier-id',
-                    name: 'Francisco Javier',
-                    avatar_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDQf2cOwEPiPWBcFToltARev3HvT1u7Xx-ZbptUjnpPk8jd2BrveE7WQ1kjbRWUzNNWSCdU-_e5v1DmmBjILbB0nIVunWtVkUiV4Xc8Bvjhvv0wloafhhCWCWIm-5VB6jtvKRYUaPojcPxTvYq7JTRb9YNgtQC_Smqa1lVH_ydDK86zOjAN_FnUdpFz0CHbBu76ysxYkpSOTQCQTyx3OlKfzoRPKXrs12uLypvpt4pTAirL9lnhqU34fqo-KlIh3lJIQh1tROQ7o-4',
-                    status: 'Desconectado',
-                    profession: 'Electricista SEC',
-                    lastMessage: '¿Podemos reprogramar para mañana?',
-                    lastMessageTime: '10:42 AM',
-                    unread: 1
-                }
-            );
-        }
-        conversations = localConversations;
-    }
-    renderConversationsList();
-}
+          }
+        } catch (e) {
+          console.warn("Using localStorage fallback for chats:", e.message);
 
-function renderConversationsList() {
-    const listContainer = document.getElementById('conversations-list');
-    if (!listContainer) return;
-    
-    listContainer.innerHTML = '';
-    
-    conversations.forEach(conv => {
-        const isActive = activeContact && activeContact.id === conv.id;
-        const bgClass = isActive ? 'bg-primary-fixed border-secondary' : 'hover:bg-surface-container-low border-transparent';
-        const unreadBadge = conv.unread > 0 
-            ? `<div class="w-5 h-5 bg-secondary text-on-secondary rounded-full flex items-center justify-center font-label-md text-[10px] shrink-0">${conv.unread}</div>`
-            : '';
-        const statusColor = conv.status === 'En línea' ? 'bg-[#10B981]' : 'bg-[#94A3B8]';
-        const lastMsgFont = conv.unread > 0 ? 'font-bold text-on-surface' : '';
-        
-        const html = `
+          activeUserId =
+            role === "customer"
+              ? "201"
+              : "11111111-1111-1111-1111-111111111111";
+
+          const requests = JSON.parse(
+            localStorage.getItem("prolink_requests") || "[]",
+          );
+          const acceptedRequests = requests.filter(
+            (r) => r.status === "aceptado",
+          );
+
+          const localConversations = [];
+          for (const req of acceptedRequests) {
+            const isMeCustomer = role === "customer";
+            const contactId = isMeCustomer ? req.providerId : req.userId;
+            const contactName = isMeCustomer
+              ? "Carlos Mendoza"
+              : req.userName || "Cliente";
+            const contactAvatar = isMeCustomer
+              ? "https://lh3.googleusercontent.com/aida-public/AB6AXuAdPJUTN3AOed0_u2Wle8oeK-WeBTxEG70bSbGByBC0nIvgHRQmXnFKM36074rS5hRy_RMjMWwAJImKPOXqiT8_8xg0JW_bneIG9l2LsD1O8DqSHbGXYccTi9ee0rM2B4_A0Y4jCbR9tW8ePBR8JkvLMaFRiTV4WOqUcI2oKE03yOIg7qahI-s-BJ9EBirAycUfEL9hAe9OP0pzsaeFtQZnpbAMGpnUKDYDD2BXZLindbLkbv5SlUUJ674DVIexV6pjkAX5FPTGQ1o"
+              : "https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI";
+
+            const lastMsgs = await getMessages(activeUserId, contactId);
+            const lastMsg =
+              lastMsgs.length > 0 ? lastMsgs[lastMsgs.length - 1] : null;
+
+            localConversations.push({
+              id: contactId,
+              name: contactName,
+              avatar_url: contactAvatar,
+              status: "En línea",
+              profession: isMeCustomer ? "Maestro Gasfitero" : "Cliente",
+              lastMessage: lastMsg
+                ? lastMsg.text
+                : "¡Match aceptado! Inicia la conversación.",
+              lastMessageTime: lastMsg
+                ? formatMessageTime(lastMsg.created_at)
+                : "Recién",
+              unread: 0,
+            });
+          }
+
+          // Add dynamic mockups if list empty
+          if (localConversations.length === 0) {
+            localConversations.push(
+              {
+                id: "javiera-paz-id",
+                name: "Javiera Paz",
+                avatar_url:
+                  "https://lh3.googleusercontent.com/aida-public/AB6AXuAwA9NCT_ClbpkD8x_c-dPhc80rko-a28tf2dakB6UbM_ncMJWjcWl9n43FSYSuCyftJRie0olVOCMZFtfpdlZIUpPIUq-tgy7fGwW1bG5C9CXZfU4Nht9gCrK6IuJzeAzrcnR5YGKjNeCmtjaplzH6VuIhZ5Nty7r1BgMD_gfLRlP__grJGQ55-wGl50PhGPYHDbExAHTWvaTMid8gp8-BtuHS1srpZK4gBHktZie_NtKRQtlfm46Bk3KNhgq1Q5l-TS5W2bupFDY",
+                status: "En línea",
+                profession: "Diseñadora de Interiores",
+                lastMessage: "¡Estaré ahí en 10 minutos!",
+                lastMessageTime: "Recién",
+                unread: 0,
+              },
+              {
+                id: "francisco-javier-id",
+                name: "Francisco Javier",
+                avatar_url:
+                  "https://lh3.googleusercontent.com/aida-public/AB6AXuDQf2cOwEPiPWBcFToltARev3HvT1u7Xx-ZbptUjnpPk8jd2BrveE7WQ1kjbRWUzNNWSCdU-_e5v1DmmBjILbB0nIVunWtVkUiV4Xc8Bvjhvv0wloafhhCWCWIm-5VB6jtvKRYUaPojcPxTvYq7JTRb9YNgtQC_Smqa1lVH_ydDK86zOjAN_FnUdpFz0CHbBu76ysxYkpSOTQCQTyx3OlKfzoRPKXrs12uLypvpt4pTAirL9lnhqU34fqo-KlIh3lJIQh1tROQ7o-4",
+                status: "Desconectado",
+                profession: "Electricista SEC",
+                lastMessage: "¿Podemos reprogramar para mañana?",
+                lastMessageTime: "10:42 AM",
+                unread: 1,
+              },
+            );
+          }
+          conversations = localConversations;
+        }
+        renderConversationsList();
+      }
+
+      function renderConversationsList() {
+        const listContainer = document.getElementById("conversations-list");
+        if (!listContainer) return;
+
+        listContainer.innerHTML = "";
+
+        conversations.forEach((conv) => {
+          const isActive = activeContact && activeContact.id === conv.id;
+          const bgClass = isActive
+            ? "bg-primary-fixed border-secondary"
+            : "hover:bg-surface-container-low border-transparent";
+          const unreadBadge =
+            conv.unread > 0
+              ? `<div class="w-5 h-5 bg-secondary text-on-secondary rounded-full flex items-center justify-center font-label-md text-[10px] shrink-0">${conv.unread}</div>`
+              : "";
+          const statusColor =
+            conv.status === "En línea" ? "bg-[#10B981]" : "bg-[#94A3B8]";
+          const lastMsgFont =
+            conv.unread > 0 ? "font-bold text-on-surface" : "";
+
+          const html = `
             <div data-contact-id="${conv.id}" class="flex items-center gap-4 p-4 cursor-pointer border-l-4 transition-colors duration-200 ${bgClass} conversation-item">
                 <div class="relative w-12 h-12 shrink-0">
                     <img alt="${conv.name}" class="w-full h-full rounded-full object-cover" src="${conv.avatar_url}" />
@@ -474,28 +787,28 @@ function renderConversationsList() {
                 ${unreadBadge}
             </div>
         `;
-        listContainer.innerHTML += html;
-    });
-    
-    document.querySelectorAll('.conversation-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const contactId = item.getAttribute('data-contact-id');
-            const contact = conversations.find(c => c.id === contactId);
-            if (contact) {
-                selectConversation(contact);
-            }
+          listContainer.innerHTML += html;
         });
-    });
-}
 
-function renderSingleMessage(msg, isMe) {
-    if (isMe) {
-        return `
+        document.querySelectorAll(".conversation-item").forEach((item) => {
+          item.addEventListener("click", () => {
+            const contactId = item.getAttribute("data-contact-id");
+            const contact = conversations.find((c) => c.id === contactId);
+            if (contact) {
+              selectConversation(contact);
+            }
+          });
+        });
+      }
+
+      function renderSingleMessage(msg, isMe) {
+        if (isMe) {
+          return `
             <div class="flex gap-3 max-w-[85%] self-end">
                 <div class="flex flex-col gap-1 items-end">
-                    <div class="${msg.image_url ? 'bg-secondary p-1' : 'bg-secondary text-on-secondary p-3'} rounded-2xl rounded-tr-sm shadow-sm ${msg.image_url ? 'overflow-hidden' : ''}">
-                        ${msg.image_url ? `<img src="${msg.image_url}" class="rounded-xl max-w-sm w-full object-cover" />` : ''}
-                        ${msg.text ? `<p class="font-body-md text-body-md ${msg.image_url ? 'p-2 text-on-secondary' : ''}">${escapeHTML(msg.text)}</p>` : ''}
+                    <div class="${msg.image_url ? "bg-secondary p-1" : "bg-secondary text-on-secondary p-3"} rounded-2xl rounded-tr-sm shadow-sm ${msg.image_url ? "overflow-hidden" : ""}">
+                        ${msg.image_url ? `<img src="${msg.image_url}" class="rounded-xl max-w-sm w-full object-cover" />` : ""}
+                        ${msg.text ? `<p class="font-body-md text-body-md ${msg.image_url ? "p-2 text-on-secondary" : ""}">${escapeHTML(msg.text)}</p>` : ""}
                     </div>
                     <div class="flex items-center gap-1 mr-1">
                         <span class="font-label-md text-label-md text-on-surface-variant">${formatTimeOnly(msg.created_at)}</span>
@@ -504,29 +817,32 @@ function renderSingleMessage(msg, isMe) {
                 </div>
             </div>
         `;
-    } else {
-        return `
+        } else {
+          return `
             <div class="flex gap-3 max-w-[85%] self-start">
                 <img alt="${activeContact.name} Avatar" class="w-8 h-8 rounded-full object-cover shrink-0 mt-1" src="${activeContact.avatar_url}"/>
                 <div class="flex flex-col gap-1">
                     <div class="bg-surface-container-high text-on-surface p-3 rounded-2xl rounded-tl-sm shadow-sm">
-                        ${msg.image_url ? `<img src="${msg.image_url}" class="rounded-xl max-w-sm w-full object-cover mb-2" />` : ''}
+                        ${msg.image_url ? `<img src="${msg.image_url}" class="rounded-xl max-w-sm w-full object-cover mb-2" />` : ""}
                         <p class="font-body-md text-body-md">${escapeHTML(msg.text)}</p>
                     </div>
                     <span class="font-label-md text-label-md text-on-surface-variant ml-1">${formatTimeOnly(msg.created_at)}</span>
                 </div>
             </div>
         `;
-    }
-}
+        }
+      }
 
-async function loadAndRenderMessages() {
-    if (!activeContact) return;
-    const messagesContainer = document.getElementById('chat-messages-container');
-    if (!messagesContainer) return;
-    
-    messagesContainer.className = "flex-1 overflow-y-auto p-gutter pb-20 md:pb-gutter flex flex-col gap-stack-md bg-surface-bright";
-    messagesContainer.innerHTML = `
+      async function loadAndRenderMessages() {
+        if (!activeContact) return;
+        const messagesContainer = document.getElementById(
+          "chat-messages-container",
+        );
+        if (!messagesContainer) return;
+
+        messagesContainer.className =
+          "flex-1 overflow-y-auto p-gutter pb-20 md:pb-gutter flex flex-col gap-stack-md bg-surface-bright";
+        messagesContainer.innerHTML = `
         <div class="flex justify-center my-stack-sm">
             <div class="bg-surface-container-highest px-4 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant shadow-sm border border-outline-variant/30 flex items-center gap-2">
                 <span class="material-symbols-outlined text-[16px] text-secondary" data-icon="check_circle">check_circle</span>
@@ -534,392 +850,545 @@ async function loadAndRenderMessages() {
             </div>
         </div>
     `;
-    
-    const msgs = await getMessages(activeUserId, activeContact.id);
-    
-    if (msgs.length === 0) {
-        messagesContainer.innerHTML += `
+
+        const msgs = await getMessages(activeUserId, activeContact.id);
+
+        if (msgs.length === 0) {
+          messagesContainer.innerHTML += `
             <div class="flex flex-col items-center justify-center p-8 text-center text-on-surface-variant flex-1 empty-msgs-state">
                 <p class="font-body-md text-body-md">No hay mensajes anteriores.</p>
                 <p class="font-label-md text-label-md text-on-surface-variant/80 mt-1">¡Sé el primero en enviar un mensaje!</p>
             </div>
         `;
-    } else {
-        let lastDateString = '';
-        msgs.forEach(msg => {
+        } else {
+          let lastDateString = "";
+          msgs.forEach((msg) => {
             const date = new Date(msg.created_at);
             const dateString = date.toDateString();
-            
+
             if (dateString !== lastDateString) {
-                const dayLabel = date.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
-                messagesContainer.innerHTML += `
+              const dayLabel = date.toLocaleDateString([], {
+                weekday: "long",
+                month: "short",
+                day: "numeric",
+              });
+              messagesContainer.innerHTML += `
                     <div class="flex justify-center my-2">
                         <span class="font-label-md text-label-md text-on-surface-variant bg-surface-container px-3 py-1 rounded-full text-xs">${dayLabel}</span>
                     </div>
                 `;
-                lastDateString = dateString;
+              lastDateString = dateString;
             }
-            
+
             const isMe = msg.sender_id === activeUserId;
             messagesContainer.innerHTML += renderSingleMessage(msg, isMe);
-        });
-    }
-    
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
+          });
+        }
 
-function setupRealtimeSubscription() {
-    if (realtimeChannel) {
-        supabase.removeChannel(realtimeChannel);
-    }
-    
-    realtimeChannel = supabase.channel(`chat-room-${activeContact.id}`)
-        .on('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages'
-        }, payload => {
-            const newMsg = payload.new;
-            
-            const isFromActiveContact = newMsg.sender_id === activeContact.id && newMsg.receiver_id === activeUserId;
-            const isFromMe = newMsg.sender_id === activeUserId && newMsg.receiver_id === activeContact.id;
-            
-            if (isFromActiveContact || isFromMe) {
-                const messagesContainer = document.getElementById('chat-messages-container');
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+
+      function setupRealtimeSubscription() {
+        if (realtimeChannel) {
+          supabase.removeChannel(realtimeChannel);
+        }
+
+        realtimeChannel = supabase
+          .channel(`chat-room-${activeContact.id}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "INSERT",
+              schema: "public",
+              table: "messages",
+            },
+            (payload) => {
+              const newMsg = payload.new;
+
+              const isFromActiveContact =
+                newMsg.sender_id === activeContact.id &&
+                newMsg.receiver_id === activeUserId;
+              const isFromMe =
+                newMsg.sender_id === activeUserId &&
+                newMsg.receiver_id === activeContact.id;
+
+              if (isFromActiveContact || isFromMe) {
+                const messagesContainer = document.getElementById(
+                  "chat-messages-container",
+                );
                 if (messagesContainer) {
-                    const emptyState = messagesContainer.querySelector('.empty-msgs-state');
-                    if (emptyState) emptyState.remove();
-                    
-                    const isMe = newMsg.sender_id === activeUserId;
-                    messagesContainer.innerHTML += renderSingleMessage(newMsg, isMe);
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }
-                
-                const conv = conversations.find(c => c.id === activeContact.id);
-                if (conv) {
-                    conv.lastMessage = newMsg.text || 'Imagen';
-                    conv.lastMessageTime = formatMessageTime(newMsg.created_at);
-                    renderConversationsList();
-                }
-            } else {
-                const conv = conversations.find(c => c.id === newMsg.sender_id && newMsg.receiver_id === activeUserId);
-                if (conv) {
-                    conv.unread += 1;
-                    conv.lastMessage = newMsg.text || 'Imagen';
-                    conv.lastMessageTime = formatMessageTime(newMsg.created_at);
-                    renderConversationsList();
-                }
-            }
-        })
-        .subscribe();
-}
+                  const emptyState =
+                    messagesContainer.querySelector(".empty-msgs-state");
+                  if (emptyState) emptyState.remove();
 
-function selectConversation(contact) {
-    activeContact = contact;
-    
-    const cIdx = conversations.findIndex(c => c.id === contact.id);
-    if (cIdx !== -1) {
-        conversations[cIdx].unread = 0;
-    }
-    renderConversationsList();
-    
-    if (window.innerWidth < 768) {
-        chatListView.classList.add('hidden');
-        chatListView.classList.remove('flex');
-        
-        chatDetailView.classList.remove('hidden');
-        chatDetailView.classList.add('flex');
-        
-        const bNav = document.getElementById('mobile-bottom-nav');
-        if(bNav) bNav.classList.add('hidden');
-    } else {
-        chatDetailView.classList.remove('hidden');
-        chatDetailView.classList.add('flex');
-    }
-    
-    const avatarImg = document.getElementById('chat-header-avatar');
-    if (avatarImg) avatarImg.src = contact.avatar_url;
-    
-    const nameEl = document.getElementById('chat-header-name');
-    if (nameEl) nameEl.innerText = contact.name;
-    
-    const dot = document.getElementById('chat-header-status-dot');
-    const statusColor = contact.status === 'En línea' ? 'bg-[#10B981]' : 'bg-[#94A3B8]';
-    if (dot) {
-        dot.className = `absolute bottom-0 right-0 w-2.5 h-2.5 ${statusColor} border border-surface rounded-full`;
-    }
-    
-    const badge = document.getElementById('chat-header-status-badge');
-    if (badge) {
-        badge.innerHTML = `<span class="w-1.5 h-1.5 ${statusColor} rounded-full"></span> ${contact.status}`;
-        badge.className = `inline-flex items-center gap-1 font-label-md text-label-md text-on-surface-variant ${contact.status === 'En línea' ? 'bg-[#10B981]/10' : 'bg-[#94A3B8]/10'} px-2 py-0.5 rounded-full mt-0.5`;
-    }
-    
-    // GPS Navigation logic for Providers
-    const btnDirections = document.getElementById('btn-directions');
-    if (btnDirections) {
-        if (role === 'provider') {
-            btnDirections.classList.remove('hidden');
-            btnDirections.onclick = () => {
-                alert(`Abriendo ruta hacia la ubicación de ${contact.name}...\\n(En producción esto abriría el navegador GPS o Waze con las coordenadas de la solicitud)`);
-            };
+                  const isMe = newMsg.sender_id === activeUserId;
+                  messagesContainer.innerHTML += renderSingleMessage(
+                    newMsg,
+                    isMe,
+                  );
+                  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+
+                const conv = conversations.find(
+                  (c) => c.id === activeContact.id,
+                );
+                if (conv) {
+                  conv.lastMessage = newMsg.text || "Imagen";
+                  conv.lastMessageTime = formatMessageTime(newMsg.created_at);
+                  renderConversationsList();
+                }
+              } else {
+                const conv = conversations.find(
+                  (c) =>
+                    c.id === newMsg.sender_id &&
+                    newMsg.receiver_id === activeUserId,
+                );
+                if (conv) {
+                  conv.unread += 1;
+                  conv.lastMessage = newMsg.text || "Imagen";
+                  conv.lastMessageTime = formatMessageTime(newMsg.created_at);
+                  renderConversationsList();
+                }
+              }
+            },
+          )
+          .subscribe();
+      }
+
+      function selectConversation(contact) {
+        activeContact = contact;
+
+        const cIdx = conversations.findIndex((c) => c.id === contact.id);
+        if (cIdx !== -1) {
+          conversations[cIdx].unread = 0;
+        }
+        renderConversationsList();
+
+        if (window.innerWidth < 768) {
+          chatListView.classList.add("hidden");
+          chatListView.classList.remove("flex");
+
+          chatDetailView.classList.remove("hidden");
+          chatDetailView.classList.add("flex");
+
+          const bNav = document.getElementById("mobile-bottom-nav");
+          if (bNav) bNav.classList.add("hidden");
         } else {
-            btnDirections.classList.add('hidden');
+          chatDetailView.classList.remove("hidden");
+          chatDetailView.classList.add("flex");
         }
-    }
-    
-    loadAndRenderMessages();
-    setupRealtimeSubscription();
-}
 
-async function handleSend() {
-    if (!activeContact) {
-        alert("Por favor selecciona un contacto para chatear.");
-        return;
-    }
-    const textarea = document.getElementById('chat-textarea');
-    if (!textarea) return;
-    
-    const text = textarea.value.trim();
-    if (!text) return;
-    
-    textarea.value = '';
-    
-    try {
-        const sent = await sendMessage(activeUserId, activeContact.id, text);
-        
-        // Manual append if channel not fully connected or fallback was used
-        const isFallback = !supabase.storage || !realtimeChannel || realtimeChannel.state !== 'joined';
-        
-        if (isFallback) {
-            const messagesContainer = document.getElementById('chat-messages-container');
+        const avatarImg = document.getElementById("chat-header-avatar");
+        if (avatarImg) avatarImg.src = contact.avatar_url;
+
+        const nameEl = document.getElementById("chat-header-name");
+        if (nameEl) nameEl.innerText = contact.name;
+
+        const dot = document.getElementById("chat-header-status-dot");
+        const statusColor =
+          contact.status === "En línea" ? "bg-[#10B981]" : "bg-[#94A3B8]";
+        if (dot) {
+          dot.className = `absolute bottom-0 right-0 w-2.5 h-2.5 ${statusColor} border border-surface rounded-full`;
+        }
+
+        const badge = document.getElementById("chat-header-status-badge");
+        if (badge) {
+          badge.innerHTML = `<span class="w-1.5 h-1.5 ${statusColor} rounded-full"></span> ${contact.status}`;
+          badge.className = `inline-flex items-center gap-1 font-label-md text-label-md text-on-surface-variant ${contact.status === "En línea" ? "bg-[#10B981]/10" : "bg-[#94A3B8]/10"} px-2 py-0.5 rounded-full mt-0.5`;
+        }
+
+        // GPS Navigation logic for Providers
+        const btnDirections = document.getElementById("btn-directions");
+        if (btnDirections) {
+          if (role === "provider") {
+            btnDirections.classList.remove("hidden");
+            btnDirections.onclick = () => {
+              alert(
+                `Abriendo ruta hacia la ubicación de ${contact.name}...\\n(En producción esto abriría el navegador GPS o Waze con las coordenadas de la solicitud)`,
+              );
+            };
+          } else {
+            btnDirections.classList.add("hidden");
+          }
+        }
+
+        loadAndRenderMessages();
+        setupRealtimeSubscription();
+      }
+
+      async function handleSend() {
+        if (!activeContact) {
+          alert("Por favor selecciona un contacto para chatear.");
+          return;
+        }
+        const textarea = document.getElementById("chat-textarea");
+        if (!textarea) return;
+
+        const text = textarea.value.trim();
+        if (!text) return;
+
+        textarea.value = "";
+
+        try {
+          const sent = await sendMessage(activeUserId, activeContact.id, text);
+
+          // Manual append if channel not fully connected or fallback was used
+          const isFallback =
+            !supabase.storage ||
+            !realtimeChannel ||
+            realtimeChannel.state !== "joined";
+
+          if (isFallback) {
+            const messagesContainer = document.getElementById(
+              "chat-messages-container",
+            );
             if (messagesContainer) {
-                const emptyState = messagesContainer.querySelector('.empty-msgs-state');
-                if (emptyState) emptyState.remove();
-                
-                const dummyMsg = {
-                    id: Date.now().toString(),
-                    created_at: new Date().toISOString(),
-                    sender_id: activeUserId,
-                    receiver_id: activeContact.id,
-                    text: text,
-                    image_url: null
-                };
-                
-                messagesContainer.innerHTML += renderSingleMessage(dummyMsg, true);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                
-                const conv = conversations.find(c => c.id === activeContact.id);
-                if (conv) {
-                    conv.lastMessage = text;
-                    conv.lastMessageTime = 'Recién';
-                    renderConversationsList();
-                }
-            }
-        }
-    } catch (err) {
-        console.error("Error al enviar mensaje:", err);
-    }
-}
+              const emptyState =
+                messagesContainer.querySelector(".empty-msgs-state");
+              if (emptyState) emptyState.remove();
 
-// Event Listeners for inputs
-const textarea = document.getElementById('chat-textarea');
-if (textarea) {
-    textarea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+              const dummyMsg = {
+                id: Date.now().toString(),
+                created_at: new Date().toISOString(),
+                sender_id: activeUserId,
+                receiver_id: activeContact.id,
+                text: text,
+                image_url: null,
+              };
+
+              messagesContainer.innerHTML += renderSingleMessage(
+                dummyMsg,
+                true,
+              );
+              messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+              const conv = conversations.find((c) => c.id === activeContact.id);
+              if (conv) {
+                conv.lastMessage = text;
+                conv.lastMessageTime = "Recién";
+                renderConversationsList();
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Error al enviar mensaje:", err);
+        }
+      }
+
+      // Event Listeners for inputs
+      const textarea = document.getElementById("chat-textarea");
+      if (textarea) {
+        textarea.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             handleSend();
-        }
-    });
-}
+          }
+        });
+      }
 
-const sendBtn = document.getElementById('chat-send-btn');
-if (sendBtn) {
-    sendBtn.addEventListener('click', handleSend);
-}
+      const sendBtn = document.getElementById("chat-send-btn");
+      if (sendBtn) {
+        sendBtn.addEventListener("click", handleSend);
+      }
 
-// Back button on mobile
-if (backBtn) {
-    backBtn.addEventListener('click', () => {
-        if (window.innerWidth < 768) {
-            chatDetailView.classList.add('hidden');
-            chatDetailView.classList.remove('flex');
-            
-            chatListView.classList.remove('hidden');
-            chatListView.classList.add('flex');
-            
-            const bNav = document.getElementById('mobile-bottom-nav');
-            if(bNav) bNav.classList.remove('hidden');
-        }
-    });
-}
+      // Back button on mobile
+      if (backBtn) {
+        backBtn.addEventListener("click", () => {
+          if (window.innerWidth < 768) {
+            chatDetailView.classList.add("hidden");
+            chatDetailView.classList.remove("flex");
 
-// Window resize handler
-window.addEventListener('resize', () => {
-    if (window.innerWidth >= 768) {
-        chatListView.classList.remove('hidden');
-        chatListView.classList.add('flex');
-        chatDetailView.classList.remove('hidden');
-        chatDetailView.classList.add('flex');
-    } else {
-        if (activeContact) {
-            chatListView.classList.add('hidden');
-            chatListView.classList.remove('flex');
-            chatDetailView.classList.remove('hidden');
-            chatDetailView.classList.add('flex');
+            chatListView.classList.remove("hidden");
+            chatListView.classList.add("flex");
+
+            const bNav = document.getElementById("mobile-bottom-nav");
+            if (bNav) bNav.classList.remove("hidden");
+          }
+        });
+      }
+
+      // Window resize handler
+      window.addEventListener("resize", () => {
+        if (window.innerWidth >= 768) {
+          chatListView.classList.remove("hidden");
+          chatListView.classList.add("flex");
+          chatDetailView.classList.remove("hidden");
+          chatDetailView.classList.add("flex");
         } else {
-            chatDetailView.classList.add('hidden');
-            chatDetailView.classList.remove('flex');
-            chatListView.classList.remove('hidden');
-            chatListView.classList.add('flex');
+          if (activeContact) {
+            chatListView.classList.add("hidden");
+            chatListView.classList.remove("flex");
+            chatDetailView.classList.remove("hidden");
+            chatDetailView.classList.add("flex");
+          } else {
+            chatDetailView.classList.add("hidden");
+            chatDetailView.classList.remove("flex");
+            chatListView.classList.remove("hidden");
+            chatListView.classList.add("flex");
+          }
         }
-    }
-});
+      });
 
-// Drawer Navigation Toggle
-const menuBtn = document.getElementById('mobile-menu-btn');
-const drawer = document.getElementById('main-drawer');
-const overlay = document.getElementById('drawer-overlay');
+      // Drawer Navigation Toggle
+      const menuBtn = document.getElementById("mobile-menu-btn");
+      const drawer = document.getElementById("main-drawer");
+      const overlay = document.getElementById("drawer-overlay");
 
-if (menuBtn && drawer && overlay) {
-    function openDrawer() {
-        overlay.classList.remove('hidden');
-        setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-        drawer.classList.remove('-translate-x-full');
-    }
+      if (menuBtn && drawer && overlay) {
+        function openDrawer() {
+          overlay.classList.remove("hidden");
+          setTimeout(() => overlay.classList.remove("opacity-0"), 10);
+          drawer.classList.remove("-translate-x-full");
+        }
 
-    function closeDrawer() {
-        overlay.classList.add('opacity-0');
-        drawer.classList.add('-translate-x-full');
-        setTimeout(() => overlay.classList.add('hidden'), 300);
-    }
+        function closeDrawer() {
+          overlay.classList.add("opacity-0");
+          drawer.classList.add("-translate-x-full");
+          setTimeout(() => overlay.classList.add("hidden"), 300);
+        }
 
-    menuBtn.addEventListener('click', openDrawer);
-    overlay.addEventListener('click', closeDrawer);
-}
+        menuBtn.addEventListener("click", openDrawer);
+        overlay.addEventListener("click", closeDrawer);
+      }
 
-// Role switching logic
-const switchBtn = document.getElementById('switch-role-btn');
-const switchText = document.getElementById('switch-role-text');
-if (switchBtn && switchText) {
-    if (role === 'customer') {
-        switchText.innerText = 'Cambiar a Perfil de Trabajador';
-        switchBtn.addEventListener('click', async (e) => {
+      // Role switching logic
+      const switchBtn = document.getElementById("switch-role-btn");
+      const switchText = document.getElementById("switch-role-text");
+      const selectProfessionModal = document.getElementById("select-profession-modal");
+      const closeSelectProfessionBtn = document.getElementById("close-select-profession-modal");
+      const addNewProfessionBtn = document.getElementById("add-new-profession-btn");
+      const professionsList = document.getElementById("professions-list");
+
+      if (closeSelectProfessionBtn) {
+        closeSelectProfessionBtn.addEventListener("click", () => {
+          selectProfessionModal.classList.add("hidden");
+          selectProfessionModal.classList.remove("flex");
+        });
+      }
+
+      if (addNewProfessionBtn) {
+        addNewProfessionBtn.addEventListener("click", () => {
+          window.location.href = "/mapa_de_b_squeda_cliente/index.html";
+        });
+      }
+
+      const renderProfessionsList = (userId) => {
+        const professions = getUserProfessions(userId);
+        professionsList.innerHTML = "";
+        
+        if (professions.length === 0) {
+          professionsList.innerHTML = "<p class='text-on-surface-variant font-body-sm text-center py-4'>No tienes oficios guardados.</p>";
+          return;
+        }
+
+        professions.forEach((prof) => {
+          const btn = document.createElement("button");
+          btn.className = "w-full text-left p-3 rounded-xl border border-outline-variant bg-surface-container-lowest flex items-center gap-3 hover:bg-surface-container-low transition-colors";
+          
+          const iconName = CATEGORIES[prof.category]?.subcategories[prof.subcategory]?.icon || "build";
+          
+          btn.innerHTML = `
+            <div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[20px]">${iconName}</span>
+            </div>
+            <div class="flex flex-col text-left">
+              <span class="font-label-lg font-bold text-on-surface">${prof.profession}</span>
+              <span class="font-body-sm text-on-surface-variant capitalize">${prof.category.replace(/_/g, ' ')}</span>
+            </div>
+          `;
+          btn.onclick = async () => {
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-secondary mx-auto">autorenew</span>`;
+            await setActiveProfession(userId, prof.id);
+            localStorage.setItem("user_role", "provider");
+            window.location.href = "/panel_del_prestador/index.html";
+          };
+          professionsList.appendChild(btn);
+        });
+      };
+
+      if (switchBtn && switchText) {
+        if (role === "customer") {
+          switchText.innerText = "Cambiar a Perfil de Trabajador";
+          switchBtn.addEventListener("click", async (e) => {
             e.preventDefault();
             try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) return;
-                
-                const profile = await getUserProfile(user.id);
-                if (!profile.category || profile.category === "") {
-                    alert("Para ofrecer servicios debes completar tu perfil profesional. Por favor, hazlo desde la pantalla de Explorar (Mapa).");
-                    window.location.href = '/mapa_de_b_squeda_cliente/index.html';
-                } else {
-                    localStorage.setItem('user_role', 'provider');
-                    window.location.href = '/panel_del_prestador/index.html';
-                }
+              const {
+                data: { user },
+              } = await supabase.auth.getUser();
+              if (!user) return;
+
+              const profile = await getUserProfile(user.id);
+              const professions = getUserProfessions(user.id);
+              
+              if (typeof closeDrawer === "function") closeDrawer();
+
+              if (professions.length > 0) {
+                renderProfessionsList(user.id);
+                selectProfessionModal.classList.remove("hidden");
+                selectProfessionModal.classList.add("flex");
+                setTimeout(() => {
+                  document.getElementById("select-profession-content").classList.remove("scale-95");
+                }, 10);
+              } 
+              else if (profile.category && profile.category !== "") {
+                saveUserProfession(user.id, {
+                  category: profile.category,
+                  subcategory: profile.subcategory,
+                  profession: profile.profession || "Especialista"
+                });
+                renderProfessionsList(user.id);
+                selectProfessionModal.classList.remove("hidden");
+                selectProfessionModal.classList.add("flex");
+                setTimeout(() => {
+                  document.getElementById("select-profession-content").classList.remove("scale-95");
+                }, 10);
+              }
+              else {
+                alert(
+                  "Para ofrecer servicios debes completar tu perfil profesional. Por favor, hazlo desde la pantalla de Explorar (Mapa)."
+                );
+                window.location.href = "/mapa_de_b_squeda_cliente/index.html";
+              }
             } catch (err) {
-                console.error(err);
-                localStorage.setItem('user_role', 'provider');
-                window.location.href = '/panel_del_prestador/index.html';
+              console.error(err);
+              localStorage.setItem("user_role", "provider");
+              window.location.href = "/panel_del_prestador/index.html";
             }
-        });
-    } else {
-        switchText.innerText = 'Cambiar a Cliente';
-        switchBtn.addEventListener('click', (e) => {
+          });
+        } else {
+          switchText.innerText = "Cambiar a Cliente";
+          switchBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            localStorage.setItem('user_role', 'customer');
-            window.location.href = '/mapa_de_b_squeda_cliente/index.html';
-        });
-    }
-}
+            localStorage.setItem("user_role", "customer");
+            window.location.href = "/mapa_de_b_squeda_cliente/index.html";
+          });
+        }
+      }
 
-// Sync fallback chat in real time across tabs using localStorage events
-window.addEventListener('storage', async (e) => {
-    if (e.key === 'prolink_messages') {
-        let hasUser = false;
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
+      // Sync fallback chat in real time across tabs using localStorage events
+      window.addEventListener("storage", async (e) => {
+        if (e.key === "prolink_messages") {
+          let hasUser = false;
+          try {
+            const {
+              data: { user },
+            } = await supabase.auth.getUser();
             if (user) hasUser = true;
-        } catch (_) {}
+          } catch (_) {}
 
-        if (!hasUser) {
+          if (!hasUser) {
             // Only use fallback sync if there is no active Supabase user session
             if (activeContact) {
-                await loadAndRenderMessages();
+              await loadAndRenderMessages();
             }
-            
+
             // Also refresh conversation list to show last message updates
-            const requests = JSON.parse(localStorage.getItem('prolink_requests') || '[]');
-            const acceptedRequests = requests.filter(r => r.status === 'aceptado');
-            
+            const requests = JSON.parse(
+              localStorage.getItem("prolink_requests") || "[]",
+            );
+            const acceptedRequests = requests.filter(
+              (r) => r.status === "aceptado",
+            );
+
             const localConversations = [];
             for (const req of acceptedRequests) {
-                const isMeCustomer = role === 'customer';
-                const contactId = isMeCustomer ? req.providerId : req.userId;
-                const contactName = isMeCustomer ? 'Carlos Mendoza' : (req.userName || 'Cliente');
-                const contactAvatar = isMeCustomer 
-                    ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuAdPJUTN3AOed0_u2Wle8oeK-WeBTxEG70bSbGByBC0nIvgHRQmXnFKM36074rS5hRy_RMjMWwAJImKPOXqiT8_8xg0JW_bneIG9l2LsD1O8DqSHbGXYccTi9ee0rM2B4_A0Y4jCbR9tW8ePBR8JkvLMaFRiTV4WOqUcI2oKE03yOIg7qahI-s-BJ9EBirAycUfEL9hAe9OP0pzsaeFtQZnpbAMGpnUKDYDD2BXZLindbLkbv5SlUUJ674DVIexV6pjkAX5FPTGQ1o'
-                    : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI';
-                
-                const lastMsgs = await getMessages(activeUserId, contactId);
-                const lastMsg = lastMsgs.length > 0 ? lastMsgs[lastMsgs.length - 1] : null;
-                
-                localConversations.push({
-                    id: contactId,
-                    name: contactName,
-                    avatar_url: contactAvatar,
-                    status: 'En línea',
-                    profession: isMeCustomer ? 'Maestro Gasfitero' : 'Cliente',
-                    lastMessage: lastMsg ? lastMsg.text : '¡Match aceptado! Inicia la conversación.',
-                    lastMessageTime: lastMsg ? formatMessageTime(lastMsg.created_at) : 'Recién',
-                    unread: 0
-                });
+              const isMeCustomer = role === "customer";
+              const contactId = isMeCustomer ? req.providerId : req.userId;
+              const contactName = isMeCustomer
+                ? "Carlos Mendoza"
+                : req.userName || "Cliente";
+              const contactAvatar = isMeCustomer
+                ? "https://lh3.googleusercontent.com/aida-public/AB6AXuAdPJUTN3AOed0_u2Wle8oeK-WeBTxEG70bSbGByBC0nIvgHRQmXnFKM36074rS5hRy_RMjMWwAJImKPOXqiT8_8xg0JW_bneIG9l2LsD1O8DqSHbGXYccTi9ee0rM2B4_A0Y4jCbR9tW8ePBR8JkvLMaFRiTV4WOqUcI2oKE03yOIg7qahI-s-BJ9EBirAycUfEL9hAe9OP0pzsaeFtQZnpbAMGpnUKDYDD2BXZLindbLkbv5SlUUJ674DVIexV6pjkAX5FPTGQ1o"
+                : "https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI";
+
+              const lastMsgs = await getMessages(activeUserId, contactId);
+              const lastMsg =
+                lastMsgs.length > 0 ? lastMsgs[lastMsgs.length - 1] : null;
+
+              localConversations.push({
+                id: contactId,
+                name: contactName,
+                avatar_url: contactAvatar,
+                status: "En línea",
+                profession: isMeCustomer ? "Maestro Gasfitero" : "Cliente",
+                lastMessage: lastMsg
+                  ? lastMsg.text
+                  : "¡Match aceptado! Inicia la conversación.",
+                lastMessageTime: lastMsg
+                  ? formatMessageTime(lastMsg.created_at)
+                  : "Recién",
+                unread: 0,
+              });
             }
             if (localConversations.length === 0) {
-                // Keep the default mockups but with updated last messages from storage
-                const allLocalMsgs = JSON.parse(localStorage.getItem('prolink_messages') || '[]');
-                const jpMsg = allLocalMsgs.filter(m => m.sender_id === 'javiera-paz-id' || m.receiver_id === 'javiera-paz-id').pop();
-                const fjMsg = allLocalMsgs.filter(m => m.sender_id === 'francisco-javier-id' || m.receiver_id === 'francisco-javier-id').pop();
-                
-                localConversations.push(
-                    {
-                        id: 'javiera-paz-id',
-                        name: 'Javiera Paz',
-                        avatar_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAwA9NCT_ClbpkD8x_c-dPhc80rko-a28tf2dakB6UbM_ncMJWjcWl9n43FSYSuCyftJRie0olVOCMZFtfpdlZIUpPIUq-tgy7fGwW1bG5C9CXZfU4Nht9gCrK6IuJzeAzrcnR5YGKjNeCmtjaplzH6VuIhZ5Nty7r1BgMD_gfLRlP__grJGQ55-wGl50PhGPYHDbExAHTWvaTMid8gp8-BtuHS1srpZK4gBHktZie_NtKRQtlfm46Bk3KNhgq1Q5l-TS5W2bupFDY',
-                        status: 'En línea',
-                        profession: 'Diseñadora de Interiores',
-                        lastMessage: jpMsg ? jpMsg.text : '¡Estaré ahí en 10 minutos!',
-                        lastMessageTime: jpMsg ? formatMessageTime(jpMsg.created_at) : 'Recién',
-                        unread: 0
-                    },
-                    {
-                        id: 'francisco-javier-id',
-                        name: 'Francisco Javier',
-                        avatar_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDQf2cOwEPiPWBcFToltARev3HvT1u7Xx-ZbptUjnpPk8jd2BrveE7WQ1kjbRWUzNNWSCdU-_e5v1DmmBjILbB0nIVunWtVkUiV4Xc8Bvjhvv0wloafhhCWCWIm-5VB6jtvKRYUaPojcPxTvYq7JTRb9YNgtQC_Smqa1lVH_ydDK86zOjAN_FnUdpFz0CHbBu76ysxYkpSOTQCQTyx3OlKfzoRPKXrs12uLypvpt4pTAirL9lnhqU34fqo-KlIh3lJIQh1tROQ7o-4',
-                        status: 'Desconectado',
-                        profession: 'Electricista SEC',
-                        lastMessage: fjMsg ? fjMsg.text : '¿Podemos reprogramar para mañana?',
-                        lastMessageTime: fjMsg ? formatMessageTime(fjMsg.created_at) : '10:42 AM',
-                        unread: 0
-                    }
-                );
+              // Keep the default mockups but with updated last messages from storage
+              const allLocalMsgs = JSON.parse(
+                localStorage.getItem("prolink_messages") || "[]",
+              );
+              const jpMsg = allLocalMsgs
+                .filter(
+                  (m) =>
+                    m.sender_id === "javiera-paz-id" ||
+                    m.receiver_id === "javiera-paz-id",
+                )
+                .pop();
+              const fjMsg = allLocalMsgs
+                .filter(
+                  (m) =>
+                    m.sender_id === "francisco-javier-id" ||
+                    m.receiver_id === "francisco-javier-id",
+                )
+                .pop();
+
+              localConversations.push(
+                {
+                  id: "javiera-paz-id",
+                  name: "Javiera Paz",
+                  avatar_url:
+                    "https://lh3.googleusercontent.com/aida-public/AB6AXuAwA9NCT_ClbpkD8x_c-dPhc80rko-a28tf2dakB6UbM_ncMJWjcWl9n43FSYSuCyftJRie0olVOCMZFtfpdlZIUpPIUq-tgy7fGwW1bG5C9CXZfU4Nht9gCrK6IuJzeAzrcnR5YGKjNeCmtjaplzH6VuIhZ5Nty7r1BgMD_gfLRlP__grJGQ55-wGl50PhGPYHDbExAHTWvaTMid8gp8-BtuHS1srpZK4gBHktZie_NtKRQtlfm46Bk3KNhgq1Q5l-TS5W2bupFDY",
+                  status: "En línea",
+                  profession: "Diseñadora de Interiores",
+                  lastMessage: jpMsg
+                    ? jpMsg.text
+                    : "¡Estaré ahí en 10 minutos!",
+                  lastMessageTime: jpMsg
+                    ? formatMessageTime(jpMsg.created_at)
+                    : "Recién",
+                  unread: 0,
+                },
+                {
+                  id: "francisco-javier-id",
+                  name: "Francisco Javier",
+                  avatar_url:
+                    "https://lh3.googleusercontent.com/aida-public/AB6AXuDQf2cOwEPiPWBcFToltARev3HvT1u7Xx-ZbptUjnpPk8jd2BrveE7WQ1kjbRWUzNNWSCdU-_e5v1DmmBjILbB0nIVunWtVkUiV4Xc8Bvjhvv0wloafhhCWCWIm-5VB6jtvKRYUaPojcPxTvYq7JTRb9YNgtQC_Smqa1lVH_ydDK86zOjAN_FnUdpFz0CHbBu76ysxYkpSOTQCQTyx3OlKfzoRPKXrs12uLypvpt4pTAirL9lnhqU34fqo-KlIh3lJIQh1tROQ7o-4",
+                  status: "Desconectado",
+                  profession: "Electricista SEC",
+                  lastMessage: fjMsg
+                    ? fjMsg.text
+                    : "¿Podemos reprogramar para mañana?",
+                  lastMessageTime: fjMsg
+                    ? formatMessageTime(fjMsg.created_at)
+                    : "10:42 AM",
+                  unread: 0,
+                },
+              );
             }
             conversations = localConversations;
             renderConversationsList();
+          }
         }
-    }
-});
+      });
 
-// Initialize conversations and check for auto-opening chat param
-await loadConversations();
-const urlParams = new URLSearchParams(window.location.search);
-const chatContactId = urlParams.get('chat');
-if (chatContactId) {
-    const contact = conversations.find(c => c.id === chatContactId);
-    if (contact) {
-        selectConversation(contact);
-    }
-}
-</script>
-</body></html>
+      // Initialize conversations and check for auto-opening chat param
+      await loadConversations();
+      const urlParams = new URLSearchParams(window.location.search);
+      const chatContactId = urlParams.get("chat");
+      if (chatContactId) {
+        const contact = conversations.find((c) => c.id === chatContactId);
+        if (contact) {
+          selectConversation(contact);
+        }
+      }
+    </script>
+  </body>
+</html>

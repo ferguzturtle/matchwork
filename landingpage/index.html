@@ -1,352 +1,535 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MatchWorking - Expertos locales a un solo toque</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" />
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MatchWorking - Expertos locales a un solo toque</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    />
+  </head>
+  <body>
+    <!-- Ambient background glow elements -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
 
-  <!-- Ambient background glow elements -->
-  <div class="bg-glow bg-glow-1"></div>
-  <div class="bg-glow bg-glow-2"></div>
+    <!-- Header -->
+    <header id="main-header">
+      <div class="nav-container">
+        <a href="#" class="logo">
+          <img
+            src="/logo.png"
+            alt="MatchWorking Logo"
+            style="height: 52px; width: auto; object-fit: contain"
+          />
+        </a>
 
-  <!-- Header -->
-  <header id="main-header">
-    <div class="nav-container">
-      <a href="#" class="logo">
-        <img src="/logo.png" alt="MatchWorking Logo" style="height: 52px; width: auto; object-fit: contain;">
-      </a>
-      
-      <ul class="nav-links" id="nav-menu">
-        <li><a href="#inicio">Inicio</a></li>
-        <li><a href="#caracteristicas">Características</a></li>
-        <li><a href="#como-funciona">Cómo Funciona</a></li>
-        <li><a href="#simulador">Simulación</a></li>
-        <li><a href="#contacto" class="btn btn-secondary">Contacto</a></li>
-      </ul>
+        <ul class="nav-links" id="nav-menu">
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#caracteristicas">Características</a></li>
+          <li><a href="#como-funciona">Cómo Funciona</a></li>
+          <li><a href="#simulador">Simulación</a></li>
+          <li><a href="#contacto" class="btn btn-secondary">Contacto</a></li>
+        </ul>
 
-      <button class="menu-btn" id="mobile-menu-toggle">
-        <span class="material-symbols-outlined" style="font-size: 28px;">menu</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="hero" id="inicio">
-    <div class="hero-content">
-      <div class="badge">
-        <div class="badge-dot"></div>
-        Geolocalización en Tiempo Real
+        <button class="menu-btn" id="mobile-menu-toggle">
+          <span class="material-symbols-outlined" style="font-size: 28px"
+            >menu</span
+          >
+        </button>
       </div>
-      <h1 class="hero-title">Servicios locales, a un solo <span>toque de distancia</span>.</h1>
-      <p class="hero-description">
-        MatchWorking es la red definitiva basada en geolocalización que te conecta directamente y en tiempo real con expertos y proveedores técnicos autorizados en tu vecindario. Sin intermediarios, sin comisiones ocultas.
-      </p>
-      <div class="hero-ctas">
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+      <div class="hero-content">
+        <div class="badge">
+          <div class="badge-dot"></div>
+          Geolocalización en Tiempo Real
+        </div>
+        <h1 class="hero-title">
+          Servicios locales, a un solo <span>toque de distancia</span>.
+        </h1>
+        <p class="hero-description">
+          MatchWorking es la red definitiva basada en geolocalización que te
+          conecta directamente y en tiempo real con expertos y proveedores
+          técnicos autorizados en tu vecindario. Sin intermediarios, sin
+          comisiones ocultas.
+        </p>
+        <div class="hero-ctas">
+          <button class="btn btn-primary open-waitlist-btn">
+            Buscar Profesionales
+            <span class="material-symbols-outlined">search</span>
+          </button>
+          <button class="btn btn-secondary open-waitlist-btn">
+            Ofrecer mis Servicios
+            <span class="material-symbols-outlined">construction</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Mock App Frame -->
+      <div class="hero-visual">
+        <div class="mock-app-frame">
+          <div class="mock-app-header">
+            <span class="mock-logo">MatchWorking</span>
+            <div class="mock-avatar">
+              <img
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80"
+                alt="Avatar"
+                style="
+                  width: 100%;
+                  height: 100%;
+                  border-radius: 50%;
+                  object-fit: cover;
+                "
+              />
+            </div>
+          </div>
+          <div class="mock-map-canvas">
+            <div class="mock-user-pin"></div>
+
+            <!-- Pins with category icons -->
+            <div class="mock-pin mock-pin-1" data-provider-id="1">
+              <div class="mock-pin-icon">
+                <span class="material-symbols-outlined">plumbing</span>
+              </div>
+            </div>
+            <div class="mock-pin mock-pin-2" data-provider-id="2">
+              <div class="mock-pin-icon">
+                <span class="material-symbols-outlined">bolt</span>
+              </div>
+            </div>
+            <div class="mock-pin mock-pin-3" data-provider-id="3">
+              <div class="mock-pin-icon">
+                <span class="material-symbols-outlined">cleaning_services</span>
+              </div>
+            </div>
+
+            <!-- Bottom Provider Drawer Mockup -->
+            <div class="mock-popup-card" id="hero-provider-popup">
+              <img
+                class="mock-card-avatar"
+                id="hero-popup-avatar"
+                src=""
+                alt="Avatar"
+              />
+              <div class="mock-card-info">
+                <div class="mock-card-name" id="hero-popup-name">
+                  Carlos Mendoza
+                </div>
+                <div class="mock-card-role" id="hero-popup-profession">
+                  Maestro Gasfitero Autorizado
+                </div>
+                <div class="mock-card-meta">
+                  <div class="mock-badge-status">
+                    <div class="mock-badge-status-dot"></div>
+                    En línea
+                  </div>
+                  <div class="mock-card-rating">
+                    <span
+                      class="material-symbols-outlined"
+                      style="
+                        font-size: 11px;
+                        font-variation-settings: &quot;FILL&quot; 1;
+                        vertical-align: middle;
+                        color: #eab308;
+                      "
+                      >star</span
+                    >
+                    <span id="hero-popup-rating">4.9</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="caracteristicas">
+      <div class="section-header">
+        <h2 class="section-title">¿Por qué elegir MatchWorking?</h2>
+        <p class="section-description">
+          Diseñamos una plataforma pensada en la velocidad, confianza mutua y
+          transparencia entre clientes y expertos locales.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">near_me</span>
+          </div>
+          <h3 class="feature-title">Geolocalización Real</h3>
+          <p class="feature-desc">
+            Visualiza a los proveedores de servicio calificados que están
+            físicamente más cerca de ti en un mapa interactivo de alta
+            precisión.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">handshake</span>
+          </div>
+          <h3 class="feature-title">Match Directo</h3>
+          <p class="feature-desc">
+            Solicita asistencia y haz contacto de forma instantánea. Di adiós a
+            comisiones extras o intermediarios burocráticos.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">chat</span>
+          </div>
+          <h3 class="feature-title">Chat y Coordinación</h3>
+          <p class="feature-desc">
+            Comunícate directamente a través de nuestra mensajería interna.
+            Envía detalles, fotos y aclara dudas al instante.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">verified_user</span>
+          </div>
+          <h3 class="feature-title">Perfiles Verificados</h3>
+          <p class="feature-desc">
+            Consulta antecedentes, reseñas auténticas de vecinos y el estado de
+            habilitación técnica del profesional antes de contratar.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="como-funciona">
+      <div class="section-header">
+        <h2 class="section-title">¿Cómo funciona la plataforma?</h2>
+        <p class="section-description">
+          Un flujo optimizado para resolver tus imprevistos en minutos o
+          potenciar tu negocio técnico local.
+        </p>
+      </div>
+
+      <div class="tab-control-wrapper">
+        <div class="tab-control">
+          <button class="tab-btn active" id="tab-client-btn">
+            Para Clientes
+          </button>
+          <button class="tab-btn" id="tab-provider-btn">
+            Para Prestadores
+          </button>
+        </div>
+      </div>
+
+      <!-- Client Steps Panel -->
+      <div class="tab-panel active" id="panel-client">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">map</span>
+          </div>
+          <h3 class="step-title">1. Explora en el Mapa</h3>
+          <p class="step-desc">
+            Filtra proveedores por especialidad técnica (gasfitería,
+            electricidad, limpieza, aire acondicionado) y localízalos al
+            instante.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">ads_click</span>
+          </div>
+          <h3 class="step-title">2. Solicita un Match</h3>
+          <p class="step-desc">
+            Selecciona un prestador disponible, examina sus valoraciones,
+            tarifas y envíale una solicitud directa con el detalle del servicio.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">question_answer</span>
+          </div>
+          <h3 class="step-title">3. Coordina y Califica</h3>
+          <p class="step-desc">
+            Una vez aceptada tu solicitud, coordina detalles en el chat privado
+            y califica el trabajo realizado para ayudar a tu comunidad.
+          </p>
+        </div>
+      </div>
+
+      <!-- Provider Steps Panel -->
+      <div class="tab-panel" id="panel-provider">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">assignment_ind</span>
+          </div>
+          <h3 class="step-title">1. Crea tu Ficha</h3>
+          <p class="step-desc">
+            Registra tus datos profesionales, especialidades, tarifas
+            referenciales e insignias que validen tu habilitación comercial o
+            técnica.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">sensors</span>
+          </div>
+          <h3 class="step-title">2. Activa tu Disponibilidad</h3>
+          <p class="step-desc">
+            Ponte "En línea" para aparecer instantáneamente en el mapa de los
+            clientes cercanos cuando tengas disponibilidad horaria.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">trending_up</span>
+          </div>
+          <h3 class="step-title">3. Recibe Solicitudes</h3>
+          <p class="step-desc">
+            Acepta solicitudes directas, chatea con el cliente, realiza los
+            servicios y aumenta tu reputación para destacar sobre la
+            competencia.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Live Demo Showcase -->
+    <section class="interactive-showcase" id="simulador">
+      <div class="section-header">
+        <h2 class="section-title">Prueba la Experiencia</h2>
+        <p class="section-description">
+          Prueba una simulación interactiva rápida de cómo funciona nuestro
+          buscador de profesionales locales.
+        </p>
+      </div>
+
+      <div class="demo-container">
+        <div class="demo-controls">
+          <h3 class="demo-title">¿Qué servicio necesitas hoy?</h3>
+          <p class="demo-text">
+            Haz clic en alguna categoría para simular cómo MatchWorking realiza
+            la geolocalización de un profesional técnico de confianza en tiempo
+            real.
+          </p>
+
+          <div class="demo-select-list">
+            <div
+              class="demo-select-item active"
+              data-category="gasfiteria"
+              data-name="Carlos Mendoza"
+              data-avatar="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=150&q=80"
+              data-profession="Maestro Gasfitero Autorizado"
+              data-rating="4.9"
+              data-lat="40%"
+              data-lng="35%"
+            >
+              <span class="material-symbols-outlined demo-select-item-icon"
+                >plumbing</span
+              >
+              <span class="demo-select-item-text">Servicio de Gasfitería</span>
+            </div>
+            <div
+              class="demo-select-item"
+              data-category="electricidad"
+              data-name="Francisco Javier"
+              data-avatar="https://lh3.googleusercontent.com/aida-public/AB6AXuCkkUwOuvyN2Qm4vmOiICtijtED3CJu4s_rWpmOyynM4l801tEL6X3P_Jnr2IcpevBIYD4BSbXAPRUX2AMCBP8C5k_9XtGS38PGXsVoaf30OkmuoOH1-NpV9avYaTU5tjbgLhRGTa8Y5KeSeBg1dMPTM9SnJLZSiAOb3S3am7yhuZGkkS1GljZv7wprS8rV-uwaf6C96yBq8oywa5GT9o_AHsvRQnNRgE1GlSjXCa1b0-qJOwT0wK_lP8Z1AL7t0M3nAKYbJgL9kn0"
+              data-profession="Electricista Certificado SEC"
+              data-rating="4.8"
+              data-lat="30%"
+              data-lng="65%"
+            >
+              <span class="material-symbols-outlined demo-select-item-icon"
+                >bolt</span
+              >
+              <span class="demo-select-item-text"
+                >Problemas de Electricidad</span
+              >
+            </div>
+            <div
+              class="demo-select-item"
+              data-category="limpieza"
+              data-name="Ana Silva"
+              data-avatar="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80"
+              data-profession="Especialista en Limpieza Profunda"
+              data-rating="5.0"
+              data-lat="65%"
+              data-lng="45%"
+            >
+              <span class="material-symbols-outlined demo-select-item-icon"
+                >cleaning_services</span
+              >
+              <span class="demo-select-item-text">Limpieza General</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Simulator Screen -->
+        <div class="demo-simulator">
+          <div class="simulator-window">
+            <div class="simulator-map">
+              <div class="simulator-user"></div>
+
+              <!-- Animated Dynamic Provider Pin -->
+              <div
+                class="simulator-provider-pin active"
+                id="sim-pin"
+                style="top: 40%; left: 35%"
+              >
+                <div class="simulator-pin-top">
+                  <span
+                    class="material-symbols-outlined"
+                    id="sim-pin-icon"
+                    style="font-size: 18px"
+                    >plumbing</span
+                  >
+                </div>
+              </div>
+
+              <!-- Loader Screen -->
+              <div class="simulator-loader" id="sim-loader">
+                <div class="spinner"></div>
+                <span class="simulator-loader-text"
+                  >Buscando técnicos cercanos...</span
+                >
+              </div>
+            </div>
+
+            <!-- Slide up card with match detail -->
+            <div class="simulator-card active" id="sim-card">
+              <div class="simulator-card-body">
+                <img
+                  class="simulator-card-avatar"
+                  id="sim-card-avatar"
+                  src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=150&q=80"
+                  alt="Avatar"
+                />
+                <div class="simulator-card-info">
+                  <div class="simulator-card-name" id="sim-card-name">
+                    Carlos Mendoza
+                  </div>
+                  <div class="simulator-card-role" id="sim-card-profession">
+                    Maestro Gasfitero Autorizado
+                  </div>
+                  <div class="simulator-card-rating">
+                    <span
+                      class="material-symbols-outlined"
+                      style="
+                        font-size: 12px;
+                        font-variation-settings: &quot;FILL&quot; 1;
+                        vertical-align: middle;
+                      "
+                      >star</span
+                    >
+                    <span id="sim-card-rating-num">4.9</span> (Verificado)
+                  </div>
+                </div>
+              </div>
+              <button class="simulator-card-btn open-waitlist-btn">
+                Solicitar Asistencia
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Box & Footer -->
+    <section class="cta-footer" id="contacto">
+      <div class="cta-box">
+        <h2>¿Quieres saber cuándo llegamos a tu ciudad?</h2>
+        <p>
+          Estamos expandiendo nuestra red de profesionales certificados y
+          clientes calificados paso a paso para garantizar la máxima seguridad
+          en cada match.
+        </p>
         <button class="btn btn-primary open-waitlist-btn">
-          Buscar Profesionales
-          <span class="material-symbols-outlined">search</span>
-        </button>
-        <button class="btn btn-secondary open-waitlist-btn">
-          Ofrecer mis Servicios
-          <span class="material-symbols-outlined">construction</span>
+          Inscribirse en Lista de Espera
+          <span class="material-symbols-outlined">send</span>
         </button>
       </div>
-    </div>
 
-    <!-- Interactive Mock App Frame -->
-    <div class="hero-visual">
-      <div class="mock-app-frame">
-        <div class="mock-app-header">
-          <span class="mock-logo">MatchWorking</span>
-          <div class="mock-avatar">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-          </div>
-        </div>
-        <div class="mock-map-canvas">
-          <div class="mock-user-pin"></div>
-          
-          <!-- Pins with category icons -->
-          <div class="mock-pin mock-pin-1" data-provider-id="1">
-            <div class="mock-pin-icon">
-              <span class="material-symbols-outlined">plumbing</span>
-            </div>
-          </div>
-          <div class="mock-pin mock-pin-2" data-provider-id="2">
-            <div class="mock-pin-icon">
-              <span class="material-symbols-outlined">bolt</span>
-            </div>
-          </div>
-          <div class="mock-pin mock-pin-3" data-provider-id="3">
-            <div class="mock-pin-icon">
-              <span class="material-symbols-outlined">cleaning_services</span>
-            </div>
-          </div>
-
-          <!-- Bottom Provider Drawer Mockup -->
-          <div class="mock-popup-card" id="hero-provider-popup">
-            <img class="mock-card-avatar" id="hero-popup-avatar" src="" alt="Avatar">
-            <div class="mock-card-info">
-              <div class="mock-card-name" id="hero-popup-name">Carlos Mendoza</div>
-              <div class="mock-card-role" id="hero-popup-profession">Maestro Gasfitero Autorizado</div>
-              <div class="mock-card-meta">
-                <div class="mock-badge-status">
-                  <div class="mock-badge-status-dot"></div>
-                  En línea
-                </div>
-                <div class="mock-card-rating">
-                  <span class="material-symbols-outlined" style="font-size: 11px; font-variation-settings: 'FILL' 1; vertical-align: middle; color: #eab308;">star</span>
-                  <span id="hero-popup-rating">4.9</span>
-                </div>
-              </div>
-            </div>
-          </div>
+      <!-- Footer Elements -->
+      <div class="footer-nav">
+        <span class="footer-copyright"
+          >&copy; 2026 MatchWorking. Todos los derechos reservados. Sitio Web
+          Informativo.</span
+        >
+        <div class="social-links">
+          <a href="#" class="social-icon">
+            <span class="material-symbols-outlined" style="font-size: 20px"
+              >public</span
+            >
+          </a>
+          <a href="#" class="social-icon">
+            <span class="material-symbols-outlined" style="font-size: 20px"
+              >alternate_email</span
+            >
+          </a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Features Section -->
-  <section class="features-section" id="caracteristicas">
-    <div class="section-header">
-      <h2 class="section-title">¿Por qué elegir MatchWorking?</h2>
-      <p class="section-description">Diseñamos una plataforma pensada en la velocidad, confianza mutua y transparencia entre clientes y expertos locales.</p>
-    </div>
-
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon-wrapper">
-          <span class="material-symbols-outlined">near_me</span>
-        </div>
-        <h3 class="feature-title">Geolocalización Real</h3>
-        <p class="feature-desc">Visualiza a los proveedores de servicio calificados que están físicamente más cerca de ti en un mapa interactivo de alta precisión.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon-wrapper">
-          <span class="material-symbols-outlined">handshake</span>
-        </div>
-        <h3 class="feature-title">Match Directo</h3>
-        <p class="feature-desc">Solicita asistencia y haz contacto de forma instantánea. Di adiós a comisiones extras o intermediarios burocráticos.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon-wrapper">
-          <span class="material-symbols-outlined">chat</span>
-        </div>
-        <h3 class="feature-title">Chat y Coordinación</h3>
-        <p class="feature-desc">Comunícate directamente a través de nuestra mensajería interna. Envía detalles, fotos y aclara dudas al instante.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon-wrapper">
-          <span class="material-symbols-outlined">verified_user</span>
-        </div>
-        <h3 class="feature-title">Perfiles Verificados</h3>
-        <p class="feature-desc">Consulta antecedentes, reseñas auténticas de vecinos y el estado de habilitación técnica del profesional antes de contratar.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- How It Works Section -->
-  <section class="how-it-works" id="como-funciona">
-    <div class="section-header">
-      <h2 class="section-title">¿Cómo funciona la plataforma?</h2>
-      <p class="section-description">Un flujo optimizado para resolver tus imprevistos en minutos o potenciar tu negocio técnico local.</p>
-    </div>
-
-    <div class="tab-control-wrapper">
-      <div class="tab-control">
-        <button class="tab-btn active" id="tab-client-btn">Para Clientes</button>
-        <button class="tab-btn" id="tab-provider-btn">Para Prestadores</button>
-      </div>
-    </div>
-
-    <!-- Client Steps Panel -->
-    <div class="tab-panel active" id="panel-client">
-      <div class="step-card">
-        <div class="step-number">01</div>
-        <div class="feature-icon-wrapper">
-          <span class="material-symbols-outlined">map</span>
-        </div>
-        <h3 class="step-title">1. Explora en el Mapa</h3>
-        <p class="step-desc">Filtra proveedores por especialidad técnica (gasfitería, electricidad, limpieza, aire acondicionado) y localízalos al instante.</p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-number">02</div>
-        <div class="feature-icon-wrapper">
-          <span class="material-symbols-outlined">ads_click</span>
-        </div>
-        <h3 class="step-title">2. Solicita un Match</h3>
-        <p class="step-desc">Selecciona un prestador disponible, examina sus valoraciones, tarifas y envíale una solicitud directa con el detalle del servicio.</p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-number">03</div>
-        <div class="feature-icon-wrapper">
-          <span class="material-symbols-outlined">question_answer</span>
-        </div>
-        <h3 class="step-title">3. Coordina y Califica</h3>
-        <p class="step-desc">Una vez aceptada tu solicitud, coordina detalles en el chat privado y califica el trabajo realizado para ayudar a tu comunidad.</p>
-      </div>
-    </div>
-
-    <!-- Provider Steps Panel -->
-    <div class="tab-panel" id="panel-provider">
-      <div class="step-card">
-        <div class="step-number">01</div>
-        <div class="feature-icon-wrapper">
-          <span class="material-symbols-outlined">assignment_ind</span>
-        </div>
-        <h3 class="step-title">1. Crea tu Ficha</h3>
-        <p class="step-desc">Registra tus datos profesionales, especialidades, tarifas referenciales e insignias que validen tu habilitación comercial o técnica.</p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-number">02</div>
-        <div class="feature-icon-wrapper">
-          <span class="material-symbols-outlined">sensors</span>
-        </div>
-        <h3 class="step-title">2. Activa tu Disponibilidad</h3>
-        <p class="step-desc">Ponte "En línea" para aparecer instantáneamente en el mapa de los clientes cercanos cuando tengas disponibilidad horaria.</p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-number">03</div>
-        <div class="feature-icon-wrapper">
-          <span class="material-symbols-outlined">trending_up</span>
-        </div>
-        <h3 class="step-title">3. Recibe Solicitudes</h3>
-        <p class="step-desc">Acepta solicitudes directas, chatea con el cliente, realiza los servicios y aumenta tu reputación para destacar sobre la competencia.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Interactive Live Demo Showcase -->
-  <section class="interactive-showcase" id="simulador">
-    <div class="section-header">
-      <h2 class="section-title">Prueba la Experiencia</h2>
-      <p class="section-description">Prueba una simulación interactiva rápida de cómo funciona nuestro buscador de profesionales locales.</p>
-    </div>
-
-    <div class="demo-container">
-      <div class="demo-controls">
-        <h3 class="demo-title">¿Qué servicio necesitas hoy?</h3>
-        <p class="demo-text">Haz clic en alguna categoría para simular cómo MatchWorking realiza la geolocalización de un profesional técnico de confianza en tiempo real.</p>
-        
-        <div class="demo-select-list">
-          <div class="demo-select-item active" data-category="gasfiteria" data-name="Carlos Mendoza" data-avatar="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=150&q=80" data-profession="Maestro Gasfitero Autorizado" data-rating="4.9" data-lat="40%" data-lng="35%">
-            <span class="material-symbols-outlined demo-select-item-icon">plumbing</span>
-            <span class="demo-select-item-text">Servicio de Gasfitería</span>
-          </div>
-          <div class="demo-select-item" data-category="electricidad" data-name="Francisco Javier" data-avatar="https://lh3.googleusercontent.com/aida-public/AB6AXuCkkUwOuvyN2Qm4vmOiICtijtED3CJu4s_rWpmOyynM4l801tEL6X3P_Jnr2IcpevBIYD4BSbXAPRUX2AMCBP8C5k_9XtGS38PGXsVoaf30OkmuoOH1-NpV9avYaTU5tjbgLhRGTa8Y5KeSeBg1dMPTM9SnJLZSiAOb3S3am7yhuZGkkS1GljZv7wprS8rV-uwaf6C96yBq8oywa5GT9o_AHsvRQnNRgE1GlSjXCa1b0-qJOwT0wK_lP8Z1AL7t0M3nAKYbJgL9kn0" data-profession="Electricista Certificado SEC" data-rating="4.8" data-lat="30%" data-lng="65%">
-            <span class="material-symbols-outlined demo-select-item-icon">bolt</span>
-            <span class="demo-select-item-text">Problemas de Electricidad</span>
-          </div>
-          <div class="demo-select-item" data-category="limpieza" data-name="Ana Silva" data-avatar="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80" data-profession="Especialista en Limpieza Profunda" data-rating="5.0" data-lat="65%" data-lng="45%">
-            <span class="material-symbols-outlined demo-select-item-icon">cleaning_services</span>
-            <span class="demo-select-item-text">Limpieza General</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Live Simulator Screen -->
-      <div class="demo-simulator">
-        <div class="simulator-window">
-          <div class="simulator-map">
-            <div class="simulator-user"></div>
-            
-            <!-- Animated Dynamic Provider Pin -->
-            <div class="simulator-provider-pin active" id="sim-pin" style="top: 40%; left: 35%;">
-              <div class="simulator-pin-top">
-                <span class="material-symbols-outlined" id="sim-pin-icon" style="font-size: 18px;">plumbing</span>
-              </div>
-            </div>
-
-            <!-- Loader Screen -->
-            <div class="simulator-loader" id="sim-loader">
-              <div class="spinner"></div>
-              <span class="simulator-loader-text">Buscando técnicos cercanos...</span>
-            </div>
-          </div>
-
-          <!-- Slide up card with match detail -->
-          <div class="simulator-card active" id="sim-card">
-            <div class="simulator-card-body">
-              <img class="simulator-card-avatar" id="sim-card-avatar" src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=150&q=80" alt="Avatar">
-              <div class="simulator-card-info">
-                <div class="simulator-card-name" id="sim-card-name">Carlos Mendoza</div>
-                <div class="simulator-card-role" id="sim-card-profession">Maestro Gasfitero Autorizado</div>
-                <div class="simulator-card-rating">
-                  <span class="material-symbols-outlined" style="font-size: 12px; font-variation-settings: 'FILL' 1; vertical-align: middle;">star</span>
-                  <span id="sim-card-rating-num">4.9</span> (Verificado)
-                </div>
-              </div>
-            </div>
-            <button class="simulator-card-btn open-waitlist-btn">Solicitar Asistencia</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Box & Footer -->
-  <section class="cta-footer" id="contacto">
-    <div class="cta-box">
-      <h2>¿Quieres saber cuándo llegamos a tu ciudad?</h2>
-      <p>Estamos expandiendo nuestra red de profesionales certificados y clientes calificados paso a paso para garantizar la máxima seguridad en cada match.</p>
-      <button class="btn btn-primary open-waitlist-btn">
-        Inscribirse en Lista de Espera
-        <span class="material-symbols-outlined">send</span>
-      </button>
-    </div>
-
-    <!-- Footer Elements -->
-    <div class="footer-nav">
-      <span class="footer-copyright">&copy; 2026 MatchWorking. Todos los derechos reservados. Sitio Web Informativo.</span>
-      <div class="social-links">
-        <a href="#" class="social-icon">
-          <span class="material-symbols-outlined" style="font-size: 20px;">public</span>
-        </a>
-        <a href="#" class="social-icon">
-          <span class="material-symbols-outlined" style="font-size: 20px;">alternate_email</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Elegant waitlist / newsletter modal popup -->
-  <div class="modal-overlay" id="waitlist-modal">
-    <div class="modal-window">
-      <button class="modal-close" id="modal-close-btn">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-      
-      <div class="modal-icon">
-        <span class="material-symbols-outlined" style="font-size: 32px;">mail</span>
-      </div>
-      
-      <h3 class="modal-title">¡Únete a la Lista de Espera!</h3>
-      <p class="modal-desc">Déjanos tu correo electrónico para notificarte tan pronto como activemos la geolocalización en tiempo real y la red de prestadores certificados en tu zona.</p>
-      
-      <form class="modal-form" id="waitlist-form">
-        <input type="email" class="modal-input" placeholder="Ingresa tu correo electrónico" required id="waitlist-email">
-        <button type="submit" class="btn btn-primary" style="width: 100%;">
-          Enviar Suscripción
+    <!-- Elegant waitlist / newsletter modal popup -->
+    <div class="modal-overlay" id="waitlist-modal">
+      <div class="modal-window">
+        <button class="modal-close" id="modal-close-btn">
+          <span class="material-symbols-outlined">close</span>
         </button>
-      </form>
-      
-      <div class="modal-feedback" id="waitlist-success">
-        <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 4px;">check_circle</span>
-        ¡Suscripción exitosa! Te mantendremos informado.
+
+        <div class="modal-icon">
+          <span class="material-symbols-outlined" style="font-size: 32px"
+            >mail</span
+          >
+        </div>
+
+        <h3 class="modal-title">¡Únete a la Lista de Espera!</h3>
+        <p class="modal-desc">
+          Déjanos tu correo electrónico para notificarte tan pronto como
+          activemos la geolocalización en tiempo real y la red de prestadores
+          certificados en tu zona.
+        </p>
+
+        <form class="modal-form" id="waitlist-form">
+          <input
+            type="email"
+            class="modal-input"
+            placeholder="Ingresa tu correo electrónico"
+            required
+            id="waitlist-email"
+          />
+          <button type="submit" class="btn btn-primary" style="width: 100%">
+            Enviar Suscripción
+          </button>
+        </form>
+
+        <div class="modal-feedback" id="waitlist-success">
+          <span
+            class="material-symbols-outlined"
+            style="vertical-align: middle; margin-right: 4px"
+            >check_circle</span
+          >
+          ¡Suscripción exitosa! Te mantendremos informado.
+        </div>
       </div>
     </div>
-  </div>
 
-  <script src="main.js"></script>
-</body>
+    <script src="main.js"></script>
+  </body>
 </html>

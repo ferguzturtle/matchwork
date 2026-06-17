@@ -1,17 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./**/*.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./**/*.html", "./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class",
   theme: {
     extend: {
-      "colors": {
+      colors: {
         "on-surface-variant": "var(--color-on-surface-variant)",
         "surface-bright": "var(--color-surface-bright)",
-        "background": "var(--color-background)",
+        background: "var(--color-background)",
         "on-secondary-fixed-variant": "var(--color-on-secondary-fixed-variant)",
         "surface-dim": "var(--color-surface-dim)",
         "on-tertiary-fixed": "var(--color-on-tertiary-fixed)",
@@ -19,7 +15,7 @@ export default {
         "on-error": "var(--color-on-error)",
         "error-container": "var(--color-error-container)",
         "on-secondary": "var(--color-on-secondary)",
-        "outline": "var(--color-outline)",
+        outline: "var(--color-outline)",
         "secondary-fixed-dim": "var(--color-secondary-fixed-dim)",
         "outline-variant": "var(--color-outline-variant)",
         "primary-fixed": "var(--color-primary-fixed)",
@@ -36,42 +32,42 @@ export default {
         "on-primary-container": "var(--color-on-primary-container)",
         "on-surface": "var(--color-on-surface)",
         "on-primary": "var(--color-on-primary)",
-        "surface": "var(--color-surface)",
+        surface: "var(--color-surface)",
         "on-tertiary": "var(--color-on-tertiary)",
         "on-error-container": "var(--color-on-error-container)",
         "on-secondary-fixed": "var(--color-on-secondary-fixed)",
         "on-primary-fixed-variant": "var(--color-on-primary-fixed-variant)",
         "surface-variant": "var(--color-surface-variant)",
         "surface-container-highest": "var(--color-surface-container-highest)",
-        "tertiary": "var(--color-tertiary)",
+        tertiary: "var(--color-tertiary)",
         "tertiary-fixed": "var(--color-tertiary-fixed)",
         "on-background": "var(--color-on-background)",
         "surface-tint": "var(--color-surface-tint)",
         "tertiary-container": "var(--color-tertiary-container)",
-        "secondary": "var(--color-secondary)",
+        secondary: "var(--color-secondary)",
         "secondary-fixed": "var(--color-secondary-fixed)",
         "surface-container-low": "var(--color-surface-container-low)",
         "on-secondary-container": "var(--color-on-secondary-container)",
         "inverse-on-surface": "var(--color-inverse-on-surface)",
-        "error": "var(--color-error)",
-        "primary": "var(--color-primary)",
-        "on-primary-fixed": "var(--color-on-primary-fixed)"
+        error: "var(--color-error)",
+        primary: "var(--color-primary)",
+        "on-primary-fixed": "var(--color-on-primary-fixed)",
       },
-      "borderRadius": {
-        "DEFAULT": "0.25rem",
-        "lg": "0.5rem",
-        "xl": "0.75rem",
-        "full": "9999px"
+      borderRadius: {
+        DEFAULT: "0.25rem",
+        lg: "0.5rem",
+        xl: "0.75rem",
+        full: "9999px",
       },
-      "spacing": {
+      spacing: {
         "stack-sm": "0.5rem",
         "stack-md": "1rem",
-        "gutter": "1rem",
+        gutter: "1rem",
         "container-margin-mobile": "1rem",
         "container-margin-desktop": "2.5rem",
-        "stack-lg": "1.5rem"
+        "stack-lg": "1.5rem",
       },
-      "fontFamily": {
+      fontFamily: {
         "body-lg": ["Inter", "sans-serif"],
         "headline-lg": ["Inter", "sans-serif"],
         "body-md": ["Inter", "sans-serif"],
@@ -79,22 +75,31 @@ export default {
         "label-lg": ["Inter", "sans-serif"],
         "headline-sm": ["Inter", "sans-serif"],
         "body-sm": ["Inter", "sans-serif"],
-        "label-md": ["Inter", "sans-serif"]
+        "label-md": ["Inter", "sans-serif"],
       },
-      "fontSize": {
-        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
-        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
-        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
-        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
-        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
-        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-        "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
-      }
-    }
+      fontSize: {
+        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+        "headline-lg": [
+          "32px",
+          { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" },
+        ],
+        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+        "headline-md": [
+          "24px",
+          { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600" },
+        ],
+        "label-lg": [
+          "14px",
+          { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "600" },
+        ],
+        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+        "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+        "label-md": ["12px", { lineHeight: "16px", fontWeight: "500" }],
+      },
+    },
   },
   plugins: [
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/container-queries')
+    require("@tailwindcss/forms"),
+    require("@tailwindcss/container-queries"),
   ],
-}
+};

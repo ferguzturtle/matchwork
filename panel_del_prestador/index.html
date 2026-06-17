@@ -1,209 +1,423 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Panel de Control del Trabajador - MatchWorking</title>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Panel de Control del Trabajador - MatchWorking</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
 
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-      display: none; /* Hide body initially to prevent unauthorized content flash */
-    }
-  </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+        display: none; /* Hide body initially to prevent unauthorized content flash */
+      }
+    </style>
     <link rel="stylesheet" href="/style.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
     <script type="module" src="/src/theme.js"></script>
-</head>
-<body class="bg-surface dark:bg-background text-on-surface dark:text-on-background font-body-md min-h-screen flex flex-col relative pb-20 md:pb-0">
-<!-- TopAppBar -->
-<header class="bg-surface dark:bg-background w-full top-0 sticky border-b border-outline-variant dark:border-on-surface-variant flex justify-between items-center px-gutter py-stack-sm z-40">
-<button id="mobile-menu-btn" class="md:hidden hover:bg-surface-container-low transition-colors active:opacity-80 transition-all p-2 rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined text-secondary dark:text-secondary-fixed" data-icon="menu">menu</span>
-</button>
-<h1 class="font-headline-md text-headline-md font-bold text-secondary dark:text-secondary-fixed">MatchWorking</h1>
-<div class="hover:bg-surface-container-low transition-colors active:opacity-80 transition-all rounded-full overflow-hidden w-8 h-8 flex items-center justify-center">
-<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="A small circular avatar showing a young adult male with short brown hair, smiling gently. The background is a clean, bright solid light gray. The image perfectly embodies a modern, corporate light-mode aesthetic, utilizing high-key lighting to emphasize trustworthiness and professionalism within a clean digital interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI"/>
-</div>
-</header>
-<!-- Mobile Drawer Overlay -->
-<div id="drawer-overlay" class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300"></div>
-<!-- NavigationDrawer / Responsive Sidebar -->
-<nav id="main-drawer" class="fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out bg-surface dark:bg-background text-secondary dark:text-secondary-fixed h-full w-80 rounded-r-xl border-r border-outline-variant shadow-lg flex flex-col p-stack-md shrink-0 z-50">
-<div class="mb-stack-lg flex items-center gap-4">
-<div class="w-12 h-12 rounded-full overflow-hidden shrink-0">
-<img alt="User avatar" class="w-full h-full object-cover" data-alt="A small circular avatar showing a young adult male with short brown hair, smiling gently. The background is a clean, bright solid light gray. The image perfectly embodies a modern, corporate light-mode aesthetic, utilizing high-key lighting to emphasize trustworthiness and professionalism within a clean digital interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI"/>
-</div>
-<div class="flex flex-col">
-<span class="font-headline-sm text-headline-sm text-on-surface">Carlos Mendoza</span>
-<span class="font-label-md text-label-md text-secondary mt-1">Verificado</span>
-</div>
-</div>
-<div class="flex flex-col gap-2">
-<a href="/mapa_de_b_squeda_cliente/index.html" class="nav-customer flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="explore">explore</span>
-<span class="font-body-md text-body-md">Explorar</span>
-</a>
-<a href="/centro_de_mensajer_a/index.html" class="nav-shared flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="chat">chat</span>
-<span class="font-body-md text-body-md">Mensajes</span>
-</a>
-<a href="/panel_del_prestador/index.html" class="nav-provider flex items-center gap-3 px-4 py-3 rounded-lg bg-secondary-container text-on-secondary-container font-semibold cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="assignment" style="font-variation-settings: 'FILL' 1;">assignment</span>
-<span class="font-label-md text-label-md">Solicitudes</span>
-</a>
-</div>
-<hr class="my-stack-md border-outline-variant"/>
-<div class="flex flex-col gap-2">
-<a id="switch-role-btn" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="switch_account">switch_account</span>
-<span id="switch-role-text" class="font-body-md text-body-md">Cambiar a Cliente</span>
-</a>
+  </head>
+  <body
+    class="bg-surface dark:bg-background text-on-surface dark:text-on-background font-body-md min-h-screen flex flex-col relative pb-20 md:pb-0"
+  >
+    <!-- TopAppBar -->
+    <header
+      class="bg-surface dark:bg-background w-full top-0 sticky border-b border-outline-variant dark:border-on-surface-variant flex justify-between items-center px-gutter py-stack-sm z-40"
+    >
+      <button
+        id="mobile-menu-btn"
+        class="md:hidden hover:bg-surface-container-low transition-colors active:opacity-80 transition-all p-2 rounded-full flex items-center justify-center"
+      >
+        <span
+          class="material-symbols-outlined text-secondary dark:text-secondary-fixed"
+          data-icon="menu"
+          >menu</span
+        >
+      </button>
+      <h1
+        class="font-headline-md text-headline-md font-bold text-secondary dark:text-secondary-fixed"
+      >
+        MatchWorking
+      </h1>
+      <div
+        class="hover:bg-surface-container-low transition-colors active:opacity-80 transition-all rounded-full overflow-hidden w-8 h-8 flex items-center justify-center"
+      >
+        <img
+          alt="User profile avatar"
+          class="w-full h-full object-cover"
+          data-alt="A small circular avatar showing a young adult male with short brown hair, smiling gently. The background is a clean, bright solid light gray. The image perfectly embodies a modern, corporate light-mode aesthetic, utilizing high-key lighting to emphasize trustworthiness and professionalism within a clean digital interface."
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI"
+        />
+      </div>
+    </header>
+    <!-- Mobile Drawer Overlay -->
+    <div
+      id="drawer-overlay"
+      class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300"
+    ></div>
+    <!-- NavigationDrawer / Responsive Sidebar -->
+    <nav
+      id="main-drawer"
+      class="fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out bg-surface dark:bg-background text-secondary dark:text-secondary-fixed h-full w-80 rounded-r-xl border-r border-outline-variant shadow-lg flex flex-col p-stack-md shrink-0 z-50"
+    >
+      <div class="mb-stack-lg flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full overflow-hidden shrink-0">
+          <img
+            alt="User avatar"
+            class="w-full h-full object-cover"
+            data-alt="A small circular avatar showing a young adult male with short brown hair, smiling gently. The background is a clean, bright solid light gray. The image perfectly embodies a modern, corporate light-mode aesthetic, utilizing high-key lighting to emphasize trustworthiness and professionalism within a clean digital interface."
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI"
+          />
+        </div>
+        <div class="flex flex-col">
+          <span class="font-headline-sm text-headline-sm text-on-surface"
+            >Carlos Mendoza</span
+          >
+          <span class="font-label-md text-label-md text-secondary mt-1"
+            >Verificado</span
+          >
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <a
+          href="/mapa_de_b_squeda_cliente/index.html"
+          class="nav-customer flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="explore"
+            >explore</span
+          >
+          <span class="font-body-md text-body-md">Explorar</span>
+        </a>
+        <a
+          href="/centro_de_mensajer_a/index.html"
+          class="nav-shared flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="chat">chat</span>
+          <span class="font-body-md text-body-md">Mensajes</span>
+        </a>
+        <a
+          href="/panel_del_prestador/index.html"
+          class="nav-provider flex items-center gap-3 px-4 py-3 rounded-lg bg-secondary-container text-on-secondary-container font-semibold cursor-pointer transition-colors duration-200"
+        >
+          <span
+            class="material-symbols-outlined"
+            data-icon="assignment"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >assignment</span
+          >
+          <span class="font-label-md text-label-md">Solicitudes</span>
+        </a>
+      </div>
+      <hr class="my-stack-md border-outline-variant" />
+      <div class="flex flex-col gap-2">
+        <a
+          id="switch-role-btn"
+          href="#"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="switch_account"
+            >switch_account</span
+          >
+          <span id="switch-role-text" class="font-body-md text-body-md"
+            >Cambiar a Cliente</span
+          >
+        </a>
 
-<a id="theme-toggle-btn" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" id="theme-toggle-icon" data-icon="dark_mode">dark_mode</span>
-<span class="font-body-md text-body-md" id="theme-toggle-text">Modo Oscuro</span>
-</a>
-<a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="help">help</span>
-<span class="font-body-md text-body-md">Centro de Ayuda</span>
-</a>
-<a id="logout-btn" href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-error hover:bg-error-container/30 cursor-pointer transition-colors duration-200">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-body-md text-body-md font-semibold">Cerrar Sesión</span>
-</a>
-</div>
-</nav>
+        <a
+          id="theme-toggle-btn"
+          href="#"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span
+            class="material-symbols-outlined"
+            id="theme-toggle-icon"
+            data-icon="dark_mode"
+            >dark_mode</span
+          >
+          <span class="font-body-md text-body-md" id="theme-toggle-text"
+            >Modo Oscuro</span
+          >
+        </a>
+        <a
+          href="#"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="help">help</span>
+          <span class="font-body-md text-body-md">Centro de Ayuda</span>
+        </a>
+        <a
+          id="logout-btn"
+          href="#"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-error hover:bg-error-container/30 cursor-pointer transition-colors duration-200"
+        >
+          <span class="material-symbols-outlined" data-icon="logout"
+            >logout</span
+          >
+          <span class="font-body-md text-body-md font-semibold"
+            >Cerrar Sesión</span
+          >
+        </a>
+      </div>
+    </nav>
 
-<!-- Main Canvas -->
-<main class="flex-grow px-container-margin-mobile md:px-container-margin-desktop py-stack-md flex flex-col gap-stack-lg max-w-4xl mx-auto w-full">
-<!-- Status & Toggle Banner -->
-<section class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant flex items-center justify-between">
-<div class="flex flex-col">
-<div class="flex items-center gap-2 mb-1">
-<div id="status-dot" class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] transition-colors"></div>
-<h2 id="status-text" class="font-headline-sm text-headline-sm text-on-surface">Disponible para Trabajos</h2>
-</div>
-<p id="status-desc" class="font-body-sm text-body-sm text-on-surface-variant">Actualmente eres visible para clientes en tu área.</p>
-</div>
-<!-- Large Toggle Switch -->
-<button id="availability-toggle" aria-pressed="true" class="w-16 h-8 bg-secondary rounded-full flex items-center px-1 cursor-pointer transition-colors shadow-inner relative">
-<div id="toggle-knob" class="w-6 h-6 bg-surface-container-lowest rounded-full shadow-sm transform translate-x-8 transition-transform"></div>
-</button>
-</section>
-<!-- Map & Stats Bento Grid -->
-<section class="grid grid-cols-1 md:grid-cols-3 gap-stack-md">
-<!-- Map Container (Spans 2 columns on desktop) -->
-<div class="md:col-span-2 relative h-64 rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container-high">
-<div id="mini-map" class="w-full h-full z-0"></div>
-<!-- Floating Map Action -->
-<button class="absolute bottom-4 right-4 bg-surface-container-lowest rounded-full p-2 shadow-md text-on-surface-variant hover:text-secondary transition-colors z-10" onclick="if(window.miniMap) window.miniMap.flyTo([window.currentRealLat || -33.4489, window.currentRealLng || -70.6693], 14)">
-<span class="material-symbols-outlined">my_location</span>
-</button>
-</div>
-<!-- Stats Column -->
-<div class="flex flex-col gap-stack-md">
-<!-- Rating Stat -->
-<div class="flex-1 bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant flex flex-col justify-center items-center relative overflow-hidden">
-<div class="absolute -top-4 -right-4 text-primary-fixed-dim opacity-20">
-<span class="material-symbols-outlined text-[80px]" style="font-variation-settings: 'FILL' 1;">star</span>
-</div>
-<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Calificación Actual</p>
-<div class="flex items-center gap-2">
-<span class="font-headline-lg text-headline-lg text-on-surface">4.9</span>
-<span class="material-symbols-outlined text-[#F59E0B]" style="font-variation-settings: 'FILL' 1;">star</span>
-</div>
-</div>
-<!-- Jobs Stat -->
-<div class="flex-1 bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant flex flex-col justify-center items-center relative overflow-hidden">
-<div class="absolute -bottom-4 -left-4 text-primary-fixed-dim opacity-20">
-<span class="material-symbols-outlined text-[80px]" style="font-variation-settings: 'FILL' 1;">task_alt</span>
-</div>
-<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Trabajos Completados</p>
-<span class="font-headline-lg text-headline-lg text-on-surface">128</span>
-</div>
-</div>
-</section>
-<!-- Incoming Requests Section -->
-<section class="flex flex-col gap-stack-sm">
-<div class="flex items-center justify-between mb-2">
-<h3 class="font-headline-sm text-headline-sm text-on-surface">Solicitudes Entrantes</h3>
-<span id="request-badge" class="bg-error-container text-on-error-container font-label-md text-label-md px-2 py-0.5 rounded-full hidden">0 Nuevas</span>
-</div>
-<div id="requests-list" class="flex flex-col gap-4">
-    <p class="text-on-surface-variant font-body-sm">No hay nuevas solicitudes.</p>
-</div>
-</section>
+    <!-- Main Canvas -->
+    <main
+      class="flex-grow px-container-margin-mobile md:px-container-margin-desktop py-stack-md flex flex-col gap-stack-lg max-w-4xl mx-auto w-full"
+    >
+      <!-- Status & Toggle Banner -->
+      <section
+        class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant flex items-center justify-between"
+      >
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2 mb-1">
+            <div
+              id="status-dot"
+              class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] transition-colors"
+            ></div>
+            <h2
+              id="status-text"
+              class="font-headline-sm text-headline-sm text-on-surface"
+            >
+              Disponible para Trabajos
+            </h2>
+          </div>
+          <p
+            id="status-desc"
+            class="font-body-sm text-body-sm text-on-surface-variant"
+          >
+            Actualmente eres visible para clientes en tu área.
+          </p>
+        </div>
+        <!-- Large Toggle Switch -->
+        <button
+          id="availability-toggle"
+          aria-pressed="true"
+          class="w-16 h-8 bg-secondary rounded-full flex items-center px-1 cursor-pointer transition-colors shadow-inner relative"
+        >
+          <div
+            id="toggle-knob"
+            class="w-6 h-6 bg-surface-container-lowest rounded-full shadow-sm transform translate-x-8 transition-transform"
+          ></div>
+        </button>
+      </section>
+      <!-- Map & Stats Bento Grid -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-stack-md">
+        <!-- Map Container (Spans 2 columns on desktop) -->
+        <div
+          class="md:col-span-2 relative h-64 rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-surface-container-high"
+        >
+          <div id="mini-map" class="w-full h-full z-0"></div>
+          <!-- Floating Map Action -->
+          <button
+            class="absolute bottom-4 right-4 bg-surface-container-lowest rounded-full p-2 shadow-md text-on-surface-variant hover:text-secondary transition-colors z-10"
+            onclick="
+              if (window.miniMap)
+                window.miniMap.flyTo(
+                  [
+                    window.currentRealLat || -33.4489,
+                    window.currentRealLng || -70.6693,
+                  ],
+                  14,
+                );
+            "
+          >
+            <span class="material-symbols-outlined">my_location</span>
+          </button>
+        </div>
+        <!-- Stats Column -->
+        <div class="flex flex-col gap-stack-md">
+          <!-- Rating Stat -->
+          <div
+            class="flex-1 bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant flex flex-col justify-center items-center relative overflow-hidden"
+          >
+            <div
+              class="absolute -top-4 -right-4 text-primary-fixed-dim opacity-20"
+            >
+              <span
+                class="material-symbols-outlined text-[80px]"
+                style="font-variation-settings: &quot;FILL&quot; 1"
+                >star</span
+              >
+            </div>
+            <p
+              class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1"
+            >
+              Calificación Actual
+            </p>
+            <div class="flex items-center gap-2">
+              <span class="font-headline-lg text-headline-lg text-on-surface"
+                >4.9</span
+              >
+              <span
+                class="material-symbols-outlined text-[#F59E0B]"
+                style="font-variation-settings: &quot;FILL&quot; 1"
+                >star</span
+              >
+            </div>
+          </div>
+          <!-- Jobs Stat -->
+          <div
+            class="flex-1 bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant flex flex-col justify-center items-center relative overflow-hidden"
+          >
+            <div
+              class="absolute -bottom-4 -left-4 text-primary-fixed-dim opacity-20"
+            >
+              <span
+                class="material-symbols-outlined text-[80px]"
+                style="font-variation-settings: &quot;FILL&quot; 1"
+                >task_alt</span
+              >
+            </div>
+            <p
+              class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1"
+            >
+              Trabajos Completados
+            </p>
+            <span class="font-headline-lg text-headline-lg text-on-surface"
+              >128</span
+            >
+          </div>
+        </div>
+      </section>
+      <!-- Incoming Requests Section -->
+      <section class="flex flex-col gap-stack-sm">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-headline-sm text-headline-sm text-on-surface">
+            Solicitudes Entrantes
+          </h3>
+          <span
+            id="request-badge"
+            class="bg-error-container text-on-error-container font-label-md text-label-md px-2 py-0.5 rounded-full hidden"
+            >0 Nuevas</span
+          >
+        </div>
+        <div id="requests-list" class="flex flex-col gap-4">
+          <p class="text-on-surface-variant font-body-sm">
+            No hay nuevas solicitudes.
+          </p>
+        </div>
+      </section>
+    </main>
+    <!-- BottomNavBar (Visible on Mobile) -->
+    <nav
+      class="md:hidden fixed bottom-0 w-full z-50 shadow-[0_-4px_12px_0px_rgba(0,0,0,0.04)] bg-surface-container-lowest flex justify-around items-center h-16 px-2 pb-safe"
+    >
+      <!-- Inactive Tab -->
+      <a
+        href="/centro_de_mensajer_a/index.html"
+        class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 cursor-pointer w-16 relative"
+      >
+        <span class="material-symbols-outlined mb-1" data-icon="chat"
+          >chat</span
+        >
+        <span class="font-label-md text-label-md">Mensajes</span>
+      </a>
+      <!-- Active Tab (Requests matches intent of this dashboard view) -->
+      <a
+        href="/panel_del_prestador/index.html"
+        class="flex flex-col items-center justify-center text-on-secondary-container bg-secondary-container rounded-xl px-4 py-1 cursor-pointer relative"
+      >
+        <div class="absolute top-1 right-2 w-2 h-2 bg-error rounded-full"></div>
+        <span
+          class="material-symbols-outlined mb-1"
+          data-icon="assignment"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >assignment</span
+        >
+        <span class="font-label-md text-label-md font-bold">Solicitudes</span>
+      </a>
+      <!-- Inactive Tab -->
+      <a
+        href="/perfil_del_prestador/index.html"
+        class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 cursor-pointer w-16"
+      >
+        <span class="material-symbols-outlined mb-1" data-icon="person"
+          >person</span
+        >
+        <span class="font-label-md text-label-md">Perfil</span>
+      </a>
+    </nav>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script type="module">
+      import {
+        getProviderRequests,
+        acceptServiceRequest,
+        rejectServiceRequest,
+        updateProviderAvailability,
+        getUserProfile,
+      } from "/src/data.js";
+      import { supabase } from "/src/supabase.js";
 
-
-</main>
-<!-- BottomNavBar (Visible on Mobile) -->
-<nav class="md:hidden fixed bottom-0 w-full z-50 shadow-[0_-4px_12px_0px_rgba(0,0,0,0.04)] bg-surface-container-lowest flex justify-around items-center h-16 px-2 pb-safe">
-<!-- Inactive Tab -->
-<a href="/centro_de_mensajer_a/index.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 cursor-pointer w-16 relative">
-<span class="material-symbols-outlined mb-1" data-icon="chat">chat</span>
-<span class="font-label-md text-label-md">Mensajes</span>
-</a>
-<!-- Active Tab (Requests matches intent of this dashboard view) -->
-<a href="/panel_del_prestador/index.html" class="flex flex-col items-center justify-center text-on-secondary-container bg-secondary-container rounded-xl px-4 py-1 cursor-pointer relative">
-<div class="absolute top-1 right-2 w-2 h-2 bg-error rounded-full"></div>
-<span class="material-symbols-outlined mb-1" data-icon="assignment" style="font-variation-settings: 'FILL' 1;">assignment</span>
-<span class="font-label-md text-label-md font-bold">Solicitudes</span>
-</a>
-<!-- Inactive Tab -->
-<a href="/perfil_del_prestador/index.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-transform duration-150 cursor-pointer w-16">
-<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
-<span class="font-label-md text-label-md">Perfil</span>
-</a>
-</nav>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script type="module">
-import { getProviderRequests, acceptServiceRequest, rejectServiceRequest, updateProviderAvailability, getUserProfile } from '/src/data.js';
-import { supabase } from '/src/supabase.js';
-
-// Auth Guard to prevent unauthorized access
-const checkAuth = async () => {
-    let authorized = false;
-    try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
+      // Auth Guard to prevent unauthorized access
+      const checkAuth = async () => {
+        let authorized = false;
+        try {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          if (session) {
             authorized = true;
-            const userRole = session.user.user_metadata.role || 'customer';
-            if (!localStorage.getItem('user_role')) { localStorage.setItem('user_role', userRole); }
-        } else {
-            if (localStorage.getItem('user_role')) {
-                authorized = true;
+            const userRole = session.user.user_metadata.role || "customer";
+            if (!localStorage.getItem("user_role")) {
+              localStorage.setItem("user_role", userRole);
             }
+          } else {
+            if (localStorage.getItem("user_role")) {
+              authorized = true;
+            }
+          }
+        } catch (_) {
+          if (localStorage.getItem("user_role")) authorized = true;
         }
-    } catch (_) {
-        if (localStorage.getItem('user_role')) authorized = true;
-    }
 
-    if (!authorized) {
-        window.location.replace('/index.html');
-    } else {
-        document.body.style.display = 'flex';
-    }
-};
-await checkAuth();
+        if (!authorized) {
+          window.location.replace("/index.html");
+        } else {
+          document.body.style.display = "flex";
+        }
+      };
+      await checkAuth();
 
-// Global State
-let currentProviderId = "11111111-1111-1111-1111-111111111111";
-let isAvailable = true;
+      // Global State
+      let currentProviderId = "11111111-1111-1111-1111-111111111111";
+      let isAvailable = true;
 
-// Init mini map
-let mapLat = -33.4489;
-let mapLng = -70.6693;
-window.miniMap = L.map('mini-map', {zoomControl: false}).setView([mapLat, mapLng], 14);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap &copy; CARTO'
-}).addTo(window.miniMap);
+      // Init mini map
+      let mapLat = -33.4489;
+      let mapLng = -70.6693;
+      window.miniMap = L.map("mini-map", { zoomControl: false }).setView(
+        [mapLat, mapLng],
+        14,
+      );
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        {
+          attribution: "&copy; OpenStreetMap &copy; CARTO",
+        },
+      ).addTo(window.miniMap);
 
-const iconHtml = `
+      const iconHtml = `
     <div class="flex flex-col items-center">
         <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center shadow-lg border-2 border-surface-container-lowest z-10 relative">
             <span class="material-symbols-outlined text-on-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">person_pin_circle</span>
@@ -212,25 +426,28 @@ const iconHtml = `
         <div class="w-2 h-2 bg-on-surface opacity-30 rounded-full mt-1 blur-[1px]"></div>
     </div>
 `;
-const customIcon = L.divIcon({
-    className: 'custom-pin',
-    html: iconHtml,
-    iconSize: [32, 40],
-    iconAnchor: [16, 40]
-});
-const providerMarker = L.marker([mapLat, mapLng], {icon: customIcon}).addTo(window.miniMap);
+      const customIcon = L.divIcon({
+        className: "custom-pin",
+        html: iconHtml,
+        iconSize: [32, 40],
+        iconAnchor: [16, 40],
+      });
+      const providerMarker = L.marker([mapLat, mapLng], {
+        icon: customIcon,
+      }).addTo(window.miniMap);
 
-// Store the real location so the button works dynamically
-window.currentRealLat = mapLat;
-window.currentRealLng = mapLng;
+      // Store the real location so the button works dynamically
+      window.currentRealLat = mapLat;
+      window.currentRealLng = mapLng;
 
-const showSecureContextWarningBanner = () => {
-    if (document.getElementById('http-warning-banner')) return;
+      const showSecureContextWarningBanner = () => {
+        if (document.getElementById("http-warning-banner")) return;
 
-    const banner = document.createElement('div');
-    banner.id = 'http-warning-banner';
-    banner.className = 'fixed bottom-24 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-amber-600/95 backdrop-blur-md text-white p-4 rounded-xl shadow-2xl z-[9999] flex flex-col gap-3 font-body-sm transition-all duration-300 border border-amber-500';
-    banner.innerHTML = `
+        const banner = document.createElement("div");
+        banner.id = "http-warning-banner";
+        banner.className =
+          "fixed bottom-24 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-amber-600/95 backdrop-blur-md text-white p-4 rounded-xl shadow-2xl z-[9999] flex flex-col gap-3 font-body-sm transition-all duration-300 border border-amber-500";
+        banner.innerHTML = `
         <div class="flex items-start gap-3">
             <span class="material-symbols-outlined text-[24px] text-white">gpp_maybe</span>
             <div>
@@ -245,16 +462,17 @@ const showSecureContextWarningBanner = () => {
             </button>
         </div>
     `;
-    document.body.appendChild(banner);
-};
+        document.body.appendChild(banner);
+      };
 
-const showGpsAlertBanner = () => {
-    if (document.getElementById('gps-blocker-alert')) return;
-    
-    const gpsAlert = document.createElement('div');
-    gpsAlert.id = 'gps-blocker-alert';
-    gpsAlert.className = 'fixed bottom-24 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-red-600 text-white p-4 rounded-xl shadow-2xl z-[9999] flex flex-col gap-3 font-body-sm transition-all duration-300';
-    gpsAlert.innerHTML = `
+      const showGpsAlertBanner = () => {
+        if (document.getElementById("gps-blocker-alert")) return;
+
+        const gpsAlert = document.createElement("div");
+        gpsAlert.id = "gps-blocker-alert";
+        gpsAlert.className =
+          "fixed bottom-24 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-red-600 text-white p-4 rounded-xl shadow-2xl z-[9999] flex flex-col gap-3 font-body-sm transition-all duration-300";
+        gpsAlert.innerHTML = `
         <div class="flex items-start gap-3">
             <span class="material-symbols-outlined text-[24px] text-white">gpp_maybe</span>
             <div>
@@ -277,150 +495,192 @@ const showGpsAlertBanner = () => {
             </button>
         </div>
     `;
-    document.body.appendChild(gpsAlert);
-    
-    document.getElementById('btn-gps-retry').onclick = () => {
-        requestGpsLocation(true);
-    };
-};
+        document.body.appendChild(gpsAlert);
 
-const requestGpsLocation = (isRetry = false) => {
-    if (!window.isSecureContext) {
-        showSecureContextWarningBanner();
-        // Coordenadas simuladas en Santiago
-        window.currentRealRealLat = -33.4489;
-        window.currentRealRealLng = -70.6693;
-        window.currentRealLat = -33.4489;
-        window.currentRealLng = -70.6693;
-        window.miniMap.flyTo([window.currentRealLat, window.currentRealLng], 14);
-        providerMarker.setLatLng([window.currentRealLat, window.currentRealLng]);
-        
-        // Si está disponible, actualizar estado en DB/local con coordenadas simuladas
-        if (isAvailable) {
-            updateAvailabilityState(true, window.currentRealLat, window.currentRealLng);
+        document.getElementById("btn-gps-retry").onclick = () => {
+          requestGpsLocation(true);
+        };
+      };
+
+      const requestGpsLocation = (isRetry = false) => {
+        if (!window.isSecureContext) {
+          showSecureContextWarningBanner();
+          // Coordenadas simuladas en Santiago
+          window.currentRealRealLat = -33.4489;
+          window.currentRealRealLng = -70.6693;
+          window.currentRealLat = -33.4489;
+          window.currentRealLng = -70.6693;
+          window.miniMap.flyTo(
+            [window.currentRealLat, window.currentRealLng],
+            14,
+          );
+          providerMarker.setLatLng([
+            window.currentRealLat,
+            window.currentRealLng,
+          ]);
+
+          // Si está disponible, actualizar estado en DB/local con coordenadas simuladas
+          if (isAvailable) {
+            updateAvailabilityState(
+              true,
+              window.currentRealLat,
+              window.currentRealLng,
+            );
+          }
+          return;
         }
-        return;
-    }
 
-    if (navigator.geolocation) {
-        const geoOptions = { enableHighAccuracy: true, timeout: 8000 };
-        
-        const successCallback = (position) => {
+        if (navigator.geolocation) {
+          const geoOptions = { enableHighAccuracy: true, timeout: 8000 };
+
+          const successCallback = (position) => {
             window.currentRealRealLat = position.coords.latitude;
             window.currentRealRealLng = position.coords.longitude;
             window.currentRealLat = position.coords.latitude;
             window.currentRealLng = position.coords.longitude;
-            window.miniMap.flyTo([window.currentRealLat, window.currentRealLng], 14);
-            providerMarker.setLatLng([window.currentRealLat, window.currentRealLng]);
-            
-            const existingAlert = document.getElementById('gps-blocker-alert');
+            window.miniMap.flyTo(
+              [window.currentRealLat, window.currentRealLng],
+              14,
+            );
+            providerMarker.setLatLng([
+              window.currentRealLat,
+              window.currentRealLng,
+            ]);
+
+            const existingAlert = document.getElementById("gps-blocker-alert");
             if (existingAlert) existingAlert.remove();
 
             if (isAvailable) {
-                updateAvailabilityState(true, window.currentRealLat, window.currentRealLng);
+              updateAvailabilityState(
+                true,
+                window.currentRealLat,
+                window.currentRealLng,
+              );
             }
-            
+
             if (isRetry) {
-                alert("¡Ubicación GPS obtenida con éxito!");
+              alert("¡Ubicación GPS obtenida con éxito!");
             }
-        };
+          };
 
-        const errorCallback = (error) => {
-            console.warn("Error en geolocalización de alta precisión (Intento 1):", error.message);
-            
+          const errorCallback = (error) => {
+            console.warn(
+              "Error en geolocalización de alta precisión (Intento 1):",
+              error.message,
+            );
+
             if (error.code === error.PERMISSION_DENIED) {
-                showGpsAlertBanner();
+              showGpsAlertBanner();
             } else {
-                console.log("Reintentando con baja precisión debido a error de alta precisión...");
-                navigator.geolocation.getCurrentPosition(
-                    successCallback,
-                    (err) => {
-                        console.warn("Fallo también geolocalización de baja precisión (Intento 2):", err.message);
-                        showGpsAlertBanner();
-                    },
-                    { enableHighAccuracy: false, timeout: 15000 }
-                );
+              console.log(
+                "Reintentando con baja precisión debido a error de alta precisión...",
+              );
+              navigator.geolocation.getCurrentPosition(
+                successCallback,
+                (err) => {
+                  console.warn(
+                    "Fallo también geolocalización de baja precisión (Intento 2):",
+                    err.message,
+                  );
+                  showGpsAlertBanner();
+                },
+                { enableHighAccuracy: false, timeout: 15000 },
+              );
             }
-        };
+          };
 
-        navigator.geolocation.getCurrentPosition(successCallback, errorCallback, geoOptions);
-    }
-};
-
-const checkGpsPermission = () => {
-    if (!window.isSecureContext) return;
-
-    try {
-        if (navigator.permissions && navigator.permissions.query) {
-            navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-                if (result.state === 'denied') {
-                    showGpsAlertBanner();
-                }
-                
-                result.onchange = () => {
-                    if (result.state === 'granted') {
-                        requestGpsLocation(false);
-                    } else if (result.state === 'denied') {
-                        showGpsAlertBanner();
-                    }
-                };
-            }).catch(e => {
-                console.warn("Permissions API query for geolocation not supported:", e);
-            });
+          navigator.geolocation.getCurrentPosition(
+            successCallback,
+            errorCallback,
+            geoOptions,
+          );
         }
-    } catch (e) {
-        console.warn("Permissions API check threw an exception:", e);
-    }
-};
+      };
 
+      const checkGpsPermission = () => {
+        if (!window.isSecureContext) return;
 
+        try {
+          if (navigator.permissions && navigator.permissions.query) {
+            navigator.permissions
+              .query({ name: "geolocation" })
+              .then((result) => {
+                if (result.state === "denied") {
+                  showGpsAlertBanner();
+                }
 
-// Seed dummy requests if none exist (solo para fallback en localStorage)
-function seedDummyRequests() {
-    const existing = JSON.parse(localStorage.getItem('prolink_requests') || '[]');
-    if (existing.length === 0) {
-        const dummyData = [
+                result.onchange = () => {
+                  if (result.state === "granted") {
+                    requestGpsLocation(false);
+                  } else if (result.state === "denied") {
+                    showGpsAlertBanner();
+                  }
+                };
+              })
+              .catch((e) => {
+                console.warn(
+                  "Permissions API query for geolocation not supported:",
+                  e,
+                );
+              });
+          }
+        } catch (e) {
+          console.warn("Permissions API check threw an exception:", e);
+        }
+      };
+
+      // Seed dummy requests if none exist (solo para fallback en localStorage)
+      function seedDummyRequests() {
+        const existing = JSON.parse(
+          localStorage.getItem("prolink_requests") || "[]",
+        );
+        if (existing.length === 0) {
+          const dummyData = [
             {
-                id: "101",
-                providerId: currentProviderId,
-                userId: "201",
-                message: 'Hola, tengo una filtración en el lavaplatos que necesito arreglar urgente.',
-                status: 'pendiente',
-                userName: 'Maria José L.',
-                timestamp: new Date().toISOString()
+              id: "101",
+              providerId: currentProviderId,
+              userId: "201",
+              message:
+                "Hola, tengo una filtración en el lavaplatos que necesito arreglar urgente.",
+              status: "pendiente",
+              userName: "Maria José L.",
+              timestamp: new Date().toISOString(),
             },
             {
-                id: "102",
-                providerId: currentProviderId,
-                userId: "202",
-                message: 'Hola Carlos, necesito instalar un nuevo enchufe para el horno eléctrico.',
-                status: 'pendiente',
-                userName: 'Juan Pablo V.',
-                timestamp: new Date().toISOString()
-            }
-        ];
-        localStorage.setItem('prolink_requests', JSON.stringify(dummyData));
-    }
-}
-seedDummyRequests();
+              id: "102",
+              providerId: currentProviderId,
+              userId: "202",
+              message:
+                "Hola Carlos, necesito instalar un nuevo enchufe para el horno eléctrico.",
+              status: "pendiente",
+              userName: "Juan Pablo V.",
+              timestamp: new Date().toISOString(),
+            },
+          ];
+          localStorage.setItem("prolink_requests", JSON.stringify(dummyData));
+        }
+      }
+      seedDummyRequests();
 
-// Track seen request IDs to only show notifications for brand new requests
-const seenRequestIds = new Set();
-let isFirstLoad = true;
+      // Track seen request IDs to only show notifications for brand new requests
+      const seenRequestIds = new Set();
+      let isFirstLoad = true;
 
-// Toast Alert System for New Matches
-function showNewRequestToast(userName) {
-    let toastContainer = document.getElementById('toast-container');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.id = 'toast-container';
-        toastContainer.className = 'fixed top-4 right-4 z-[9999] flex flex-col gap-3 max-w-sm w-full px-4 pointer-events-none';
-        document.body.appendChild(toastContainer);
-    }
-    
-    const toast = document.createElement('div');
-    toast.className = 'bg-surface-container-highest/95 backdrop-blur-md text-on-surface p-4 rounded-xl shadow-2xl border border-primary/20 pointer-events-auto flex items-start gap-3 transition-all duration-300 transform translate-y-[-20px] opacity-0';
-    toast.innerHTML = `
+      // Toast Alert System for New Matches
+      function showNewRequestToast(userName) {
+        let toastContainer = document.getElementById("toast-container");
+        if (!toastContainer) {
+          toastContainer = document.createElement("div");
+          toastContainer.id = "toast-container";
+          toastContainer.className =
+            "fixed top-4 right-4 z-[9999] flex flex-col gap-3 max-w-sm w-full px-4 pointer-events-none";
+          document.body.appendChild(toastContainer);
+        }
+
+        const toast = document.createElement("div");
+        toast.className =
+          "bg-surface-container-highest/95 backdrop-blur-md text-on-surface p-4 rounded-xl shadow-2xl border border-primary/20 pointer-events-auto flex items-start gap-3 transition-all duration-300 transform translate-y-[-20px] opacity-0";
+        toast.innerHTML = `
         <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 animate-bounce">
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
         </div>
@@ -432,30 +692,31 @@ function showNewRequestToast(userName) {
             <span class="material-symbols-outlined text-[18px]">close</span>
         </button>
     `;
-    
-    toastContainer.appendChild(toast);
-    
-    try {
-        if ('vibrate' in navigator) navigator.vibrate(200);
-    } catch (_) {}
-    
-    setTimeout(() => {
-        toast.classList.remove('translate-y-[-20px]', 'opacity-0');
-    }, 10);
-    
-    setTimeout(() => {
-        if (toast && toast.parentElement) {
-            toast.classList.add('translate-y-[-20px]', 'opacity-0');
-            setTimeout(() => toast.remove(), 300);
-        }
-    }, 6000);
-}
 
-// Celebration Modal for Match
-function showMatchCelebration(userName, customerId) {
-    const celebration = document.createElement('div');
-    celebration.className = 'fixed inset-0 z-[10000] bg-background/90 backdrop-blur-md flex flex-col items-center justify-center text-center p-6 animate-fade-in';
-    celebration.innerHTML = `
+        toastContainer.appendChild(toast);
+
+        try {
+          if ("vibrate" in navigator) navigator.vibrate(200);
+        } catch (_) {}
+
+        setTimeout(() => {
+          toast.classList.remove("translate-y-[-20px]", "opacity-0");
+        }, 10);
+
+        setTimeout(() => {
+          if (toast && toast.parentElement) {
+            toast.classList.add("translate-y-[-20px]", "opacity-0");
+            setTimeout(() => toast.remove(), 300);
+          }
+        }, 6000);
+      }
+
+      // Celebration Modal for Match
+      function showMatchCelebration(userName, customerId) {
+        const celebration = document.createElement("div");
+        celebration.className =
+          "fixed inset-0 z-[10000] bg-background/90 backdrop-blur-md flex flex-col items-center justify-center text-center p-6 animate-fade-in";
+        celebration.innerHTML = `
         <div class="relative max-w-sm w-full flex flex-col items-center gap-6 p-8 bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-2xl scale-95 animate-scale-up">
             <div class="relative w-24 h-24 flex items-center justify-center">
                 <div class="absolute inset-0 bg-primary/10 rounded-full animate-ping"></div>
@@ -480,11 +741,11 @@ function showMatchCelebration(userName, customerId) {
             </div>
         </div>
     `;
-    
-    if (!document.getElementById('celebration-styles')) {
-        const style = document.createElement('style');
-        style.id = 'celebration-styles';
-        style.innerHTML = `
+
+        if (!document.getElementById("celebration-styles")) {
+          const style = document.createElement("style");
+          style.id = "celebration-styles";
+          style.innerHTML = `
             @keyframes fadeIn {
                 from { opacity: 0; }
                 to { opacity: 1; }
@@ -500,50 +761,54 @@ function showMatchCelebration(userName, customerId) {
                 animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             }
         `;
-        document.head.appendChild(style);
-    }
-    
-    document.body.appendChild(celebration);
-}
-
-async function renderRequests() {
-    const requests = await getProviderRequests(currentProviderId);
-    const list = document.getElementById('requests-list');
-    const badge = document.getElementById('request-badge');
-    
-    // Filtramos solo las solicitudes que estén 'pendiente'
-    const pendingRequests = requests.filter(r => r.status === 'pendiente');
-    
-    // Check for new requests to notify
-    if (!isFirstLoad) {
-        pendingRequests.forEach(req => {
-            if (!seenRequestIds.has(req.id)) {
-                showNewRequestToast(req.userName || 'Un cliente');
-                seenRequestIds.add(req.id);
-            }
-        });
-    } else {
-        pendingRequests.forEach(req => seenRequestIds.add(req.id));
-        isFirstLoad = false;
-    }
-    
-    // Renderizamos tanto 'pendiente' como 'aceptado'
-    const visibleRequests = requests.filter(r => r.status === 'pendiente' || r.status === 'aceptado');
-    
-    if (visibleRequests.length > 0) {
-        if (pendingRequests.length > 0) {
-            badge.innerText = pendingRequests.length + ' Nuevas';
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
+          document.head.appendChild(style);
         }
-        list.innerHTML = '';
-        
-        visibleRequests.forEach(req => {
-            const isAccepted = req.status === 'aceptado';
-            
+
+        document.body.appendChild(celebration);
+      }
+
+      async function renderRequests() {
+        const requests = await getProviderRequests(currentProviderId);
+        const list = document.getElementById("requests-list");
+        const badge = document.getElementById("request-badge");
+
+        // Filtramos solo las solicitudes que estén 'pendiente'
+        const pendingRequests = requests.filter(
+          (r) => r.status === "pendiente",
+        );
+
+        // Check for new requests to notify
+        if (!isFirstLoad) {
+          pendingRequests.forEach((req) => {
+            if (!seenRequestIds.has(req.id)) {
+              showNewRequestToast(req.userName || "Un cliente");
+              seenRequestIds.add(req.id);
+            }
+          });
+        } else {
+          pendingRequests.forEach((req) => seenRequestIds.add(req.id));
+          isFirstLoad = false;
+        }
+
+        // Renderizamos tanto 'pendiente' como 'aceptado'
+        const visibleRequests = requests.filter(
+          (r) => r.status === "pendiente" || r.status === "aceptado",
+        );
+
+        if (visibleRequests.length > 0) {
+          if (pendingRequests.length > 0) {
+            badge.innerText = pendingRequests.length + " Nuevas";
+            badge.classList.remove("hidden");
+          } else {
+            badge.classList.add("hidden");
+          }
+          list.innerHTML = "";
+
+          visibleRequests.forEach((req) => {
+            const isAccepted = req.status === "aceptado";
+
             if (isAccepted) {
-                const html = `
+              const html = `
                     <div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-emerald-500/20 flex flex-col gap-4 animate-fade-in">
                         <div class="flex justify-between items-start">
                             <div class="flex gap-4 items-center">
@@ -551,7 +816,7 @@ async function renderRequests() {
                                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
                                 </div>
                                 <div>
-                                    <h4 class="font-headline-sm text-headline-sm text-on-surface leading-tight">${req.userName || 'Match Aceptado'}</h4>
+                                    <h4 class="font-headline-sm text-headline-sm text-on-surface leading-tight">${req.userName || "Match Aceptado"}</h4>
                                     <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">${req.message}</p>
                                 </div>
                             </div>
@@ -562,17 +827,19 @@ async function renderRequests() {
                             </div>
                         </div>
                         <div class="flex gap-3 mt-2">
-                            <a href="/centro_de_mensajer_a/index.html?chat=${req.customerId || req.userId || '201'}" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-label-lg text-label-lg py-2 rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 active:scale-[0.98]">
+                            <a href="/centro_de_mensajer_a/index.html?chat=${req.customerId || req.userId || "201"}" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-label-lg text-label-lg py-2 rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 active:scale-[0.98]">
                                 <span class="material-symbols-outlined text-[18px]">chat</span>
                                 Mensaje
                             </a>
                         </div>
                     </div>
                 `;
-                list.innerHTML += html;
+              list.innerHTML += html;
             } else {
-                const escapedName = (req.userName || 'Cliente de MatchWorking').replace(/'/g, "\\'");
-                const html = `
+              const escapedName = (
+                req.userName || "Cliente de MatchWorking"
+              ).replace(/'/g, "\\'");
+              const html = `
                     <div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col gap-4">
                         <div class="flex justify-between items-start">
                             <div class="flex gap-4 items-center">
@@ -580,7 +847,7 @@ async function renderRequests() {
                                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_repair_service</span>
                                 </div>
                                 <div>
-                                    <h4 class="font-headline-sm text-headline-sm text-on-surface leading-tight">${req.userName || 'Solicitud de Servicio'}</h4>
+                                    <h4 class="font-headline-sm text-headline-sm text-on-surface leading-tight">${req.userName || "Solicitud de Servicio"}</h4>
                                     <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">${req.message}</p>
                                 </div>
                             </div>
@@ -589,7 +856,7 @@ async function renderRequests() {
                             </div>
                         </div>
                         <div class="flex gap-3 mt-2">
-                            <button onclick="acceptRequest('${req.id}', '${escapedName}', '${req.customerId || req.userId || '201'}')" class="flex-1 bg-secondary text-on-secondary font-label-lg text-label-lg py-2 rounded-lg hover:bg-secondary-container hover:text-on-secondary-container transition-colors shadow-sm active:scale-[0.98]">
+                            <button onclick="acceptRequest('${req.id}', '${escapedName}', '${req.customerId || req.userId || "201"}')" class="flex-1 bg-secondary text-on-secondary font-label-lg text-label-lg py-2 rounded-lg hover:bg-secondary-container hover:text-on-secondary-container transition-colors shadow-sm active:scale-[0.98]">
                                 Aceptar
                             </button>
                             <button onclick="rejectRequest('${req.id}')" class="flex-1 bg-surface-container-lowest border border-on-secondary-fixed text-on-secondary-fixed font-label-lg text-label-lg py-2 rounded-lg hover:bg-surface-container-low transition-colors active:scale-[0.98]">
@@ -598,290 +865,360 @@ async function renderRequests() {
                         </div>
                     </div>
                 `;
-                list.innerHTML += html;
+              list.innerHTML += html;
             }
-        });
-    } else {
-        badge.classList.add('hidden');
-        list.innerHTML = '<p class="text-on-surface-variant font-body-sm">No hay solicitudes.</p>';
-    }
-}
+          });
+        } else {
+          badge.classList.add("hidden");
+          list.innerHTML =
+            '<p class="text-on-surface-variant font-body-sm">No hay solicitudes.</p>';
+        }
+      }
 
-// Accept Request Logic
-window.acceptRequest = async (reqId, userName, customerId) => {
-    try {
-        const res = await acceptServiceRequest(reqId);
-        if (res) {
+      // Accept Request Logic
+      window.acceptRequest = async (reqId, userName, customerId) => {
+        try {
+          const res = await acceptServiceRequest(reqId);
+          if (res) {
             showMatchCelebration(userName, customerId);
             await renderRequests();
-        } else {
+          } else {
             alert("No se pudo aceptar la solicitud. Intenta de nuevo.");
+          }
+        } catch (e) {
+          console.error("Error al aceptar solicitud", e);
         }
-    } catch (e) {
-        console.error("Error al aceptar solicitud", e);
-    }
-};
+      };
 
-window.rejectRequest = async (reqId) => {
-    try {
-        const res = await rejectServiceRequest(reqId);
-        if (res) {
+      window.rejectRequest = async (reqId) => {
+        try {
+          const res = await rejectServiceRequest(reqId);
+          if (res) {
             await renderRequests();
-        } else {
+          } else {
             alert("No se pudo rechazar la solicitud. Intenta de nuevo.");
+          }
+        } catch (e) {
+          console.error("Error al rechazar solicitud", e);
         }
-    } catch (e) {
-        console.error("Error al rechazar solicitud", e);
-    }
-};
-// Detect active session of Supabase
-const detectSession = async () => {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
+      };
+      // Detect active session of Supabase
+      const detectSession = async () => {
+        try {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          if (user) {
             currentProviderId = user.id;
-            
+
             // Cargar datos de perfil del prestador
             const profile = await getUserProfile(user.id);
             if (profile) {
-                // Actualizar avatar y nombre en interfaz
-                document.querySelectorAll('img[alt="User profile avatar"]').forEach(img => img.src = profile.avatar_url);
-                document.querySelectorAll('img[alt="User avatar"]').forEach(img => img.src = profile.avatar_url);
-                const titleEl = document.querySelector('#main-drawer span.font-headline-sm');
-                if (titleEl) titleEl.innerText = profile.name;
-                
+              // Actualizar avatar y nombre en interfaz
+              document
+                .querySelectorAll('img[alt="User profile avatar"]')
+                .forEach((img) => (img.src = profile.avatar_url));
+              document
+                .querySelectorAll('img[alt="User avatar"]')
+                .forEach((img) => (img.src = profile.avatar_url));
+              const titleEl = document.querySelector(
+                "#main-drawer span.font-headline-sm",
+              );
+              if (titleEl) titleEl.innerText = profile.name;
             }
+          }
+        } catch (e) {
+          console.warn(
+            "No active Supabase user session, using default provider ID.",
+            e,
+          );
         }
-    } catch (e) {
-        console.warn("No active Supabase user session, using default provider ID.", e);
-    }
 
-    // Cargar estado de disponibilidad inicial
-    try {
-        const providersList = await getProviders();
-        const currentProvider = providersList.find(p => p.id === currentProviderId);
-        if (currentProvider) {
-            const enabled = currentProvider.status !== 'Fuera de servicio';
+        // Cargar estado de disponibilidad inicial
+        try {
+          const providersList = await getProviders();
+          const currentProvider = providersList.find(
+            (p) => p.id === currentProviderId,
+          );
+          if (currentProvider) {
+            const enabled = currentProvider.status !== "Fuera de servicio";
             updateAvailabilityUI(enabled);
             // Si está activo y tiene coordenadas, actualizar mapa
             if (enabled && currentProvider.lat && currentProvider.lng) {
-                window.currentRealLat = currentProvider.lat;
-                window.currentRealLng = currentProvider.lng;
-                providerMarker.setLatLng([window.currentRealLat, window.currentRealLng]);
-                window.miniMap.setView([window.currentRealLat, window.currentRealLng], 14);
+              window.currentRealLat = currentProvider.lat;
+              window.currentRealLng = currentProvider.lng;
+              providerMarker.setLatLng([
+                window.currentRealLat,
+                window.currentRealLng,
+              ]);
+              window.miniMap.setView(
+                [window.currentRealLat, window.currentRealLng],
+                14,
+              );
             }
-        } else {
+          } else {
             // El trabajador es nuevo o no está registrado en la tabla providers.
             // Para asegurar consistencia absoluta con la UI visual que inicia en "ON" (Disponible para Trabajos),
             // lo registramos de inmediato en la base de datos como "En línea".
-            console.log("Nuevo trabajador detectado sin registro en providers. Registrando disponibilidad inicial...");
+            console.log(
+              "Nuevo trabajador detectado sin registro en providers. Registrando disponibilidad inicial...",
+            );
             const initialLat = window.currentRealLat || -33.4489;
             const initialLng = window.currentRealLng || -70.6693;
             await updateAvailabilityState(true, initialLat, initialLng);
+          }
+        } catch (err) {
+          console.warn("Error cargando estado inicial de disponibilidad", err);
         }
-    } catch (err) {
-        console.warn("Error cargando estado inicial de disponibilidad", err);
-    }
 
-    await renderRequests();
-};
+        await renderRequests();
+      };
 
+      // Drawer Toggle Logic
+      const menuBtn = document.getElementById("mobile-menu-btn");
+      const drawer = document.getElementById("main-drawer");
+      const overlay = document.getElementById("drawer-overlay");
 
+      if (menuBtn && drawer && overlay) {
+        function openDrawer() {
+          overlay.classList.remove("hidden");
+          setTimeout(() => overlay.classList.remove("opacity-0"), 10);
+          drawer.classList.remove("-translate-x-full");
+        }
 
-// Drawer Toggle Logic
-const menuBtn = document.getElementById('mobile-menu-btn');
-const drawer = document.getElementById('main-drawer');
-const overlay = document.getElementById('drawer-overlay');
+        function closeDrawer() {
+          overlay.classList.add("opacity-0");
+          drawer.classList.add("-translate-x-full");
+          setTimeout(() => overlay.classList.add("hidden"), 300);
+        }
 
-if (menuBtn && drawer && overlay) {
-    function openDrawer() {
-        overlay.classList.remove('hidden');
-        setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-        drawer.classList.remove('-translate-x-full');
-    }
+        menuBtn.addEventListener("click", openDrawer);
+        overlay.addEventListener("click", closeDrawer);
+      }
 
-    function closeDrawer() {
-        overlay.classList.add('opacity-0');
-        drawer.classList.add('-translate-x-full');
-        setTimeout(() => overlay.classList.add('hidden'), 300);
-    }
+      // Role-based navigation in drawer
+      const role = localStorage.getItem("user_role") || "customer";
+      document
+        .querySelectorAll(".nav-customer")
+        .forEach(
+          (el) => (el.style.display = role === "customer" ? "flex" : "none"),
+        );
+      document
+        .querySelectorAll(".nav-provider")
+        .forEach(
+          (el) => (el.style.display = role === "provider" ? "flex" : "none"),
+        );
 
-    menuBtn.addEventListener('click', openDrawer);
-    overlay.addEventListener('click', closeDrawer);
-}
-
-// Role-based navigation in drawer
-const role = localStorage.getItem('user_role') || 'customer';
-document.querySelectorAll('.nav-customer').forEach(el => el.style.display = role === 'customer' ? 'flex' : 'none');
-document.querySelectorAll('.nav-provider').forEach(el => el.style.display = role === 'provider' ? 'flex' : 'none');
-
-// Role switching logic
-const switchBtn = document.getElementById('switch-role-btn');
-const switchText = document.getElementById('switch-role-text');
-if (switchBtn && switchText) {
-    if (role === 'customer') {
-        switchText.innerText = 'Cambiar a Perfil de Trabajador';
-        switchBtn.addEventListener('click', (e) => {
+      // Role switching logic
+      const switchBtn = document.getElementById("switch-role-btn");
+      const switchText = document.getElementById("switch-role-text");
+      if (switchBtn && switchText) {
+        if (role === "customer") {
+          switchText.innerText = "Cambiar a Perfil de Trabajador";
+          switchBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            localStorage.setItem('user_role', 'provider');
-            window.location.href = '/panel_del_prestador/index.html';
-        });
-    } else {
-        switchText.innerText = 'Cambiar a Cliente';
-        switchBtn.addEventListener('click', (e) => {
+            localStorage.setItem("user_role", "provider");
+            window.location.href = "/panel_del_prestador/index.html";
+          });
+        } else {
+          switchText.innerText = "Cambiar a Cliente";
+          switchBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            localStorage.setItem('user_role', 'customer');
-            window.location.href = '/mapa_de_b_squeda_cliente/index.html';
+            localStorage.setItem("user_role", "customer");
+            window.location.href = "/mapa_de_b_squeda_cliente/index.html";
+          });
+        }
+      }
+
+      // Logout logic
+      const logoutBtn = document.getElementById("logout-btn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          await supabase.auth.signOut();
+          localStorage.removeItem("user_role");
+          window.location.href = "/index.html";
         });
-    }
-}
+      }
 
-// Logout logic
-const logoutBtn = document.getElementById('logout-btn');
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        await supabase.auth.signOut();
-        localStorage.removeItem('user_role');
-        window.location.href = '/index.html';
-    });
-}
+      // Availability Toggle Logic
+      const toggleBtn = document.getElementById("availability-toggle");
+      const knob = document.getElementById("toggle-knob");
+      const statusDot = document.getElementById("status-dot");
+      const statusText = document.getElementById("status-text");
+      const statusDesc = document.getElementById("status-desc");
 
-// Availability Toggle Logic
-const toggleBtn = document.getElementById('availability-toggle');
-const knob = document.getElementById('toggle-knob');
-const statusDot = document.getElementById('status-dot');
-const statusText = document.getElementById('status-text');
-const statusDesc = document.getElementById('status-desc');
+      // Hoisted UI updates function
+      window.updateAvailabilityUI = function (enabled) {
+        isAvailable = enabled;
+        if (isAvailable) {
+          // ON State
+          toggleBtn.classList.remove("bg-outline-variant");
+          toggleBtn.classList.add("bg-secondary");
+          knob.classList.remove("translate-x-0");
+          knob.classList.add("translate-x-8");
+          statusDot.classList.remove("bg-outline-variant");
+          statusDot.classList.add("bg-emerald-500");
+          statusDot.style.boxShadow = "0 0 8px rgba(16,185,129,0.5)";
+          statusText.innerText = "Disponible para Trabajos";
+          statusDesc.innerText =
+            "Actualmente eres visible para clientes en tu área.";
 
+          // Show marker on map
+          if (providerMarker) providerMarker.addTo(window.miniMap);
+        } else {
+          // OFF State
+          toggleBtn.classList.remove("bg-secondary");
+          toggleBtn.classList.add("bg-outline-variant");
+          knob.classList.remove("translate-x-8");
+          knob.classList.add("translate-x-0");
+          statusDot.classList.remove("bg-emerald-500");
+          statusDot.classList.add("bg-outline-variant");
+          statusDot.style.boxShadow = "none";
+          statusText.innerText = "Fuera de Servicio";
+          statusDesc.innerText = "Tu ubicación está oculta para los clientes.";
 
+          // Remove marker from map
+          if (providerMarker) window.miniMap.removeLayer(providerMarker);
+        }
 
-// Hoisted UI updates function
-window.updateAvailabilityUI = function(enabled) {
-    isAvailable = enabled;
-    if (isAvailable) {
-        // ON State
-        toggleBtn.classList.remove('bg-outline-variant');
-        toggleBtn.classList.add('bg-secondary');
-        knob.classList.remove('translate-x-0');
-        knob.classList.add('translate-x-8');
-        statusDot.classList.remove('bg-outline-variant');
-        statusDot.classList.add('bg-emerald-500');
-        statusDot.style.boxShadow = '0 0 8px rgba(16,185,129,0.5)';
-        statusText.innerText = 'Disponible para Trabajos';
-        statusDesc.innerText = 'Actualmente eres visible para clientes en tu área.';
-        
-        // Show marker on map
-        if (providerMarker) providerMarker.addTo(window.miniMap);
-    } else {
-        // OFF State
-        toggleBtn.classList.remove('bg-secondary');
-        toggleBtn.classList.add('bg-outline-variant');
-        knob.classList.remove('translate-x-8');
-        knob.classList.add('translate-x-0');
-        statusDot.classList.remove('bg-emerald-500');
-        statusDot.classList.add('bg-outline-variant');
-        statusDot.style.boxShadow = 'none';
-        statusText.innerText = 'Fuera de Servicio';
-        statusDesc.innerText = 'Tu ubicación está oculta para los clientes.';
-        
-        // Remove marker from map
-        if (providerMarker) window.miniMap.removeLayer(providerMarker);
-    }
-    
-    toggleBtn.setAttribute('aria-pressed', isAvailable);
-};
+        toggleBtn.setAttribute("aria-pressed", isAvailable);
+      };
 
-// Global function to update DB & State
-async function updateAvailabilityState(enabled, lat = null, lng = null) {
-    const status = enabled ? 'En línea' : 'Fuera de servicio';
-    await updateProviderAvailability(currentProviderId, status, lat, lng);
-    window.updateAvailabilityUI(enabled);
-}
+      // Global function to update DB & State
+      async function updateAvailabilityState(enabled, lat = null, lng = null) {
+        const status = enabled ? "En línea" : "Fuera de servicio";
+        await updateProviderAvailability(currentProviderId, status, lat, lng);
+        window.updateAvailabilityUI(enabled);
+      }
 
-// Fallback globally exposed function for page startup compatibility
-function updateAvailabilityUI(enabled) {
-    window.updateAvailabilityUI(enabled);
-}
+      // Fallback globally exposed function for page startup compatibility
+      function updateAvailabilityUI(enabled) {
+        window.updateAvailabilityUI(enabled);
+      }
 
-toggleBtn.addEventListener('click', async () => {
-    const nextState = !isAvailable;
-    
-    if (nextState) {
-        if (!window.isSecureContext) {
+      let gpsWatchId = null;
+      let lastGpsUpdateTime = 0;
+
+      toggleBtn.addEventListener("click", async () => {
+        const nextState = !isAvailable;
+
+        if (nextState) {
+          if (!window.isSecureContext) {
             showSecureContextWarningBanner();
             // Usar coordenadas por defecto de Santiago en simulación
             window.currentRealLat = -33.4489;
             window.currentRealLng = -70.6693;
             window.currentRealRealLat = -33.4489;
             window.currentRealRealLng = -70.6693;
-            
-            providerMarker.setLatLng([window.currentRealLat, window.currentRealLng]);
-            window.miniMap.flyTo([window.currentRealLat, window.currentRealLng], 14);
-            
-            await updateAvailabilityState(true, window.currentRealLat, window.currentRealLng);
-            return;
-        }
 
-        if (navigator.geolocation) {
-            const geoOptions = { enableHighAccuracy: true, timeout: 8000 };
-            
+            providerMarker.setLatLng([
+              window.currentRealLat,
+              window.currentRealLng,
+            ]);
+            window.miniMap.flyTo(
+              [window.currentRealLat, window.currentRealLng],
+              14,
+            );
+
+            await updateAvailabilityState(
+              true,
+              window.currentRealLat,
+              window.currentRealLng,
+            );
+            return;
+          }
+
+          if (navigator.geolocation) {
+            const geoOptions = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
+
             const successCallback = async (position) => {
-                window.currentRealLat = position.coords.latitude;
-                window.currentRealLng = position.coords.longitude;
-                window.currentRealRealLat = position.coords.latitude;
-                window.currentRealRealLng = position.coords.longitude;
-                
-                providerMarker.setLatLng([window.currentRealLat, window.currentRealLng]);
-                window.miniMap.flyTo([window.currentRealLat, window.currentRealLng], 14);
-                
-                await updateAvailabilityState(true, window.currentRealLat, window.currentRealLng);
+              window.currentRealLat = position.coords.latitude;
+              window.currentRealLng = position.coords.longitude;
+              window.currentRealRealLat = position.coords.latitude;
+              window.currentRealRealLng = position.coords.longitude;
+
+              providerMarker.setLatLng([
+                window.currentRealLat,
+                window.currentRealLng,
+              ]);
+              window.miniMap.flyTo(
+                [window.currentRealLat, window.currentRealLng],
+                14,
+              );
+
+              const now = Date.now();
+              // Actualizar base de datos máximo 1 vez cada 5 segundos para no saturar Supabase
+              if (now - lastGpsUpdateTime > 5000) {
+                  lastGpsUpdateTime = now;
+                  await updateAvailabilityState(
+                    true,
+                    window.currentRealLat,
+                    window.currentRealLng,
+                  );
+              }
             };
 
             const errorCallback = async (error) => {
-                console.warn("Error en geolocalización al activar disponibilidad (Intento 1):", error.message);
-                if (error.code === error.PERMISSION_DENIED) {
-                    showGpsAlertBanner();
-                    // Si se deniega, activamos con la última conocida
-                    await updateAvailabilityState(true, window.currentRealLat, window.currentRealLng);
-                } else {
-                    console.log("Reintentando con baja precisión al activar disponibilidad...");
-                    navigator.geolocation.getCurrentPosition(
-                        successCallback,
-                        async (err) => {
-                            console.warn("Fallo también geolocalización de baja precisión al activar (Intento 2):", err.message);
-                            showGpsAlertBanner();
-                            await updateAvailabilityState(true, window.currentRealLat, window.currentRealLng);
-                        },
-                        { enableHighAccuracy: false, timeout: 15000 }
-                    );
+              console.warn(
+                "Error en geolocalización continua:",
+                error.message,
+              );
+              if (error.code === error.PERMISSION_DENIED) {
+                showGpsAlertBanner();
+                // Si se deniega, activamos con la última conocida sin tracking
+                await updateAvailabilityState(
+                  true,
+                  window.currentRealLat,
+                  window.currentRealLng,
+                );
+                if (gpsWatchId !== null) {
+                  navigator.geolocation.clearWatch(gpsWatchId);
+                  gpsWatchId = null;
                 }
+              }
             };
 
-            navigator.geolocation.getCurrentPosition(successCallback, errorCallback, geoOptions);
-        } else {
+            if (gpsWatchId !== null) {
+               navigator.geolocation.clearWatch(gpsWatchId);
+            }
+            // Empezar a seguir la posición continuamente
+            gpsWatchId = navigator.geolocation.watchPosition(
+              successCallback,
+              errorCallback,
+              geoOptions,
+            );
+          } else {
             alert("Tu navegador no soporta geolocalización.");
-            await updateAvailabilityState(true, window.currentRealLat, window.currentRealLng);
+            await updateAvailabilityState(
+              true,
+              window.currentRealLat,
+              window.currentRealLng,
+            );
+          }
+        } else {
+          // OFF State - Stop watching position
+          if (gpsWatchId !== null) {
+             navigator.geolocation.clearWatch(gpsWatchId);
+             gpsWatchId = null;
+          }
+          await updateAvailabilityState(false, null, null);
         }
-    } else {
-        await updateAvailabilityState(false, null, null);
-    }
-});
+      });
 
+      // Cargar sesión, configurar GPS e inicializar estado
+      await detectSession();
+      checkGpsPermission();
+      requestGpsLocation(false);
 
-
-// Cargar sesión, configurar GPS e inicializar estado
-await detectSession();
-checkGpsPermission();
-requestGpsLocation(false);
-
-// Polling de respaldo cada 3 segundos para solicitudes entrantes sin requerir recarga manual
-setInterval(async () => {
-    try {
-        await renderRequests();
-    } catch (err) {
-        console.warn("Error en polling de solicitudes entrantes:", err);
-    }
-}, 3000);
-</script>
-</body></html>
+      // Polling de respaldo cada 3 segundos para solicitudes entrantes sin requerir recarga manual
+      setInterval(async () => {
+        try {
+          await renderRequests();
+        } catch (err) {
+          console.warn("Error en polling de solicitudes entrantes:", err);
+        }
+      }, 3000);
+    </script>
+  </body>
+</html>
