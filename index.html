@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Bienvenida - MatchWorking</title>
+    <title>Bienvenida - MatchWork</title>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link
@@ -22,11 +22,12 @@
 
     <style>
       body {
-        min-height: max(884px, 100dvh);
+        min-height: 100dvh;
         display: none; /* Hide body initially to prevent unauthorized content flash */
       }
     </style>
     <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/src/theme.js"></script>
   </head>
   <body
     class="bg-background text-on-surface font-body-md antialiased min-h-screen flex items-center justify-center p-container-margin-mobile md:p-container-margin-desktop relative overflow-y-auto py-8"
@@ -41,7 +42,7 @@
         <div class="w-full max-w-[180px] mb-2">
           <img
             src="/logo.png"
-            alt="MatchWorking Logo"
+            alt="MatchWork Logo"
             class="w-full h-auto object-contain"
           />
         </div>
@@ -49,7 +50,7 @@
           id="auth-title"
           class="font-headline-md text-headline-md text-on-surface"
         >
-          Únete a MatchWorking
+          Únete a MatchWork
         </h1>
         <p
           id="auth-subtitle"
@@ -332,7 +333,7 @@
             document.getElementById("field-category").style.display = "none";
             subcategoryField.style.display = "none";
           } else {
-            title.innerText = "Únete a MatchWorking";
+            title.innerText = "Únete a MatchWork";
             subtitle.innerText = "Selecciona tu tipo de cuenta para comenzar.";
             roleSelection.style.display = "grid"; // Mostrar selección de rol
             submitBtn.innerHTML = `
@@ -354,7 +355,7 @@
         });
 
         submitBtn.addEventListener("click", async () => {
-          const email = document.getElementById("email").value;
+          const email = document.getElementById("email").value.trim();
           const password = document.getElementById("password").value;
           let role = "customer"; // Default role
 
@@ -417,14 +418,8 @@
               // Si la sesión es null (confirmación de email activada o user ya existe), avisar al usuario.
               if (!authResponse.data.session) {
                 alert(
-                  "Aviso: Como la confirmación por correo está activada o el correo ya existe, entraremos en modo de prueba local.",
+                  "Revisa tu correo para confirmar tu cuenta (o este correo ya está registrado).",
                 );
-                localStorage.setItem("user_role", role);
-                if (role === "customer") {
-                  window.location.href = "/mapa_de_b_squeda_cliente/index.html";
-                } else {
-                  window.location.href = "/panel_del_prestador/index.html";
-                }
                 return; // Detener flujo
               } else {
                 const user = authResponse.data.user;
@@ -549,17 +544,11 @@
             }
           } catch (error) {
             console.warn("Supabase auth error:", error);
-            let errorMsg = error.message;
-            alert(
-              `Aviso: Hubo un problema con la autenticación (${errorMsg}). Entrando en modo de prueba local.`,
-            );
-
-            // Fallback for demo purposes
-            localStorage.setItem("user_role", role);
-            if (role === "customer") {
-              window.location.href = "/mapa_de_b_squeda_cliente/index.html";
+            
+            if (isLoginMode) {
+              alert("La cuenta no existe o las credenciales son incorrectas.");
             } else {
-              window.location.href = "/panel_del_prestador/index.html";
+              alert(`Hubo un problema al crear la cuenta: ${error.message}`);
             }
           } finally {
             submitBtn.innerHTML = originalText;

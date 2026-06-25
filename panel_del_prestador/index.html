@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Panel de Control del Trabajador - MatchWorking</title>
+    <title>Panel de Control del Trabajador - MatchWork</title>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
@@ -21,7 +21,7 @@
 
     <style>
       body {
-        min-height: max(884px, 100dvh);
+        min-height: 100dvh;
         display: none; /* Hide body initially to prevent unauthorized content flash */
       }
     </style>
@@ -54,7 +54,7 @@
       <h1
         class="font-headline-md text-headline-md font-bold text-secondary dark:text-secondary-fixed"
       >
-        MatchWorking
+        MatchWork
       </h1>
       <div
         class="hover:bg-surface-container-low transition-colors active:opacity-80 transition-all rounded-full overflow-hidden w-8 h-8 flex items-center justify-center"
@@ -315,6 +315,24 @@
         </div>
       </section>
     </main>
+
+    <!-- Modal: Alerta de Solicitud Entrante -->
+    <div id="incoming-request-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] hidden items-center justify-center p-4 transition-opacity opacity-0 duration-300">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-2xl p-6 w-full max-w-sm flex flex-col items-center text-center transform scale-95 transition-transform duration-300 relative overflow-hidden" id="incoming-request-content">
+        <div class="absolute top-0 left-0 w-full h-1 bg-secondary animate-pulse"></div>
+        <div class="w-16 h-16 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center mb-4 mt-2">
+            <span class="material-symbols-outlined text-[32px] animate-bounce">notifications_active</span>
+        </div>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold mb-1">¡Nueva Solicitud!</h3>
+        <p class="font-body-md text-on-surface-variant mb-6">Un cliente solicita tus servicios en este momento.</p>
+        <div class="flex gap-3 w-full">
+            <button id="reject-incoming-btn" class="flex-1 bg-surface-container-high text-on-surface font-label-lg py-3 rounded-xl hover:bg-surface-container-highest transition-colors font-semibold">Rechazar</button>
+            <button id="accept-incoming-btn" class="flex-1 bg-secondary text-on-secondary font-label-lg py-3 rounded-xl shadow-md shadow-secondary/30 hover:opacity-90 active:scale-95 transition-all font-semibold flex items-center justify-center gap-2">
+                Aceptar <span class="material-symbols-outlined text-[18px]">check</span>
+            </button>
+        </div>
+      </div>
+    </div>
     <!-- BottomNavBar (Visible on Mobile) -->
     <nav
       class="md:hidden fixed bottom-0 w-full z-50 shadow-[0_-4px_12px_0px_rgba(0,0,0,0.04)] bg-surface-container-lowest flex justify-around items-center h-16 px-2 pb-safe"
@@ -477,7 +495,7 @@
             <span class="material-symbols-outlined text-[24px] text-white">gpp_maybe</span>
             <div>
                 <h4 class="font-bold font-headline-sm text-white">Ubicación GPS Bloqueada</h4>
-                <p class="mt-1 text-[13px] text-white/90">Para que los clientes puedan encontrarte en el mapa, MatchWorking necesita tu ubicación. Por favor, habilítala siguiendo estos pasos:</p>
+                <p class="mt-1 text-[13px] text-white/90">Para que los clientes puedan encontrarte en el mapa, MatchWork necesita tu ubicación. Por favor, habilítala siguiendo estos pasos:</p>
                 <ol class="list-decimal list-inside mt-2 flex flex-col gap-1 text-[13px] text-white/95">
                     <li>Haz clic en el ícono del <b>candado</b> <span class="material-symbols-outlined text-[14px] align-middle">lock</span> al lado de la barra de direcciones de tu navegador.</li>
                     <li>Busca el permiso de <b>Ubicación</b>.</li>
@@ -837,7 +855,7 @@
               list.innerHTML += html;
             } else {
               const escapedName = (
-                req.userName || "Cliente de MatchWorking"
+                req.userName || "Cliente de MatchWork"
               ).replace(/'/g, "\\'");
               const html = `
                     <div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col gap-4">
@@ -1206,8 +1224,104 @@
         }
       });
 
+      // --- AUDIO & REALTIME ALERTS ---
+      let audioCtx = null;
+      
+      const playDingSound = () => {
+        try {
+          if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          if (audioCtx.state === "suspended") {
+            audioCtx.resume();
+          }
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+          osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5); 
+          
+          gain.gain.setValueAtTime(0, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
+          
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.start(audioCtx.currentTime);
+          osc.stop(audioCtx.currentTime + 1);
+        } catch(e) {
+          console.warn("Audio synthesis failed:", e);
+        }
+      };
+
+      const incomingReqModal = document.getElementById("incoming-request-modal");
+      const incomingReqContent = document.getElementById("incoming-request-content");
+      let activeIncomingRequestId = null;
+
+      const showIncomingRequestAlert = (reqId) => {
+        activeIncomingRequestId = reqId;
+        playDingSound();
+        
+        incomingReqModal.classList.remove("hidden");
+        incomingReqModal.classList.add("flex");
+        setTimeout(() => {
+          incomingReqModal.classList.remove("opacity-0");
+          incomingReqContent.classList.remove("scale-95");
+          incomingReqContent.classList.add("scale-100");
+        }, 10);
+      };
+
+      const hideIncomingRequestAlert = () => {
+        incomingReqModal.classList.add("opacity-0");
+        incomingReqContent.classList.remove("scale-100");
+        incomingReqContent.classList.add("scale-95");
+        setTimeout(() => {
+          incomingReqModal.classList.add("hidden");
+          incomingReqModal.classList.remove("flex");
+          activeIncomingRequestId = null;
+        }, 300);
+      };
+
+      document.getElementById("reject-incoming-btn").addEventListener("click", async () => {
+        if(activeIncomingRequestId) {
+          await rejectServiceRequest(activeIncomingRequestId);
+          hideIncomingRequestAlert();
+          await renderRequests();
+        }
+      });
+
+      document.getElementById("accept-incoming-btn").addEventListener("click", async () => {
+        if(activeIncomingRequestId) {
+          await acceptServiceRequest(activeIncomingRequestId);
+          hideIncomingRequestAlert();
+          await renderRequests();
+        }
+      });
+
+      // Listen to Supabase Realtime
+      let realtimeChannel = null;
+      const setupRealtime = () => {
+        if(realtimeChannel) supabase.removeChannel(realtimeChannel);
+        
+        realtimeChannel = supabase.channel('provider-alerts')
+          .on('postgres_changes', { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'service_requests',
+            filter: `provider_id=eq.${currentProviderId}` 
+          }, payload => {
+             console.log("Nueva solicitud detectada en tiempo real:", payload);
+             showIncomingRequestAlert(payload.new.id);
+             renderRequests();
+          })
+          .subscribe();
+      };
+
       // Cargar sesión, configurar GPS e inicializar estado
       await detectSession();
+      setupRealtime();
       checkGpsPermission();
       requestGpsLocation(false);
 

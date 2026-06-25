@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Onboarding - MatchWorking</title>
+    <title>Onboarding - MatchWork</title>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link
@@ -22,11 +22,12 @@
 
     <style>
       body {
-        min-height: max(884px, 100dvh);
+        min-height: 100dvh;
         display: none; /* Hide body initially to prevent unauthorized content flash */
       }
     </style>
     <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/src/theme.js"></script>
   </head>
   <body
     class="bg-background text-on-surface font-body-md antialiased min-h-screen flex items-center justify-center p-container-margin-mobile md:p-container-margin-desktop relative overflow-hidden"
@@ -41,7 +42,7 @@
         <div class="w-full max-w-[180px] mb-2">
           <img
             src="/logo.png"
-            alt="MatchWorking Logo"
+            alt="MatchWork Logo"
             class="w-full h-auto object-contain"
           />
         </div>
@@ -49,7 +50,7 @@
           id="auth-title"
           class="font-headline-md text-headline-md text-on-surface"
         >
-          Únete a MatchWorking
+          Únete a MatchWork
         </h1>
         <p
           id="auth-subtitle"
@@ -342,7 +343,7 @@
           document.getElementById("field-category").style.display = "none";
           subcategoryField.style.display = "none";
         } else {
-          title.innerText = "Únete a MatchWorking";
+          title.innerText = "Únete a MatchWork";
           subtitle.innerText =
             "Selecciona cómo quieres iniciar en MatchAPP (podrás cambiar de vista más adelante).";
           roleSelection.style.display = "grid";
@@ -365,7 +366,7 @@
       });
 
       submitBtn.addEventListener("click", async () => {
-        const email = document.getElementById("email").value;
+        const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value;
         let role = "customer";
 

@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Messages - MatchWorking</title>
+    <title>Messages - MatchWork</title>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
@@ -21,7 +21,8 @@
 
     <style>
       body {
-        min-height: max(884px, 100dvh);
+        height: 100dvh;
+        max-height: 100dvh;
         display: none; /* Hide body initially to prevent unauthorized content flash */
       }
     </style>
@@ -29,7 +30,7 @@
     <script type="module" src="/src/theme.js"></script>
   </head>
   <body
-    class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:flex-row overflow-hidden"
+    class="bg-background text-on-background font-body-md h-full flex flex-col md:flex-row overflow-hidden fixed inset-0 w-full"
   >
     <!-- Mobile TopAppBar / Hidden on Desktop -->
     <header
@@ -48,7 +49,7 @@
       <h1
         class="font-headline-md text-headline-md font-bold text-secondary dark:text-secondary-fixed"
       >
-        MatchWorking
+        MatchWork
       </h1>
       <div
         class="hover:bg-surface-container-low transition-colors active:opacity-80 transition-all rounded-full overflow-hidden w-8 h-8 flex items-center justify-center"
@@ -188,7 +189,7 @@
       </div>
     </nav>
     <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative min-h-0">
       <!-- Conversation List -->
       <div
         id="chat-list-view"
@@ -230,7 +231,7 @@
       <!-- Chat Detail View -->
       <div
         id="chat-detail-view"
-        class="hidden md:flex flex-1 flex-col h-full bg-surface-container-lowest w-full"
+        class="hidden md:flex flex-1 flex-col h-full min-h-0 bg-surface-container-lowest w-full"
       >
         <!-- Chat Header -->
         <div
@@ -302,7 +303,7 @@
         <!-- Chat Messages Area -->
         <div
           id="chat-messages-container"
-          class="flex-1 overflow-y-auto p-gutter pb-gutter flex flex-col gap-stack-md bg-surface-bright justify-center items-center"
+          class="flex-1 min-h-0 overflow-y-auto p-gutter pb-gutter flex flex-col gap-stack-md bg-surface-bright justify-center items-center"
         >
           <div
             class="flex flex-col items-center justify-center p-8 text-center text-on-surface-variant"
@@ -313,7 +314,7 @@
               >chat</span
             >
             <p class="font-headline-sm text-headline-sm font-semibold">
-              MatchWorking Centro de Mensajería
+              MatchWork Centro de Mensajería
             </p>
             <p
               class="font-body-md text-body-md text-on-surface-variant/80 mt-1 max-w-sm"
@@ -323,9 +324,8 @@
             </p>
           </div>
         </div>
-        <!-- Message Input Area -->
         <div
-          class="p-4 pb-8 md:pb-4 bg-surface border-t border-outline-variant shadow-[0_-4px_12px_0px_rgba(0,0,0,0.02)]"
+          class="shrink-0 p-4 pb-8 md:pb-4 bg-surface border-t border-outline-variant shadow-[0_-4px_12px_0px_rgba(0,0,0,0.02)]"
         >
           <div
             class="flex items-end gap-2 bg-[#F1F5F9] focus-within:bg-surface-container-lowest focus-within:ring-2 focus-within:ring-secondary rounded-2xl p-2 transition-all"
@@ -646,7 +646,7 @@
               if (!contactProfile) {
                 contactProfile = {
                   id: contactId,
-                  name: "Usuario MatchWorking",
+                  name: "Usuario MatchWork",
                   avatar_url:
                     "https://lh3.googleusercontent.com/aida-public/AB6AXuCiHN3Z5cXovSzR9qPbNjKF-HrCgeKRo1Dtg_VkXSeBrF4-nWI0OacFm-4MvjVPaU27_n4wpMGgXbBTW1iLqYVQgSwmSbIN6_KCZDD0w5yQbRp8oVxMGPwmOZxU50qSw5tI_ZPiIGr-HorwTv3LVat6o2BGI0lhoCfjY8St_UeQSH1t_8Qaqe2NDP7SA0CDaE6AREQUao4P4szT3_GGMxSZGB6sL4SZEyFGEWq_pzRJO4sFGKjVEMG4Y-YEyT8o23SCIjmJ3NjA0xI",
                   status: "En línea",
@@ -841,20 +841,21 @@
         if (!messagesContainer) return;
 
         messagesContainer.className =
-          "flex-1 overflow-y-auto p-gutter pb-20 md:pb-gutter flex flex-col gap-stack-md bg-surface-bright";
-        messagesContainer.innerHTML = `
+          "flex-1 min-h-0 overflow-y-auto p-gutter pb-20 md:pb-gutter flex flex-col gap-stack-md bg-surface-bright";
+
+        const msgs = await getMessages(activeUserId, activeContact.id);
+
+        let newHTML = `
         <div class="flex justify-center my-stack-sm">
             <div class="bg-surface-container-highest px-4 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant shadow-sm border border-outline-variant/30 flex items-center gap-2">
                 <span class="material-symbols-outlined text-[16px] text-secondary" data-icon="check_circle">check_circle</span>
                 Solicitud de Match Aceptada
             </div>
         </div>
-    `;
-
-        const msgs = await getMessages(activeUserId, activeContact.id);
+        `;
 
         if (msgs.length === 0) {
-          messagesContainer.innerHTML += `
+          newHTML += `
             <div class="flex flex-col items-center justify-center p-8 text-center text-on-surface-variant flex-1 empty-msgs-state">
                 <p class="font-body-md text-body-md">No hay mensajes anteriores.</p>
                 <p class="font-label-md text-label-md text-on-surface-variant/80 mt-1">¡Sé el primero en enviar un mensaje!</p>
@@ -872,7 +873,7 @@
                 month: "short",
                 day: "numeric",
               });
-              messagesContainer.innerHTML += `
+              newHTML += `
                     <div class="flex justify-center my-2">
                         <span class="font-label-md text-label-md text-on-surface-variant bg-surface-container px-3 py-1 rounded-full text-xs">${dayLabel}</span>
                     </div>
@@ -881,11 +882,15 @@
             }
 
             const isMe = msg.sender_id === activeUserId;
-            messagesContainer.innerHTML += renderSingleMessage(msg, isMe);
+            newHTML += renderSingleMessage(msg, isMe);
           });
         }
 
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        // Solo actualizar el DOM y mover el scroll si hay cambios reales
+        if (messagesContainer.innerHTML.trim() !== newHTML.trim()) {
+          messagesContainer.innerHTML = newHTML;
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
       }
 
       function setupRealtimeSubscription() {
@@ -1014,6 +1019,14 @@
 
         loadAndRenderMessages();
         setupRealtimeSubscription();
+        
+        // Polling de respaldo cada 3 segundos
+        if (window.chatPollingInterval) clearInterval(window.chatPollingInterval);
+        window.chatPollingInterval = setInterval(() => {
+          if (activeContact) {
+            loadAndRenderMessages();
+          }
+        }, 3000);
       }
 
       async function handleSend() {
@@ -1032,42 +1045,35 @@
         try {
           const sent = await sendMessage(activeUserId, activeContact.id, text);
 
-          // Manual append if channel not fully connected or fallback was used
-          const isFallback =
-            !supabase.storage ||
-            !realtimeChannel ||
-            realtimeChannel.state !== "joined";
+          // Optimistic UI update (always show the message immediately)
+          const messagesContainer = document.getElementById(
+            "chat-messages-container",
+          );
+          if (messagesContainer) {
+            const emptyState =
+              messagesContainer.querySelector(".empty-msgs-state");
+            if (emptyState) emptyState.remove();
 
-          if (isFallback) {
-            const messagesContainer = document.getElementById(
-              "chat-messages-container",
+            const dummyMsg = {
+              id: Date.now().toString(),
+              created_at: new Date().toISOString(),
+              sender_id: activeUserId,
+              receiver_id: activeContact.id,
+              text: text,
+              image_url: null,
+            };
+
+            messagesContainer.innerHTML += renderSingleMessage(
+              dummyMsg,
+              true,
             );
-            if (messagesContainer) {
-              const emptyState =
-                messagesContainer.querySelector(".empty-msgs-state");
-              if (emptyState) emptyState.remove();
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-              const dummyMsg = {
-                id: Date.now().toString(),
-                created_at: new Date().toISOString(),
-                sender_id: activeUserId,
-                receiver_id: activeContact.id,
-                text: text,
-                image_url: null,
-              };
-
-              messagesContainer.innerHTML += renderSingleMessage(
-                dummyMsg,
-                true,
-              );
-              messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-              const conv = conversations.find((c) => c.id === activeContact.id);
-              if (conv) {
-                conv.lastMessage = text;
-                conv.lastMessageTime = "Recién";
-                renderConversationsList();
-              }
+            const conv = conversations.find((c) => c.id === activeContact.id);
+            if (conv) {
+              conv.lastMessage = text;
+              conv.lastMessageTime = "Recién";
+              renderConversationsList();
             }
           }
         } catch (err) {
@@ -1215,31 +1221,33 @@
               const {
                 data: { user },
               } = await supabase.auth.getUser();
-              if (!user) return;
+              const currentUserId = user ? user.id : "00000000-0000-0000-0000-000000000000";
 
-              const profile = await getUserProfile(user.id);
-              const professions = getUserProfessions(user.id);
+              const profile = await getUserProfile(currentUserId);
+              const professions = getUserProfessions(currentUserId);
               
               if (typeof closeDrawer === "function") closeDrawer();
 
               if (professions.length > 0) {
-                renderProfessionsList(user.id);
+                renderProfessionsList(currentUserId);
                 selectProfessionModal.classList.remove("hidden");
                 selectProfessionModal.classList.add("flex");
                 setTimeout(() => {
+                  selectProfessionModal.classList.remove("opacity-0");
                   document.getElementById("select-profession-content").classList.remove("scale-95");
                 }, 10);
               } 
               else if (profile.category && profile.category !== "") {
-                saveUserProfession(user.id, {
+                saveUserProfession(currentUserId, {
                   category: profile.category,
                   subcategory: profile.subcategory,
                   profession: profile.profession || "Especialista"
                 });
-                renderProfessionsList(user.id);
+                renderProfessionsList(currentUserId);
                 selectProfessionModal.classList.remove("hidden");
                 selectProfessionModal.classList.add("flex");
                 setTimeout(() => {
+                  selectProfessionModal.classList.remove("opacity-0");
                   document.getElementById("select-profession-content").classList.remove("scale-95");
                 }, 10);
               }

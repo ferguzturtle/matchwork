@@ -133,7 +133,7 @@ export const getProviders = async () => {
           icon: up.icon || "plumbing",
           image: up.image,
           price: "$100",
-          description: "Prestador verificado de la red MatchWorking.",
+          description: "Prestador verificado de la red MatchWork",
         });
       }
     });
@@ -175,7 +175,7 @@ export const getRequestsForProvider = async (providerId) => {
         customerId: req.customer_id,
         message: req.message,
         status: req.status,
-        userName: profile ? profile.name : "Cliente de MatchWorking",
+        userName: profile ? profile.name : "Cliente de MatchWork",
         timestamp: req.created_at,
       };
     });
@@ -193,7 +193,7 @@ export const getRequestsForProvider = async (providerId) => {
         userId: req.userId || req.customerId,
         message: req.message,
         status: req.status,
-        userName: req.userName || "Cliente de MatchWorking",
+        userName: req.userName || "Cliente de MatchWork",
         timestamp: req.timestamp,
       }));
   }
@@ -790,6 +790,41 @@ export const checkIfMatched = async (providerId, customerId) => {
   }
 };
 
+export const checkIfPending = async (providerId, customerId) => {
+  try {
+    const { data, error } = await supabase
+      .from("service_requests")
+      .select("*")
+      .eq("provider_id", providerId)
+      .eq("customer_id", customerId)
+      .eq("status", "pendiente");
+    if (error) throw error;
+    if (data && data.length > 0) return true;
+
+    // Fallback local
+    const requests = JSON.parse(
+      localStorage.getItem("prolink_requests") || "[]",
+    );
+    return requests.some(
+      (r) =>
+        r.providerId == providerId &&
+        (r.customerId == customerId || r.userId == customerId) &&
+        r.status === "pendiente",
+    );
+  } catch (e) {
+    console.error("Error checking pending status, using local fallback:", e);
+    const requests = JSON.parse(
+      localStorage.getItem("prolink_requests") || "[]",
+    );
+    return requests.some(
+      (r) =>
+        r.providerId == providerId &&
+        (r.customerId == customerId || r.userId == customerId) &&
+        r.status === "pendiente",
+    );
+  }
+};
+
 // --- FUNCIONALIDADES DE MULTIPLES OFICIOS ---
 
 export const getUserProfessions = (userId) => {
@@ -855,5 +890,43 @@ export const setActiveProfession = async (userId, professionId) => {
   } catch (e) {
     console.error("Error setting active profession", e);
     return null;
+  }
+};
+
+export const getHiredProviders = async (userId) => {
+  try {
+    const { data, error } = await supabase
+      .from("service_requests")
+      .select("provider_id")
+      .eq("customer_id", userId)
+      .eq("status", "aceptada");
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) return [];
+
+    const providerIds = [...new Set(data.map((req) => req.provider_id))];
+
+    const { data: providers, error: provError } = await supabase
+      .from("providers")
+      .select("*")
+      .in("id", providerIds);
+
+    if (provError) throw provError;
+    return providers || [];
+  } catch (e) {
+    console.log("Fallback: obteniendo historial de contrataciones", e.message);
+    const requests = JSON.parse(
+      localStorage.getItem("prolink_requests") || "[]",
+    );
+    const hiredProviderIds = requests
+      .filter((req) => req.customerId == userId && req.status === "aceptada")
+      .map((req) => req.providerId);
+    
+    if (hiredProviderIds.length === 0) return [];
+
+    const allProviders = await getProvidersData();
+    const hired = allProviders.filter(p => hiredProviderIds.includes(p.id));
+    return hired;
   }
 };

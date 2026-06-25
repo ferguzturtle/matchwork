@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Perfil del Cliente - MatchWorking</title>
+    <title>Perfil del Cliente - MatchWork</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
       rel="stylesheet"
@@ -14,7 +14,7 @@
     />
     <style>
       body {
-        min-height: max(884px, 100dvh);
+        min-height: 100dvh;
         display: none; /* Hide body initially to prevent unauthorized content flash */
       }
     </style>
@@ -37,7 +37,7 @@
       <h1
         class="font-headline-md text-headline-md font-bold text-secondary dark:text-secondary-fixed"
       >
-        MatchWorking
+        MatchWork
       </h1>
       <div
         class="hover:bg-surface-container-low transition-colors active:opacity-80 p-1 rounded-full cursor-pointer"
@@ -169,7 +169,7 @@
             >
             Direcciones Guardadas
           </h3>
-          <button
+          <button id="add-location-btn"
             class="text-secondary hover:bg-secondary-container hover:text-on-secondary-container p-1 rounded-full transition-colors"
           >
             <span class="material-symbols-outlined">add</span>
@@ -195,7 +195,27 @@
           </h3>
         </div>
         <div id="saved-services-container" class="flex flex-col">
-          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- Trabajadores Contratados (Historial) -->
+      <div
+        class="bg-surface-container-lowest border border-outline-variant shadow-sm rounded-xl overflow-hidden mt-4"
+      >
+        <div
+          class="px-stack-md py-stack-sm border-b border-outline-variant bg-surface flex justify-between items-center"
+        >
+          <h3
+            class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined text-secondary"
+              >history</span
+            >
+            Trabajadores Contratados
+          </h3>
+        </div>
+        <div id="hired-providers-container" class="flex flex-col">
+          <div class="p-8 text-center text-on-surface-variant font-body-md">Cargando historial...</div>
         </div>
       </div>
 
@@ -304,8 +324,10 @@
         getUserLocations,
         deleteUserLocation,
         updateUserLocation,
+        saveUserLocation,
         getSavedProviders,
         toggleSavedProvider,
+        getHiredProviders,
       } from "/src/data.js";
 
       // Auth Guard to prevent unauthorized access
@@ -705,6 +727,20 @@
         .getElementById("close-edit-location")
         .addEventListener("click", closeEditLocModal);
 
+      document.getElementById("add-location-btn").addEventListener("click", () => {
+        editIdInput.value = "";
+        editLabelInput.value = "";
+        editAddressInput.value = "";
+
+        editModal.classList.remove("hidden");
+        editModal.classList.add("flex");
+        setTimeout(() => {
+          editModal.classList.remove("opacity-0");
+          editContent.classList.remove("scale-95");
+          editContent.classList.add("scale-100");
+        }, 10);
+      });
+
       saveEditBtn.addEventListener("click", async () => {
         const id = editIdInput.value;
         const label = editLabelInput.value.trim();
@@ -736,7 +772,11 @@
             lng = -70.6693 + (Math.random() - 0.5) * 0.05;
           }
 
-          await updateUserLocation(id, label, address, lat, lng);
+          if (id) {
+            await updateUserLocation(id, label, address, lat, lng);
+          } else {
+            await saveUserLocation(activeUserId, label, address, lat, lng);
+          }
           await renderSavedLocations();
           closeEditLocModal();
         } catch (err) {
@@ -803,10 +843,54 @@
         }
       };
 
+      const hiredProvidersContainer = document.getElementById(
+        "hired-providers-container",
+      );
+
+      async function renderHiredProviders() {
+        if (!activeUserId) return;
+        try {
+          const hiredProviders = await getHiredProviders(activeUserId);
+          if (!hiredProviders || hiredProviders.length === 0) {
+            hiredProvidersContainer.innerHTML =
+              '<div class="p-4 text-center text-on-surface-variant font-body-md">Aún no has contratado a ningún trabajador.</div>';
+            return;
+          }
+
+          let html = "";
+          hiredProviders.forEach((provider) => {
+            html += `
+                        <div class="p-stack-md border-b border-outline-variant flex justify-between items-center hover:bg-surface-bright group cursor-pointer" onclick="window.location.href='/perfil_del_prestador/index.html?id=${provider.id}'">
+                            <div class="flex items-center gap-3">
+                                <img src="${provider.image}" alt="${provider.name}" class="w-12 h-12 rounded-full object-cover">
+                                <div class="flex flex-col">
+                                    <span class="font-label-lg text-label-lg text-on-surface">${provider.name}</span>
+                                    <span class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">${provider.profession}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button class="text-secondary hover:text-secondary-fixed p-2 rounded-full transition-colors flex items-center gap-1 font-label-md" title="Ver Perfil">
+                                    Ver Perfil <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+          });
+          hiredProvidersContainer.innerHTML = html;
+        } catch (err) {
+          hiredProvidersContainer.innerHTML =
+            '<div class="p-4 text-center text-error font-body-md">Error cargando historial: ' +
+            err.message +
+            "</div>";
+          console.error("Error loading hired providers", err);
+        }
+      }
+
       // Initialize
       loadProfile().then(() => {
         renderSavedLocations();
         renderSavedServices();
+        renderHiredProviders();
       });
     </script>
   </body>

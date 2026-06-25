@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>MatchWorking - Explorar</title>
+    <title>MatchWork - Explorar</title>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
@@ -28,10 +28,17 @@
         -ms-overflow-style: none;
         scrollbar-width: none;
       }
+      @keyframes popIn {
+        0% { transform: scale(0.5) translateY(20px); opacity: 0; }
+        100% { transform: scale(1) translateY(0); opacity: 1; }
+      }
+      .animate-pop {
+        animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      }
     </style>
     <style>
       body {
-        min-height: max(884px, 100dvh);
+        min-height: 100dvh;
         display: none; /* Hide body initially to prevent unauthorized content flash */
       }
     </style>
@@ -62,7 +69,7 @@
         <span class="material-symbols-outlined text-[24px]">menu</span>
       </button>
       <h1 class="font-headline-md text-headline-md font-bold text-secondary">
-        MatchWorking
+        MatchWork
       </h1>
       <button
         class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant shadow-sm hover:bg-surface-container-low transition-colors active:opacity-80 transition-all"
@@ -824,6 +831,7 @@
         CATEGORIES,
         createServiceRequest,
         checkIfMatched,
+        checkIfPending,
         getUserProfessions,
         saveUserProfession,
         setActiveProfession,
@@ -1068,14 +1076,30 @@
                 "/centro_de_mensajer_a/index.html?provider=" + p.id;
             };
           } else {
-            btnRequest.innerHTML = `
-                <span class="material-symbols-outlined text-[18px]">handshake</span>
-                Solicitar
-            `;
-            btnRequest.onclick = (e) => {
-              e.stopPropagation();
-              openServiceRequestModal(p);
-            };
+            checkIfPending(p.id, globalUserId).then((isPending) => {
+              if (isPending) {
+                btnRequest.innerHTML = `
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    Esperando...
+                `;
+                btnRequest.classList.replace("bg-secondary", "bg-emerald-600");
+                btnRequest.onclick = (e) => {
+                  e.stopPropagation();
+                  alert(
+                    "Ya has enviado una solicitud a este trabajador. Por favor, espera a que la evalúe.",
+                  );
+                };
+              } else {
+                btnRequest.innerHTML = `
+                    <span class="material-symbols-outlined text-[18px]">handshake</span>
+                    Solicitar
+                `;
+                btnRequest.onclick = (e) => {
+                  e.stopPropagation();
+                  openServiceRequestModal(p);
+                };
+              }
+            });
           }
         });
 
@@ -1329,7 +1353,7 @@
 
         filteredProviders.forEach((p) => {
           const iconHtml = `
-            <div class="flex flex-col items-center group cursor-pointer drop-shadow-md">
+            <div class="flex flex-col items-center group cursor-pointer drop-shadow-md animate-pop">
                 <div class="w-10 h-10 bg-surface-container-lowest border border-on-secondary-fixed-variant rounded-full flex items-center justify-center relative z-10 hover:bg-secondary hover:text-on-secondary transition-colors text-on-secondary-fixed-variant">
                     <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">${p.icon}</span>
                 </div>
@@ -1387,7 +1411,7 @@
             <span class="material-symbols-outlined text-[24px] text-white">gpp_maybe</span>
             <div>
                 <h4 class="font-bold font-headline-sm text-white">Ubicación GPS Bloqueada</h4>
-                <p class="mt-1 text-[13px] text-white/90">Para que MatchWorking funcione correctamente y pueda visualizar a los trabajadores cercanos en su área, por favor siga estos pasos:</p>
+                <p class="mt-1 text-[13px] text-white/90">Para que MatchWork funcione correctamente y pueda visualizar a los trabajadores cercanos en su área, por favor siga estos pasos:</p>
                 <ol class="list-decimal list-inside mt-2 flex flex-col gap-1 text-[13px] text-white/95">
                     <li>Haga clic en el ícono del <b>candado</b> <span class="material-symbols-outlined text-[14px] align-middle">lock</span> al lado de la barra de direcciones de su navegador.</li>
                     <li>Busque el permiso de <b>Ubicación</b>.</li>
@@ -1867,31 +1891,33 @@
               const {
                 data: { user },
               } = await supabase.auth.getUser();
-              if (!user) return;
+              const currentUserId = user ? user.id : "00000000-0000-0000-0000-000000000000";
 
-              const profile = await getUserProfile(user.id);
-              const professions = getUserProfessions(user.id);
+              const profile = await getUserProfile(currentUserId);
+              const professions = getUserProfessions(currentUserId);
               
               if (typeof closeDrawer === "function") closeDrawer();
 
               if (professions.length > 0) {
-                renderProfessionsList(user.id);
+                renderProfessionsList(currentUserId);
                 selectProfessionModal.classList.remove("hidden");
                 selectProfessionModal.classList.add("flex");
                 setTimeout(() => {
+                  selectProfessionModal.classList.remove("opacity-0");
                   document.getElementById("select-profession-content").classList.remove("scale-95");
                 }, 10);
               } 
               else if (profile.category && profile.category !== "") {
-                saveUserProfession(user.id, {
+                saveUserProfession(currentUserId, {
                   category: profile.category,
                   subcategory: profile.subcategory,
                   profession: profile.profession || "Especialista"
                 });
-                renderProfessionsList(user.id);
+                renderProfessionsList(currentUserId);
                 selectProfessionModal.classList.remove("hidden");
                 selectProfessionModal.classList.add("flex");
                 setTimeout(() => {
+                  selectProfessionModal.classList.remove("opacity-0");
                   document.getElementById("select-profession-content").classList.remove("scale-95");
                 }, 10);
               }

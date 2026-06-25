@@ -15,6 +15,9 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     subcategory TEXT,
     description TEXT,
     price TEXT DEFAULT '$0',
+    experience TEXT DEFAULT '5+ años',
+    guarantee TEXT DEFAULT '30 días de garantía sobre la mano de obra',
+    payment_methods TEXT[] DEFAULT '{"cash", "transfer", "card"}'::text[],
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -85,3 +88,19 @@ CREATE TABLE IF NOT EXISTS public.app_feedback (
 );
 -- Desactivar Row Level Security (RLS)
 ALTER TABLE public.app_feedback DISABLE ROW LEVEL SECURITY;
+
+-- ========================================================
+-- 8. HABILITAR SUPABASE REALTIME
+-- ========================================================
+-- Esto es crucial para que los mensajes del chat y las alertas
+-- de nuevas solicitudes lleguen al instante sin refrescar la página.
+begin;
+  -- Eliminar la publicación si ya existe para evitar errores
+  drop publication if exists supabase_realtime;
+  -- Crear la publicación
+  create publication supabase_realtime;
+commit;
+
+-- Añadir las tablas a la publicación de realtime
+alter publication supabase_realtime add table public.messages;
+alter publication supabase_realtime add table public.service_requests;
