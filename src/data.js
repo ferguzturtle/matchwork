@@ -697,10 +697,15 @@ export const toggleSavedProvider = (userId, provider) => {
     if (exists >= 0) {
       saved.splice(exists, 1);
     } else {
+      const rawImage = provider.image || provider.avatar_url || "";
+      const cleanedImage = (rawImage.startsWith("data:") || rawImage.length > 2000)
+        ? `https://i.pravatar.cc/150?u=${provider.id}`
+        : rawImage;
+
       saved.push({
         id: provider.id,
         name: provider.name,
-        image: provider.image || provider.avatar_url,
+        image: cleanedImage,
         profession: provider.profession,
         category: provider.category,
         subcategory: provider.subcategory,
