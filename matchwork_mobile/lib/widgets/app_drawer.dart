@@ -88,143 +88,198 @@ class AppDrawer extends StatelessWidget {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              children: [
-                // Explorar (Mapa)
-                _buildDrawerItem(
-                  context: context,
-                  icon: Icons.explore_outlined,
-                  title: 'Explorar',
-                  isSelected: appState.userRole == 'customer',
-                  textColor: textColor,
-                  iconColor: iconColor,
-                  activeTileBg: activeTileBg,
-                  activeTextColor: activeTextColor,
-                  onTap: () {
-                    Navigator.pop(context);
-                    if (appState.userRole != 'customer') {
-                      appState.switchRole('customer');
-                    }
-                  },
-                ),
-                
-                // Mensajes
-                _buildDrawerItem(
-                  context: context,
-                  icon: Icons.chat_bubble_outline,
-                  title: 'Mensajes',
-                  isSelected: false,
-                  textColor: textColor,
-                  iconColor: iconColor,
-                  activeTileBg: activeTileBg,
-                  activeTextColor: activeTextColor,
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ConversationsListScreen()),
-                    );
-                  },
-                ),
-
-                // Perfil
-                _buildDrawerItem(
-                  context: context,
-                  icon: Icons.person_outline,
-                  title: 'Perfil',
-                  isSelected: false,
-                  textColor: textColor,
-                  iconColor: iconColor,
-                  activeTileBg: activeTileBg,
-                  activeTextColor: activeTextColor,
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showProfileDialog(context, userName, userEmail);
-                  },
-                ),
-                
-                const Divider(),
-                
-                // Cambiar a Perfil de Trabajador / Cliente
-                _buildDrawerItem(
-                  context: context,
-                  icon: Icons.contact_mail_outlined,
-                  title: appState.userRole == 'customer' 
-                      ? 'Cambiar a Perfil de Trabajador' 
-                      : 'Cambiar a Perfil de Cliente',
-                  isSelected: false,
-                  textColor: textColor,
-                  iconColor: iconColor,
-                  activeTileBg: activeTileBg,
-                  activeTextColor: activeTextColor,
-                  onTap: () async {
-                    Navigator.pop(context);
-                    final nextRole = appState.userRole == 'customer' ? 'provider' : 'customer';
-                    await appState.switchRole(nextRole);
-                    if (nextRole == 'provider') {
-                      final userId = SupabaseService.instance.currentUser?.id;
-                      if (userId != null) {
-                        await appState.initializeProviderState(userId);
-                      }
-                    }
-                  },
-                ),
-
-                // Agregar Ubicación
-                _buildDrawerItem(
-                  context: context,
-                  icon: Icons.add_location_outlined,
-                  title: 'Agregar Ubicación',
-                  isSelected: false,
-                  textColor: textColor,
-                  iconColor: iconColor,
-                  activeTileBg: activeTileBg,
-                  activeTextColor: activeTextColor,
-                  onTap: () {
-                    Navigator.pop(context);
-                    if (onAddLocationTap != null) {
-                      onAddLocationTap!();
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Esta opción solo está disponible desde el mapa.'),
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                    }
-                  },
-                ),
-
-                // Modo Claro / Oscuro
-                _buildDrawerItem(
-                  context: context,
-                  icon: isDark ? Icons.wb_sunny_outlined : Icons.dark_mode_outlined,
-                  title: isDark ? 'Modo Claro' : 'Modo Oscuro',
-                  isSelected: false,
-                  textColor: textColor,
-                  iconColor: iconColor,
-                  activeTileBg: activeTileBg,
-                  activeTextColor: activeTextColor,
-                  onTap: () {
-                    appState.toggleTheme(!isDark);
-                  },
-                ),
-
-                // Dejar Comentarios
-                _buildDrawerItem(
-                  context: context,
-                  icon: Icons.rate_review_outlined,
-                  title: 'Dejar Comentarios',
-                  isSelected: false,
-                  textColor: textColor,
-                  iconColor: iconColor,
-                  activeTileBg: activeTileBg,
-                  activeTextColor: activeTextColor,
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showFeedbackDialog(context);
-                  },
-                ),
-              ],
+              children: appState.userRole == 'customer'
+                  ? [
+                      // Client Drawer Items
+                      _buildDrawerItem(
+                        context: context,
+                        icon: Icons.explore_outlined,
+                        title: 'Explorar',
+                        isSelected: true,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      _buildDrawerItem(
+                        context: context,
+                        icon: Icons.chat_bubble_outline,
+                        title: 'Mensajes',
+                        isSelected: false,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ConversationsListScreen()),
+                          );
+                        },
+                      ),
+                      _buildDrawerItem(
+                        context: context,
+                        icon: Icons.person_outline,
+                        title: 'Perfil',
+                        isSelected: false,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _showProfileDialog(context, userName, userEmail);
+                        },
+                      ),
+                      const Divider(),
+                      _buildDrawerItem(
+                        context: context,
+                        icon: Icons.contact_mail_outlined,
+                        title: 'Cambiar a Perfil de Trabajador',
+                        isSelected: false,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () async {
+                          Navigator.pop(context);
+                          await appState.switchRole('provider');
+                          final userId = SupabaseService.instance.currentUser?.id;
+                          if (userId != null) {
+                            await appState.initializeProviderState(userId);
+                          }
+                        },
+                      ),
+                      _buildDrawerItem(
+                        context: context,
+                        icon: Icons.add_location_outlined,
+                        title: 'Agregar Ubicación',
+                        isSelected: false,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () {
+                          Navigator.pop(context);
+                          if (onAddLocationTap != null) {
+                            onAddLocationTap!();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Esta opción solo está disponible desde el mapa.'),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                      _buildDrawerItem(
+                        context: context,
+                        icon: isDark ? Icons.wb_sunny_outlined : Icons.dark_mode_outlined,
+                        title: isDark ? 'Modo Claro' : 'Modo Oscuro',
+                        isSelected: false,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () {
+                          appState.toggleTheme(!isDark);
+                        },
+                      ),
+                      _buildDrawerItem(
+                        context: context,
+                        icon: Icons.rate_review_outlined,
+                        title: 'Dejar Comentarios',
+                        isSelected: false,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _showFeedbackDialog(context);
+                        },
+                      ),
+                    ]
+                  : [
+                      // Worker Drawer Items
+                      _buildDrawerItem(
+                        context: context,
+                        icon: Icons.chat_bubble_outline,
+                        title: 'Mensajes',
+                        isSelected: false,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ConversationsListScreen()),
+                          );
+                        },
+                      ),
+                      _buildDrawerItem(
+                        context: context,
+                        icon: Icons.assignment_outlined,
+                        title: 'Solicitudes',
+                        isSelected: true,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      const Divider(),
+                      _buildDrawerItem(
+                        context: context,
+                        icon: Icons.switch_account_outlined,
+                        title: 'Cambiar a Cliente',
+                        isSelected: false,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () async {
+                          Navigator.pop(context);
+                          await appState.switchRole('customer');
+                        },
+                      ),
+                      _buildDrawerItem(
+                        context: context,
+                        icon: isDark ? Icons.wb_sunny_outlined : Icons.dark_mode_outlined,
+                        title: isDark ? 'Modo Claro' : 'Modo Oscuro',
+                        isSelected: false,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () {
+                          appState.toggleTheme(!isDark);
+                        },
+                      ),
+                      _buildDrawerItem(
+                        context: context,
+                        icon: Icons.help_outline,
+                        title: 'Centro de Ayuda',
+                        isSelected: false,
+                        textColor: textColor,
+                        iconColor: iconColor,
+                        activeTileBg: activeTileBg,
+                        activeTextColor: activeTextColor,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _showHelpCenterDialog(context);
+                        },
+                      ),
+                    ],
             ),
           ),
           
@@ -416,6 +471,54 @@ class AppDrawer extends StatelessWidget {
                 if (context.mounted) Navigator.pop(context);
               },
               child: const Text('Enviar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showHelpCenterDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.help_outline, color: Color(0xFF2563EB)),
+              SizedBox(width: 10),
+              Text('Centro de Ayuda'),
+            ],
+          ),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '¿Tienes dudas o problemas con tus servicios?',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text('Contáctanos a soporte técnico:'),
+              Text(
+                'soporte@matchwork.com',
+                style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Preguntas Frecuentes:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 4),
+              Text('• ¿Cómo recibo pagos? Se acuerda directo con el cliente.'),
+              Text('• ¿Cómo aparezco en el mapa? Pon tu estado en "Disponible".'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cerrar'),
             ),
           ],
         );
