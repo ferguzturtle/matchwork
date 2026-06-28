@@ -542,6 +542,43 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                   },
                 ),
                 const SizedBox(height: 12),
+                // Fit all providers button
+                FloatingActionButton(
+                  heroTag: 'fit_all_btn',
+                  backgroundColor: Colors.white,
+                  foregroundColor: surfaceNavy,
+                  child: const Icon(Icons.zoom_out_map),
+                  onPressed: () {
+                    if (filtered.isNotEmpty) {
+                      double minLat = appState.currentLat;
+                      double maxLat = appState.currentLat;
+                      double minLng = appState.currentLng;
+                      double maxLng = appState.currentLng;
+
+                      for (var p in filtered) {
+                        if (p.lat < minLat) minLat = p.lat;
+                        if (p.lat > maxLat) maxLat = p.lat;
+                        if (p.lng < minLng) minLng = p.lng;
+                        if (p.lng > maxLng) maxLng = p.lng;
+                      }
+
+                      _mapController.fitCamera(
+                        CameraFit.bounds(
+                          bounds: LatLngBounds(
+                            LatLng(minLat, minLng),
+                            LatLng(maxLat, maxLng),
+                          ),
+                          padding: const EdgeInsets.all(50.0),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('No hay proveedores disponibles para enfocar')),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
                 // Recenter map button
                 FloatingActionButton(
                   heroTag: 'center_btn',
