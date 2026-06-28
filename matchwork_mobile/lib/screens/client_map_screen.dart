@@ -8,6 +8,7 @@ import '../models/provider_model.dart';
 import '../providers/app_state_provider.dart';
 import 'chat_screen.dart';
 import '../widgets/app_drawer.dart';
+import '../models/categories_data.dart';
 
 class ClientMapScreen extends StatefulWidget {
   const ClientMapScreen({super.key});
@@ -20,7 +21,8 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
   final MapController _mapController = MapController();
   
   List<ProviderModel> _allProviders = [];
-  String _selectedCategory = 'todos';
+  String _selectedFilterType = 'all'; // 'all', 'category', 'subcategory'
+  String _selectedFilterValue = '';
   String _selectedRadius = 'all'; // 'all', '2', '5', '10', '20'
   bool _isLoadingProviders = false;
   
@@ -59,7 +61,12 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
     return _allProviders.filter((p) {
       if (p.status == 'Fuera de servicio') return false;
       
-      final matchesCategory = _selectedCategory == 'todos' || p.category == _selectedCategory;
+      bool matchesCategory = true;
+      if (_selectedFilterType == 'category') {
+        matchesCategory = p.category == _selectedFilterValue;
+      } else if (_selectedFilterType == 'subcategory') {
+        matchesCategory = p.subcategory == _selectedFilterValue;
+      }
       
       bool matchesRadius = true;
       if (_selectedRadius != 'all') {
@@ -132,16 +139,201 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
     );
   }
 
+  String _getFilterLabel() {
+    if (_selectedFilterType == 'all') return 'Todas las Categorías';
+    if (_selectedFilterType == 'category') {
+      return categories[_selectedFilterValue]?.label ?? _selectedFilterValue;
+    }
+    // Subcategory: loop to find it
+    for (var cat in categories.values) {
+      if (cat.subcategories.containsKey(_selectedFilterValue)) {
+        return cat.subcategories[_selectedFilterValue]!.label;
+      }
+    }
+    return _selectedFilterValue;
+  }
+
+  void _showCategoryExplorer() {
+    String? activeCategoryKey;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            const surfaceNavy = Color(0xFF0F172A);
+            const accentBlue = Color(0xFF2563EB);
+
+            if (activeCategoryKey == null) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Text(
+                      'Explorar Categorías',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: surfaceNavy),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.grid_view, color: accentBlue),
+                    title: const Text('Todas las Categorías', style: TextStyle(fontWeight: FontWeight.bold)),
+                    onTap: () {
+                      setState(() {
+                        _selectedFilterType = 'all';
+                        _selectedFilterValue = '';
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+                  Expanded(
+                    child: ListView(
+                      children: categories.entries.map((e) {
+                        IconData catIcon;
+                        switch (e.key) {
+                          case 'construccion':
+                            catIcon = Icons.construction;
+                            break;
+                          case 'salud':
+                            catIcon = Icons.medical_services;
+                            break;
+                          case 'instalaciones':
+                            catIcon = Icons.engineering;
+                            break;
+                          case 'mantenimiento':
+                            catIcon = Icons.cleaning_services;
+                            break;
+                          case 'profesionales':
+                            catIcon = Icons.support_agent;
+                            break;
+                          default:
+                            catIcon = Icons.category;
+                        }
+                        return ListTile(
+                          leading: Icon(catIcon, color: surfaceNavy),
+                          title: Text(e.value.label, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () {
+                            setModalState(() {
+                              activeCategoryKey = e.key;
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              final catDetail = categories[activeCategoryKey!]!;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back, color: surfaceNavy),
+                          onPressed: () {
+                            setModalState(() {
+                              activeCategoryKey = null;
+                            });
+                          },
+                        ),
+                        Expanded(
+                          child: Text(
+                            catDetail.label,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: surfaceNavy),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.list, color: accentBlue),
+                    title: Text('Ver todo en ${catDetail.label}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    onTap: () {
+                      setState(() {
+                        _selectedFilterType = 'category';
+                        _selectedFilterValue = activeCategoryKey!;
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+                  Expanded(
+                    child: ListView(
+                      children: catDetail.subcategories.entries.map((sub) {
+                        return ListTile(
+                          leading: Icon(_getIconData(sub.value.icon), color: surfaceNavy),
+                          title: Text(sub.value.label),
+                          onTap: () {
+                            setState(() {
+                              _selectedFilterType = 'subcategory';
+                              _selectedFilterValue = sub.key;
+                            });
+                            Navigator.pop(context);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
   IconData _getIconData(String iconName) {
     switch (iconName) {
+      case 'construction':
+        return Icons.construction;
+      case 'format_paint':
+        return Icons.format_paint;
+      case 'handyman':
+        return Icons.handyman;
       case 'plumbing':
         return Icons.plumbing;
+      case 'medical_services':
+        return Icons.medical_services;
+      case 'physical_therapy':
+        return Icons.accessibility_new;
+      case 'elderly':
+        return Icons.elderly;
+      case 'child_care':
+        return Icons.child_care;
       case 'bolt':
         return Icons.bolt;
-      case 'cleaning_services':
-        return Icons.cleaning_services;
       case 'ac_unit':
         return Icons.ac_unit;
+      case 'router':
+        return Icons.router;
+      case 'cleaning_services':
+        return Icons.cleaning_services;
+      case 'pest_control':
+        return Icons.bug_report;
+      case 'yard':
+        return Icons.yard;
+      case 'pool':
+        return Icons.pool;
+      case 'school':
+        return Icons.school;
+      case 'computer':
+        return Icons.computer;
+      case 'local_shipping':
+        return Icons.local_shipping;
+      case 'support_agent':
+        return Icons.support_agent;
+      case 'engineering':
+        return Icons.engineering;
       default:
         return Icons.build;
     }
@@ -275,45 +467,33 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
             top: 16,
             left: 16,
             right: 16,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _CategoryChip(
-                    label: 'Todos',
-                    icon: Icons.grid_view,
-                    isSelected: _selectedCategory == 'todos',
-                    onSelected: () => setState(() => _selectedCategory = 'todos'),
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              color: Colors.white,
+              child: InkWell(
+                onTap: _showCategoryExplorer,
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.category, color: Color(0xFF2563EB)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _getFilterLabel(),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                      ),
+                      const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  _CategoryChip(
-                    label: 'Gasfitería',
-                    icon: Icons.plumbing,
-                    isSelected: _selectedCategory == 'gasfiteria',
-                    onSelected: () => setState(() => _selectedCategory = 'gasfiteria'),
-                  ),
-                  const SizedBox(width: 8),
-                  _CategoryChip(
-                    label: 'Electricidad',
-                    icon: Icons.bolt,
-                    isSelected: _selectedCategory == 'electricidad',
-                    onSelected: () => setState(() => _selectedCategory = 'electricidad'),
-                  ),
-                  const SizedBox(width: 8),
-                  _CategoryChip(
-                    label: 'Limpieza',
-                    icon: Icons.cleaning_services,
-                    isSelected: _selectedCategory == 'limpieza',
-                    onSelected: () => setState(() => _selectedCategory = 'limpieza'),
-                  ),
-                  const SizedBox(width: 8),
-                  _CategoryChip(
-                    label: 'Climatización',
-                    icon: Icons.ac_unit,
-                    isSelected: _selectedCategory == 'climatizacion',
-                    onSelected: () => setState(() => _selectedCategory = 'climatizacion'),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -538,46 +718,6 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
             ),
         ],
       ),
-    );
-  }
-}
-
-// Category custom chip
-class _CategoryChip extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool isSelected;
-  final VoidCallback onSelected;
-
-  const _CategoryChip({
-    required this.label,
-    required this.icon,
-    required this.isSelected,
-    required this.onSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    const surfaceNavy = Color(0xFF0F172A);
-    const accentBlue = Color(0xFF2563EB);
-
-    return FilterChip(
-      showCheckmark: false,
-      avatar: Icon(
-        icon,
-        color: isSelected ? Colors.white : surfaceNavy,
-        size: 16,
-      ),
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => onSelected(),
-      backgroundColor: Colors.white,
-      selectedColor: accentBlue,
-      labelStyle: TextStyle(
-        color: isSelected ? Colors.white : surfaceNavy,
-        fontWeight: FontWeight.bold,
-      ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     );
   }
 }

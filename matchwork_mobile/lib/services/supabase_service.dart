@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/provider_model.dart';
 import '../models/request_model.dart';
+import '../models/categories_data.dart';
 
 class SupabaseService {
   static final SupabaseService instance = SupabaseService._internal();
@@ -25,6 +26,8 @@ class SupabaseService {
     required String password,
     required String name,
     required String role,
+    String? category,
+    String? subcategory,
   }) async {
     final AuthResponse res = await client.auth.signUp(
       email: email,
@@ -37,6 +40,11 @@ class SupabaseService {
 
     final user = res.user;
     if (user != null) {
+      String profession = "Trabajador General";
+      if (role == 'provider' && subcategory != null) {
+        profession = getProfessionLabel(subcategory);
+      }
+
       // Seed profile table
       await client.from('profiles').upsert({
         'id': user.id,
@@ -44,7 +52,29 @@ class SupabaseService {
         'email': email,
         'role': role,
         'avatar_url': 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+        'profession': role == 'customer' ? '' : profession,
+        'category': role == 'customer' ? '' : (category ?? ''),
+        'subcategory': role == 'customer' ? '' : (subcategory ?? ''),
+        'description': role == 'customer' ? '' : 'Sin descripción disponible.',
+        'price': role == 'customer' ? '' : '\$0',
       });
+
+      // If provider, also seed provider availability immediately
+      if (role == 'provider') {
+        await client.from('providers').upsert({
+          'id': user.id,
+          'name': name,
+          'image': 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+          'profession': profession,
+          'category': category ?? '',
+          'subcategory': subcategory ?? '',
+          'rating': 4.9,
+          'status': 'En línea',
+          'lat': -33.4489,
+          'lng': -70.6693,
+          'icon': getSubcategoryIcon(subcategory ?? ''),
+        });
+      }
     }
     return user;
   }

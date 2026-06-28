@@ -4,6 +4,7 @@ import '../services/supabase_service.dart';
 import '../providers/app_state_provider.dart';
 import 'client_map_screen.dart';
 import 'provider_panel_screen.dart';
+import '../models/categories_data.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -21,6 +22,9 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isSignUp = false;
   String _selectedRole = 'customer'; // 'customer' or 'provider'
   bool _isLoading = false;
+  
+  String? _selectedCategory = 'construccion';
+  String? _selectedSubcategory = 'albanileria';
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -41,6 +45,8 @@ class _AuthScreenState extends State<AuthScreen> {
           password: password,
           name: name,
           role: _selectedRole,
+          category: _selectedRole == 'provider' ? _selectedCategory : null,
+          subcategory: _selectedRole == 'provider' ? _selectedSubcategory : null,
         );
 
         if (user != null) {
@@ -274,6 +280,81 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                       ],
                     ),
+                    if (_selectedRole == 'provider') ...[
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Categoría de Servicio',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
+                          color: surfaceNavy,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        value: _selectedCategory,
+                        style: const TextStyle(color: surfaceNavy),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFF8FAFC),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: borderGrey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: accentBlue, width: 2),
+                          ),
+                        ),
+                        items: categories.entries.map((e) {
+                          return DropdownMenuItem(value: e.key, child: Text(e.value.label));
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            _selectedCategory = val;
+                            if (val != null && categories[val] != null) {
+                              _selectedSubcategory = categories[val]!.subcategories.keys.first;
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Subcategoría de Servicio',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
+                          color: surfaceNavy,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        value: _selectedSubcategory,
+                        style: const TextStyle(color: surfaceNavy),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFF8FAFC),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: borderGrey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: accentBlue, width: 2),
+                          ),
+                        ),
+                        items: _selectedCategory == null || categories[_selectedCategory] == null
+                            ? []
+                            : categories[_selectedCategory]!.subcategories.entries.map((e) {
+                                return DropdownMenuItem(value: e.key, child: Text(e.value.label));
+                              }).toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            _selectedSubcategory = val;
+                          });
+                        },
+                      ),
+                    ],
                     const SizedBox(height: 24),
                   ],
 
