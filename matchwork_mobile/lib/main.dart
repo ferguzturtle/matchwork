@@ -95,11 +95,13 @@ class MatchWorkApp extends StatelessWidget {
     }
 
     final session = SupabaseService.instance.client.auth.currentSession;
+    final appState = Provider.of<AppStateProvider>(context);
     
     return MaterialApp(
       title: 'MatchWork',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF2563EB),
           primary: const Color(0xFF2563EB),
@@ -108,6 +110,19 @@ class MatchWorkApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Inter',
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF0F172A),
+        colorScheme: ColorScheme.fromSeed(
+          brightness: Brightness.dark,
+          seedColor: const Color(0xFF2563EB),
+          primary: const Color(0xFF2563EB),
+          surface: const Color(0xFF0F172A),
+        ),
+        useMaterial3: true,
+        fontFamily: 'Inter',
+      ),
+      themeMode: appState.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: session == null 
           ? const AuthScreen() 
           : const AuthWrapper(),

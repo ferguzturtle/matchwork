@@ -356,4 +356,18 @@ class SupabaseService {
       return false;
     }
   }
+
+  Future<bool> saveFeedback(String userId, String comment) async {
+    try {
+      await client.from('app_feedback').insert({
+        'user_id': userId,
+        'comment': comment,
+        'status': 'nuevo',
+      });
+      return true;
+    } catch (e) {
+      print("Error saving feedback: $e");
+      return false;
+    }
+  }
 }

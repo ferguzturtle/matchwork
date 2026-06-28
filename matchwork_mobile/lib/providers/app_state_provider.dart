@@ -30,14 +30,31 @@ class AppStateProvider extends ChangeNotifier {
   double get currentLng => _currentLng;
   bool get isAvailable => _isAvailable;
 
+  bool _isDarkMode = false;
+  bool get isDarkMode => _isDarkMode;
+
   AppStateProvider() {
     _loadLocalRole();
+    _loadLocalTheme();
   }
 
   // --- INITIALIZATION ---
   Future<void> _loadLocalRole() async {
     final prefs = await SharedPreferences.getInstance();
     _userRole = prefs.getString('user_role') ?? 'customer';
+    notifyListeners();
+  }
+
+  Future<void> _loadLocalTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isDarkMode = prefs.getBool('is_dark_mode') ?? false;
+    notifyListeners();
+  }
+
+  Future<void> toggleTheme(bool val) async {
+    _isDarkMode = val;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_dark_mode', val);
     notifyListeners();
   }
 

@@ -416,7 +416,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
         foregroundColor: Colors.white,
         title: const Text('MatchWork', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
-      drawer: const AppDrawer(),
+      drawer: AppDrawer(onAddLocationTap: _showAddLocationDialog),
       body: Stack(
         children: [
           // 1. Interactive Map
