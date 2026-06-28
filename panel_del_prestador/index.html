@@ -182,18 +182,19 @@
       class="flex-grow px-container-margin-mobile md:px-container-margin-desktop py-stack-md flex flex-col gap-stack-lg max-w-4xl mx-auto w-full"
     >
       <!-- Status & Toggle Banner -->
+      <!-- Availability Header Card -->
       <section
-        class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant flex items-center justify-between"
+        class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-4"
       >
-        <div class="flex flex-col">
-          <div class="flex items-center gap-2 mb-1">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-1.5">
             <div
               id="status-dot"
               class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] transition-colors"
             ></div>
             <h2
               id="status-text"
-              class="font-headline-sm text-headline-sm text-on-surface"
+              class="font-headline-sm text-headline-sm text-on-surface font-semibold"
             >
               Disponible para Trabajos
             </h2>
@@ -204,19 +205,36 @@
           >
             Actualmente eres visible para clientes en tu área.
           </p>
+
+          <!-- Segmented status picker (Online, Busy, Offline) -->
+          <div class="flex bg-surface-container-high p-1 rounded-xl w-full max-w-sm mt-3 border border-outline-variant">
+            <button id="status-opt-online" class="flex-1 py-1.5 px-3 rounded-lg text-center font-label-md transition-all flex items-center justify-center gap-1.5 bg-secondary text-on-secondary shadow-sm font-semibold">
+              Disponible
+            </button>
+            <button id="status-opt-busy" class="flex-1 py-1.5 px-3 rounded-lg text-center font-label-md transition-all flex items-center justify-center gap-1.5 text-on-surface-variant hover:bg-surface-container-highest">
+              Ocupado
+            </button>
+            <button id="status-opt-offline" class="flex-1 py-1.5 px-3 rounded-lg text-center font-label-md transition-all flex items-center justify-center gap-1.5 text-on-surface-variant hover:bg-surface-container-highest">
+              Desconectado
+            </button>
+          </div>
+
+          <!-- Busy duration selector -->
+          <div id="busy-duration-container" class="hidden flex-col gap-2 mt-3 w-full max-w-sm p-3 bg-surface-container-low rounded-xl border border-outline-variant">
+            <p class="font-body-sm text-body-sm text-on-surface-variant font-semibold">Duración de estado ocupado:</p>
+            <div class="grid grid-cols-5 gap-1">
+              <button class="busy-time-btn py-1 px-1 bg-surface-container-lowest border border-outline-variant rounded-lg font-label-sm text-center text-on-surface hover:bg-surface-bright" data-hours="1">1h</button>
+              <button class="busy-time-btn py-1 px-1 bg-surface-container-lowest border border-outline-variant rounded-lg font-label-sm text-center text-on-surface hover:bg-surface-bright" data-hours="2">2h</button>
+              <button class="busy-time-btn py-1 px-1 bg-surface-container-lowest border border-outline-variant rounded-lg font-label-sm text-center text-on-surface hover:bg-surface-bright" data-hours="4">4h</button>
+              <button class="busy-time-btn py-1 px-1 bg-surface-container-lowest border border-outline-variant rounded-lg font-label-sm text-center text-on-surface hover:bg-surface-bright" data-hours="8">8h</button>
+              <button class="busy-time-btn py-1 px-1 bg-secondary text-on-secondary font-bold rounded-lg font-label-sm text-center" data-hours="indefinido">Indef</button>
+            </div>
+          </div>
         </div>
-        <!-- Large Toggle Switch -->
-        <button
-          id="availability-toggle"
-          aria-pressed="true"
-          class="w-16 h-8 bg-secondary rounded-full flex items-center px-1 cursor-pointer transition-colors shadow-inner relative"
-        >
-          <div
-            id="toggle-knob"
-            class="w-6 h-6 bg-surface-container-lowest rounded-full shadow-sm transform translate-x-8 transition-transform"
-          ></div>
-        </button>
-      </section>
+
+        <!-- Hidden elements for backward compatibility -->
+        <button id="availability-toggle" class="hidden"></button>
+        <div id="toggle-knob" class="hidden"></div>
       <!-- Map & Stats Bento Grid -->
       <section class="grid grid-cols-1 md:grid-cols-3 gap-stack-md">
         <!-- Map Container (Spans 2 columns on desktop) -->
@@ -420,6 +438,8 @@
       // Global State
       let currentProviderId = "11111111-1111-1111-1111-111111111111";
       let isAvailable = true;
+      let currentStatusState = "Fuera de servicio";
+      let selectedBusyHours = "indefinido";
 
       // Init mini map
       let mapLat = -33.4489;
@@ -1040,8 +1060,15 @@
           });
         } else {
           switchText.innerText = "Cambiar a Cliente";
-          switchBtn.addEventListener("click", (e) => {
+          switchBtn.addEventListener("click", async (e) => {
             e.preventDefault();
+            try {
+              if (currentProviderId) {
+                await updateProviderAvailability(currentProviderId, "Fuera de servicio", null, null);
+              }
+            } catch (err) {
+              console.warn("Error setting provider offline on switch", err);
+            }
             localStorage.setItem("user_role", "customer");
             window.location.href = "/mapa_de_b_squeda_cliente/index.html";
           });
@@ -1053,6 +1080,13 @@
       if (logoutBtn) {
         logoutBtn.addEventListener("click", async (e) => {
           e.preventDefault();
+          try {
+            if (currentProviderId) {
+              await updateProviderAvailability(currentProviderId, "Fuera de servicio", null, null);
+            }
+          } catch (err) {
+            console.warn("Error setting provider offline on logout", err);
+          }
           await supabase.auth.signOut();
           localStorage.removeItem("user_role");
           window.location.href = "/index.html";
@@ -1066,48 +1100,81 @@
       const statusText = document.getElementById("status-text");
       const statusDesc = document.getElementById("status-desc");
 
-      // Hoisted UI updates function
-      window.updateAvailabilityUI = function (enabled) {
-        isAvailable = enabled;
-        if (isAvailable) {
-          // ON State
-          toggleBtn.classList.remove("bg-outline-variant");
-          toggleBtn.classList.add("bg-secondary");
-          knob.classList.remove("translate-x-0");
-          knob.classList.add("translate-x-8");
-          statusDot.classList.remove("bg-outline-variant");
-          statusDot.classList.add("bg-emerald-500");
-          statusDot.style.boxShadow = "0 0 8px rgba(16,185,129,0.5)";
-          statusText.innerText = "Disponible para Trabajos";
-          statusDesc.innerText =
-            "Actualmente eres visible para clientes en tu área.";
+      const updateBusyButtonsUI = () => {
+        document.querySelectorAll(".busy-time-btn").forEach((btn) => {
+          const hrs = btn.getAttribute("data-hours");
+          if (hrs === selectedBusyHours) {
+            btn.className = "busy-time-btn py-1 px-1 bg-secondary text-on-secondary font-bold rounded-lg font-label-sm text-center";
+          } else {
+            btn.className = "busy-time-btn py-1 px-1 bg-surface-container-lowest border border-outline-variant rounded-lg font-label-sm text-center text-on-surface hover:bg-surface-bright";
+          }
+        });
+      };
 
-          // Show marker on map
+      // Hoisted UI updates function
+      window.updateAvailabilityUI = function (status) {
+        if (status === true) status = "En línea";
+        if (status === false) status = "Fuera de servicio";
+
+        currentStatusState = status;
+        isAvailable = (status === "En línea" || status.startsWith("Ocupado"));
+
+        const onlineBtn = document.getElementById("status-opt-online");
+        const busyBtn = document.getElementById("status-opt-busy");
+        const offlineBtn = document.getElementById("status-opt-offline");
+        const durationContainer = document.getElementById("busy-duration-container");
+
+        // Reset classes for segmented controls
+        [onlineBtn, busyBtn, offlineBtn].forEach(btn => {
+          if (btn) {
+            btn.className = "flex-1 py-1.5 px-3 rounded-lg text-center font-label-md transition-all flex items-center justify-center gap-1.5 text-on-surface-variant hover:bg-surface-container-highest";
+          }
+        });
+
+        if (status === "En línea") {
+          if (onlineBtn) onlineBtn.className = "flex-1 py-1.5 px-3 rounded-lg text-center font-label-md transition-all flex items-center justify-center gap-1.5 bg-secondary text-on-secondary shadow-sm font-semibold";
+          statusDot.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] transition-colors";
+          statusText.innerText = "Disponible para Trabajos";
+          statusDesc.innerText = "Actualmente eres visible para clientes en tu área.";
+          if (durationContainer) durationContainer.classList.add("hidden");
+          if (providerMarker) providerMarker.addTo(window.miniMap);
+        } else if (status.startsWith("Ocupado")) {
+          if (busyBtn) busyBtn.className = "flex-1 py-1.5 px-3 rounded-lg text-center font-label-md transition-all flex items-center justify-center gap-1.5 bg-amber-500 text-white shadow-sm font-semibold";
+          statusDot.className = "w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-colors";
+          
+          let busyTimeLabel = "Ocupado (Indefinido)";
+          const parts = status.split("|");
+          if (parts[1]) {
+            const date = new Date(parts[1]);
+            const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            busyTimeLabel = `Ocupado (Hasta las ${timeStr})`;
+          }
+          statusText.innerText = busyTimeLabel;
+          statusDesc.innerText = "Eres visible en el mapa y recibes solicitudes, pero no puedes aceptar nuevos trabajos inmediatamente.";
+          if (durationContainer) durationContainer.classList.remove("hidden");
           if (providerMarker) providerMarker.addTo(window.miniMap);
         } else {
-          // OFF State
-          toggleBtn.classList.remove("bg-secondary");
-          toggleBtn.classList.add("bg-outline-variant");
-          knob.classList.remove("translate-x-8");
-          knob.classList.add("translate-x-0");
-          statusDot.classList.remove("bg-emerald-500");
-          statusDot.classList.add("bg-outline-variant");
+          // Fuera de servicio
+          if (offlineBtn) offlineBtn.className = "flex-1 py-1.5 px-3 rounded-lg text-center font-label-md transition-all flex items-center justify-center gap-1.5 bg-outline-variant text-on-surface shadow-sm font-semibold";
+          statusDot.className = "w-3 h-3 rounded-full bg-outline-variant transition-colors";
           statusDot.style.boxShadow = "none";
           statusText.innerText = "Fuera de Servicio";
           statusDesc.innerText = "Tu ubicación está oculta para los clientes.";
-
-          // Remove marker from map
+          if (durationContainer) durationContainer.classList.add("hidden");
           if (providerMarker) window.miniMap.removeLayer(providerMarker);
         }
 
-        toggleBtn.setAttribute("aria-pressed", isAvailable);
+        // Re-render requests to disable/enable accept button
+        renderRequests().catch(console.error);
       };
 
       // Global function to update DB & State
-      async function updateAvailabilityState(enabled, lat = null, lng = null) {
-        const status = enabled ? "En línea" : "Fuera de servicio";
+      async function updateAvailabilityState(status, lat = null, lng = null) {
+        if (status === true) status = "En línea";
+        if (status === false) status = "Fuera de servicio";
+
         await updateProviderAvailability(currentProviderId, status, lat, lng);
-        window.updateAvailabilityUI(enabled);
+        window.updateAvailabilityUI(status);
       }
 
       // Fallback globally exposed function for page startup compatibility
@@ -1118,78 +1185,40 @@
       let gpsWatchId = null;
       let lastGpsUpdateTime = 0;
 
-      toggleBtn.addEventListener("click", async () => {
-        const nextState = !isAvailable;
-
-        if (nextState) {
+      async function setStatusAndGps(status) {
+        if (status === "En línea" || status.startsWith("Ocupado")) {
+          // Iniciar GPS
           if (!window.isSecureContext) {
             showSecureContextWarningBanner();
-            // Usar coordenadas por defecto de Santiago en simulación
             window.currentRealLat = -33.4489;
             window.currentRealLng = -70.6693;
-            window.currentRealRealLat = -33.4489;
-            window.currentRealRealLng = -70.6693;
-
-            providerMarker.setLatLng([
-              window.currentRealLat,
-              window.currentRealLng,
-            ]);
-            window.miniMap.flyTo(
-              [window.currentRealLat, window.currentRealLng],
-              14,
-            );
-
-            await updateAvailabilityState(
-              true,
-              window.currentRealLat,
-              window.currentRealLng,
-            );
+            providerMarker.setLatLng([window.currentRealLat, window.currentRealLng]);
+            window.miniMap.flyTo([window.currentRealLat, window.currentRealLng], 14);
+            await updateAvailabilityState(status, window.currentRealLat, window.currentRealLng);
             return;
           }
 
           if (navigator.geolocation) {
             const geoOptions = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
-
             const successCallback = async (position) => {
               window.currentRealLat = position.coords.latitude;
               window.currentRealLng = position.coords.longitude;
-              window.currentRealRealLat = position.coords.latitude;
-              window.currentRealRealLng = position.coords.longitude;
-
-              providerMarker.setLatLng([
-                window.currentRealLat,
-                window.currentRealLng,
-              ]);
-              window.miniMap.flyTo(
-                [window.currentRealLat, window.currentRealLng],
-                14,
-              );
-
+              providerMarker.setLatLng([window.currentRealLat, window.currentRealLng]);
+              window.miniMap.flyTo([window.currentRealLat, window.currentRealLng], 14);
+              
               const now = Date.now();
-              // Actualizar base de datos máximo 1 vez cada 5 segundos para no saturar Supabase
               if (now - lastGpsUpdateTime > 5000) {
-                  lastGpsUpdateTime = now;
-                  await updateAvailabilityState(
-                    true,
-                    window.currentRealLat,
-                    window.currentRealLng,
-                  );
+                lastGpsUpdateTime = now;
+                // Mantener el estado exacto al actualizar coordenadas
+                await updateAvailabilityState(status, window.currentRealLat, window.currentRealLng);
               }
             };
 
             const errorCallback = async (error) => {
-              console.warn(
-                "Error en geolocalización continua:",
-                error.message,
-              );
+              console.warn("Error en geolocalización continua:", error.message);
               if (error.code === error.PERMISSION_DENIED) {
                 showGpsAlertBanner();
-                // Si se deniega, activamos con la última conocida sin tracking
-                await updateAvailabilityState(
-                  true,
-                  window.currentRealLat,
-                  window.currentRealLng,
-                );
+                await updateAvailabilityState(status, window.currentRealLat, window.currentRealLng);
                 if (gpsWatchId !== null) {
                   navigator.geolocation.clearWatch(gpsWatchId);
                   gpsWatchId = null;
@@ -1198,31 +1227,72 @@
             };
 
             if (gpsWatchId !== null) {
-               navigator.geolocation.clearWatch(gpsWatchId);
+              navigator.geolocation.clearWatch(gpsWatchId);
             }
-            // Empezar a seguir la posición continuamente
-            gpsWatchId = navigator.geolocation.watchPosition(
-              successCallback,
-              errorCallback,
-              geoOptions,
-            );
+            gpsWatchId = navigator.geolocation.watchPosition(successCallback, errorCallback, geoOptions);
           } else {
-            alert("Tu navegador no soporta geolocalización.");
-            await updateAvailabilityState(
-              true,
-              window.currentRealLat,
-              window.currentRealLng,
-            );
+            await updateAvailabilityState(status, window.currentRealLat, window.currentRealLng);
           }
         } else {
-          // OFF State - Stop watching position
+          // Fuera de servicio
           if (gpsWatchId !== null) {
-             navigator.geolocation.clearWatch(gpsWatchId);
-             gpsWatchId = null;
+            navigator.geolocation.clearWatch(gpsWatchId);
+            gpsWatchId = null;
           }
-          await updateAvailabilityState(false, null, null);
+          await updateAvailabilityState("Fuera de servicio", null, null);
         }
+      }
+
+      // Event Listeners for Segmented Controls
+      document.getElementById("status-opt-online").addEventListener("click", async () => {
+        selectedBusyHours = "indefinido";
+        updateBusyButtonsUI();
+        await setStatusAndGps("En línea");
       });
+
+      document.getElementById("status-opt-busy").addEventListener("click", async () => {
+        selectedBusyHours = "indefinido";
+        updateBusyButtonsUI();
+        await setStatusAndGps("Ocupado");
+      });
+
+      document.getElementById("status-opt-offline").addEventListener("click", async () => {
+        selectedBusyHours = "indefinido";
+        updateBusyButtonsUI();
+        await setStatusAndGps("Fuera de servicio");
+      });
+
+      // Duration Selectors
+      document.querySelectorAll(".busy-time-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const hrs = btn.getAttribute("data-hours");
+          selectedBusyHours = hrs;
+          updateBusyButtonsUI();
+
+          let status = "Ocupado";
+          if (hrs !== "indefinido") {
+            const until = new Date(Date.now() + parseFloat(hrs) * 60 * 60 * 1000).toISOString();
+            status = `Ocupado|${until}`;
+          }
+          await setStatusAndGps(status);
+        });
+      });
+
+      // Polling de restauración para Ocupado con expiración
+      setInterval(async () => {
+        if (currentStatusState && currentStatusState.startsWith("Ocupado|")) {
+          const parts = currentStatusState.split("|");
+          if (parts[1]) {
+            const expireTime = new Date(parts[1]).getTime();
+            if (Date.now() > expireTime) {
+              console.log("Tiempo de estado ocupado completado. Volviendo a Disponible...");
+              selectedBusyHours = "indefinido";
+              updateBusyButtonsUI();
+              await setStatusAndGps("En línea");
+            }
+          }
+        }
+      }, 10000);
 
       // --- AUDIO & REALTIME ALERTS ---
       let audioCtx = null;
@@ -1333,6 +1403,108 @@
           console.warn("Error en polling de solicitudes entrantes:", err);
         }
       }, 3000);
+
+      // ---- Lógica de Inactividad de 15 Minutos ----
+      let lastActivityTime = Date.now();
+      const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutos
+
+      const resetActivityTimer = () => {
+        lastActivityTime = Date.now();
+      };
+
+      // Registrar eventos de interacción
+      ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart', 'click'].forEach((event) => {
+        window.addEventListener(event, resetActivityTimer, { passive: true });
+      });
+
+      // Reactivar disponibilidad al pulsar en el modal
+      window.reactivateFromInactivity = async () => {
+        const modal = document.getElementById("inactivity-modal");
+        if (modal) modal.remove();
+        resetActivityTimer();
+        const lat = window.currentRealLat || -33.4489;
+        const lng = window.currentRealLng || -70.6693;
+        await updateAvailabilityState(true, lat, lng);
+      };
+
+      // Mostrar modal de inactividad
+      function showInactivityModal() {
+        if (document.getElementById("inactivity-modal")) return;
+
+        const modal = document.createElement("div");
+        modal.id = "inactivity-modal";
+        modal.className = "fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in";
+        modal.innerHTML = `
+          <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant p-6 max-w-sm w-full shadow-2xl flex flex-col gap-4 text-center">
+            <div class="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 mx-auto animate-bounce">
+              <span class="material-symbols-outlined text-[24px]">timer_off</span>
+            </div>
+            <div>
+              <h3 class="font-headline-md text-headline-sm font-bold text-on-surface">Estado: Fuera de Servicio</h3>
+              <p class="font-body-sm text-body-sm text-on-surface-variant mt-2">
+                Hemos cambiado tu estado a <b>Fuera de servicio</b> debido a que no has interactuado con la aplicación en los últimos 15 minutos.
+              </p>
+            </div>
+            <button onclick="reactivateFromInactivity()" class="w-full bg-secondary text-on-secondary font-label-lg py-2.5 rounded-lg hover:opacity-90 active:scale-[0.98] transition-all">
+              Volver a Activar
+            </button>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+
+      // Chequeo periódico de inactividad
+      setInterval(async () => {
+        const isBusy = currentStatusState && currentStatusState.startsWith("Ocupado");
+        if (isAvailable && !isBusy && Date.now() - lastActivityTime > INACTIVITY_LIMIT) {
+          console.log("Inactividad detectada. Pasando a Fuera de servicio...");
+          try {
+            await updateAvailabilityState(false, null, null);
+            showInactivityModal();
+          } catch (e) {
+            console.error("Error al poner fuera de servicio por inactividad:", e);
+          }
+        }
+      }, 30000); // Cada 30 segundos
+
+      // Detectar inactividad en segundo plano (Background)
+      let hiddenTime = 0;
+      document.addEventListener("visibilitychange", async () => {
+        if (document.hidden) {
+          hiddenTime = Date.now();
+        } else {
+          if (hiddenTime > 0) {
+            const timeDiff = Date.now() - hiddenTime;
+            const isBusy = currentStatusState && currentStatusState.startsWith("Ocupado");
+            if (isAvailable && !isBusy && timeDiff > INACTIVITY_LIMIT) {
+              console.log("Pestaña inactiva en segundo plano por más de 15 minutos.");
+              try {
+                await updateAvailabilityState(false, null, null);
+                showInactivityModal();
+              } catch (e) {
+                console.error(e);
+              }
+            } else {
+              resetActivityTimer();
+            }
+            hiddenTime = 0;
+          }
+        }
+      });
+
+      // Ping de presencia para mantener al proveedor activo en el mapa
+      setInterval(async () => {
+        if (isAvailable && currentProviderId) {
+          try {
+            console.log("Enviando ping de presencia activa...");
+            const lat = window.currentRealLat || -33.4489;
+            const lng = window.currentRealLng || -70.6693;
+            await updateProviderAvailability(currentProviderId, currentStatusState, lat, lng);
+          } catch (e) {
+            console.warn("Error en ping de presencia:", e);
+          }
+        }
+      }, 2 * 60 * 1000); // Cada 2 minutos
     </script>
   </body>
 </html>

@@ -97,13 +97,41 @@ export const getProviders = async () => {
       localStorage.getItem("prolink_providers_updates") || "{}",
     );
 
+    const now = Date.now();
+    const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutos
+
     // Mapear los existentes (ya sean de Supabase o estáticos)
+    const resolveStatusHelper = (status, lastActive) => {
+      if (!status) return "Fuera de servicio";
+      if (status.startsWith("Ocupado|")) {
+        const parts = status.split("|");
+        if (parts[1]) {
+          const expireTime = new Date(parts[1]).getTime();
+          if (now > expireTime) {
+            return "En línea";
+          }
+        }
+        return status;
+      }
+      if (status === "En línea") {
+        if (lastActive > 0 && now - lastActive > INACTIVITY_TIMEOUT) {
+          return "Fuera de servicio";
+        }
+      }
+      return status;
+    };
+
     providers = providers.map((p) => {
+      const lastActive = p.created_at ? new Date(p.created_at).getTime() : 0;
+      let resolvedStatus = resolveStatusHelper(p.status, lastActive);
+
       if (localUpdates[p.id]) {
         const up = localUpdates[p.id];
+        const upLastActive = up.created_at ? new Date(up.created_at).getTime() : lastActive;
+        const upStatus = resolveStatusHelper(up.status, upLastActive);
         return {
           ...p,
-          status: up.status,
+          status: upStatus,
           lat: up.lat !== null ? up.lat : p.lat,
           lng: up.lng !== null ? up.lng : p.lng,
           name: up.name || p.name,
@@ -111,15 +139,21 @@ export const getProviders = async () => {
           profession: up.profession || p.profession,
           category: up.category || p.category,
           subcategory: up.subcategory || p.subcategory,
+          created_at: up.created_at || p.created_at,
         };
       }
-      return p;
+      return {
+        ...p,
+        status: resolvedStatus
+      };
     });
 
     // Agregar los nuevos que no estaban en la lista
     Object.keys(localUpdates).forEach((id) => {
       if (!providers.some((p) => p.id === id)) {
         const up = localUpdates[id];
+        const upLastActive = up.created_at ? new Date(up.created_at).getTime() : 0;
+        const upStatus = resolveStatusHelper(up.status, upLastActive);
         providers.push({
           id: id,
           name: up.name,
@@ -127,13 +161,14 @@ export const getProviders = async () => {
           category: up.category,
           subcategory: up.subcategory || "",
           rating: up.rating || 4.9,
-          status: up.status,
+          status: upStatus,
           lat: up.lat !== null ? up.lat : -33.4489,
           lng: up.lng !== null ? up.lng : -70.6693,
           icon: up.icon || "plumbing",
           image: up.image,
           price: "$100",
           description: "Prestador verificado de la red MatchWork",
+          created_at: up.created_at,
         });
       }
     });
@@ -406,6 +441,8 @@ export const updateProviderAvailability = async (
     console.warn("No se pudo obtener perfil para la actualización local:", e);
   }
 
+  const currentTimestamp = new Date().toISOString();
+
   // Primero, actualizar en localStorage para activar el evento 'storage' instantáneamente en otras pestañas locales
   try {
     const localUpdates = JSON.parse(
@@ -423,6 +460,7 @@ export const updateProviderAvailability = async (
       lng,
       rating: 4.9, // Valor por defecto
       icon: getSubcategoryIcon(subcategory),
+      created_at: currentTimestamp,
     };
     localStorage.setItem(
       "prolink_providers_updates",
@@ -443,6 +481,7 @@ export const updateProviderAvailability = async (
       subcategory,
       rating: 4.9, // Valor por defecto
       icon: getSubcategoryIcon(subcategory),
+      created_at: currentTimestamp,
     };
     if (lat !== null && lng !== null) {
       updateData.lat = lat;

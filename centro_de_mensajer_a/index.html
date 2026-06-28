@@ -436,7 +436,7 @@
 
     <script type="module">
       import { supabase } from "/src/supabase.js";
-      import { getMessages, sendMessage, getUserProfile, getUserProfessions, saveUserProfession, setActiveProfession, CATEGORIES } from "/src/data.js";
+      import { getMessages, sendMessage, getUserProfile, getUserProfessions, saveUserProfession, setActiveProfession, CATEGORIES, updateProviderAvailability } from "/src/data.js";
 
       // Auth Guard to prevent unauthorized access
       const checkAuth = async () => {
@@ -574,6 +574,19 @@
           if (user) {
             activeUserId = user.id;
             await syncNavigationHeader(user);
+
+            // Si el rol actual es cliente, nos aseguramos de que su estado de trabajador esté "Fuera de servicio"
+            const currentRole = localStorage.getItem("user_role") || "customer";
+            if (currentRole === "customer") {
+              try {
+                await updateProviderAvailability(user.id, "Fuera de servicio");
+              } catch (err) {
+                console.warn("Error setting provider offline on customer chat load:", err);
+              }
+            } else if (currentRole === "provider") {
+              // Si está activo en el chat como trabajador, iniciar el keep-alive ping y el detector de inactividad
+              startProviderActivityTracker(user.id);
+            }
 
             // Fetch service requests status 'aceptado'
             const { data: matches, error } = await supabase
@@ -1388,6 +1401,143 @@
         if (contact) {
           selectConversation(contact);
         }
+      }
+
+      // ---- Lógica de Inactividad de 15 Minutos en el Chat para Trabajadores ----
+      async function startProviderActivityTracker(providerId) {
+        let lastActivityTime = Date.now();
+        const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutos
+        let isCurrentlyAvailable = true;
+        let trackerStatus = "En línea";
+
+        try {
+          const { data: p } = await supabase.from("providers").select("status").eq("id", providerId).single();
+          if (p && p.status) trackerStatus = p.status;
+        } catch (_) {}
+
+        // Suscribirse a cambios en providers para el trabajador
+        supabase
+          .channel(`provider-status-${providerId}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "UPDATE",
+              schema: "public",
+              table: "providers",
+              filter: `id=eq.${providerId}`,
+            },
+            (payload) => {
+              if (payload.new && payload.new.status) {
+                trackerStatus = payload.new.status;
+                isCurrentlyAvailable = (trackerStatus === "En línea" || trackerStatus.startsWith("Ocupado"));
+              }
+            }
+          )
+          .subscribe();
+
+        const resetActivityTimer = () => {
+          lastActivityTime = Date.now();
+        };
+
+        // Registrar eventos de interacción en la ventana de chat
+        ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart', 'click'].forEach((event) => {
+          window.addEventListener(event, resetActivityTimer, { passive: true });
+        });
+
+        // Reactivar disponibilidad al pulsar en el modal
+        window.reactivateFromInactivity = async () => {
+          const modal = document.getElementById("inactivity-modal");
+          if (modal) modal.remove();
+          resetActivityTimer();
+          isCurrentlyAvailable = true;
+          trackerStatus = "En línea";
+          try {
+            await updateProviderAvailability(providerId, "En línea");
+          } catch (e) {
+            console.error("Error al reactivar disponibilidad:", e);
+          }
+        };
+
+        // Mostrar modal de inactividad
+        function showInactivityModal() {
+          if (document.getElementById("inactivity-modal")) return;
+
+          const modal = document.createElement("div");
+          modal.id = "inactivity-modal";
+          modal.className = "fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in";
+          modal.innerHTML = `
+            <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant p-6 max-w-sm w-full shadow-2xl flex flex-col gap-4 text-center">
+              <div class="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 mx-auto animate-bounce">
+                <span class="material-symbols-outlined text-[24px]">timer_off</span>
+              </div>
+              <div>
+                <h3 class="font-headline-md text-headline-sm font-bold text-on-surface">Estado: Fuera de Servicio</h3>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-2">
+                  Hemos cambiado tu estado a <b>Fuera de servicio</b> debido a que no has interactuado con la aplicación en los últimos 15 minutos.
+                </p>
+              </div>
+              <button onclick="reactivateFromInactivity()" class="w-full bg-secondary text-on-secondary font-label-lg py-2.5 rounded-lg hover:opacity-90 active:scale-[0.98] transition-all">
+                Volver a Activar
+              </button>
+            </div>
+          `;
+          document.body.appendChild(modal);
+        }
+
+        // Chequeo periódico de inactividad
+        setInterval(async () => {
+          const isBusy = trackerStatus && trackerStatus.startsWith("Ocupado");
+          if (isCurrentlyAvailable && !isBusy && Date.now() - lastActivityTime > INACTIVITY_LIMIT) {
+            console.log("Inactividad detectada en chat. Pasando a Fuera de servicio...");
+            isCurrentlyAvailable = false;
+            trackerStatus = "Fuera de servicio";
+            try {
+              await updateProviderAvailability(providerId, "Fuera de servicio");
+              showInactivityModal();
+            } catch (e) {
+              console.error("Error al poner fuera de servicio por inactividad:", e);
+            }
+          }
+        }, 30000); // Cada 30 segundos
+
+        // Detectar inactividad en segundo plano (Background)
+        let hiddenTime = 0;
+        document.addEventListener("visibilitychange", async () => {
+          if (document.hidden) {
+            hiddenTime = Date.now();
+          } else {
+            if (hiddenTime > 0) {
+              const timeDiff = Date.now() - hiddenTime;
+              const isBusy = trackerStatus && trackerStatus.startsWith("Ocupado");
+              if (isCurrentlyAvailable && !isBusy && timeDiff > INACTIVITY_LIMIT) {
+                console.log("Pestaña de chat inactiva en segundo plano por más de 15 minutos.");
+                isCurrentlyAvailable = false;
+                trackerStatus = "Fuera de servicio";
+                try {
+                  await updateProviderAvailability(providerId, "Fuera de servicio");
+                  showInactivityModal();
+                } catch (e) {
+                  console.error(e);
+                }
+              } else {
+                resetActivityTimer();
+              }
+              hiddenTime = 0;
+            }
+          }
+        });
+
+        // Ping de presencia para mantener al proveedor activo en el mapa
+        setInterval(async () => {
+          if (isCurrentlyAvailable) {
+            try {
+              console.log("Enviando ping de presencia activa desde el chat...");
+              await updateProviderAvailability(providerId, trackerStatus);
+            } catch (e) {
+              console.warn("Error en ping de presencia:", e);
+            }
+          }
+        }, 2 * 60 * 1000); // Cada 2 minutos
       }
     </script>
   </body>

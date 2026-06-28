@@ -328,6 +328,7 @@
         getSavedProviders,
         toggleSavedProvider,
         getHiredProviders,
+        updateProviderAvailability,
       } from "/src/data.js";
 
       // Auth Guard to prevent unauthorized access
@@ -399,6 +400,14 @@
 
             const profile = await getUserProfile(user.id);
             if (profile) {
+              const currentRole = localStorage.getItem("user_role") || "customer";
+              if (currentRole === "customer") {
+                try {
+                  await updateProviderAvailability(user.id, "Fuera de servicio");
+                } catch (err) {
+                  console.warn("Error setting provider offline on customer profile load:", err);
+                }
+              }
               if (avatarImg) avatarImg.src = profile.avatar_url;
               if (photoImg) photoImg.src = profile.avatar_url;
               if (nameText) nameText.innerText = profile.name;
