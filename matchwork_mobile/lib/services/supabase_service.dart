@@ -320,4 +320,40 @@ class SupabaseService {
     ).subscribe();
     return channel;
   }
+
+  Future<List<Map<String, dynamic>>> getUserLocations(String userId) async {
+    try {
+      final List<dynamic> data = await client
+          .from('user_locations')
+          .select()
+          .eq('user_id', userId)
+          .order('created_at', ascending: true);
+      return List<Map<String, dynamic>>.from(data);
+    } catch (e) {
+      print("Error getting user locations: $e");
+      return [];
+    }
+  }
+
+  Future<bool> saveUserLocation({
+    required String userId,
+    required String label,
+    required String address,
+    required double lat,
+    required double lng,
+  }) async {
+    try {
+      await client.from('user_locations').insert({
+        'user_id': userId,
+        'label': label,
+        'address': address,
+        'lat': lat,
+        'lng': lng,
+      });
+      return true;
+    } catch (e) {
+      print("Error saving user location: $e");
+      return false;
+    }
+  }
 }

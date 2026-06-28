@@ -29,11 +29,28 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
   ProviderModel? _selectedProvider;
   bool _isMatched = false;
   bool _isPending = false;
+
+  List<Map<String, dynamic>> _userSavedLocations = [];
+  Map<String, dynamic>? _selectedLocation;
+  String _selectedLocationName = 'Ubicación GPS Actual';
   
   @override
   void initState() {
     super.initState();
     _loadProviders();
+    _loadSavedLocations();
+  }
+
+  Future<void> _loadSavedLocations() async {
+    final userId = SupabaseService.instance.currentUser?.id;
+    if (userId != null) {
+      final locs = await SupabaseService.instance.getUserLocations(userId);
+      if (mounted) {
+        setState(() {
+          _userSavedLocations = locs;
+        });
+      }
+    }
   }
 
   Future<void> _loadProviders() async {
@@ -385,7 +402,13 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
     const accentBlue = Color(0xFF2563EB);
 
     final appState = Provider.of<AppStateProvider>(context);
-    final filtered = _getFilteredProviders(appState.currentLat, appState.currentLng);
+    final double searchLat = _selectedLocation != null 
+        ? (_selectedLocation!['lat'] as num).toDouble() 
+        : appState.currentLat;
+    final double searchLng = _selectedLocation != null 
+        ? (_selectedLocation!['lng'] as num).toDouble() 
+        : appState.currentLng;
+    final filtered = _getFilteredProviders(searchLat, searchLng);
 
     return Scaffold(
       appBar: AppBar(
@@ -442,6 +465,18 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                     ),
                   ),
 
+                  if (_selectedLocation != null)
+                    Marker(
+                      point: LatLng(searchLat, searchLng),
+                      width: 40,
+                      height: 40,
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Colors.red,
+                        size: 38,
+                      ),
+                    ),
+
                   // Providers pins
                   ...filtered.map((p) {
                     final isBusy = p.status.startsWith('Ocupado');
@@ -489,39 +524,84 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
             ],
           ),
 
-          // 2. Category Selector Header (Horizontal Scroll)
+          // 2. Location & Category Selector Header (Column of Pills)
           Positioned(
             top: 16,
             left: 16,
             right: 16,
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              color: Colors.white,
-              child: InkWell(
-                onTap: _showCategoryExplorer,
-                borderRadius: BorderRadius.circular(12),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.category, color: Color(0xFF2563EB)),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          _getFilterLabel(),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Color(0xFF0F172A),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Location Selector Dropdown
+                GestureDetector(
+                  onTap: _showLocationPicker,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                      border: Border.all(color: Colors.grey[200]!),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.location_on, color: accentBlue, size: 20),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            _selectedLocationName,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: surfaceNavy,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ),
-                      const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                    ],
+                        const Icon(Icons.expand_more, color: Colors.grey, size: 20),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 10),
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  color: Colors.white,
+                  child: InkWell(
+                    onTap: _showCategoryExplorer,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.category, color: accentBlue),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              _getFilterLabel(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: surfaceNavy,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -603,10 +683,10 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                   child: const Icon(Icons.zoom_out_map),
                   onPressed: () {
                     if (filtered.isNotEmpty) {
-                      double minLat = appState.currentLat;
-                      double maxLat = appState.currentLat;
-                      double minLng = appState.currentLng;
-                      double maxLng = appState.currentLng;
+                      double minLat = searchLat;
+                      double maxLat = searchLat;
+                      double minLng = searchLng;
+                      double maxLng = searchLng;
 
                       for (var p in filtered) {
                         if (p.lat < minLat) minLat = p.lat;
@@ -640,7 +720,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                   child: const Icon(Icons.my_location),
                   onPressed: () {
                     _mapController.move(
-                      LatLng(appState.currentLat, appState.currentLng),
+                      LatLng(searchLat, searchLng),
                       14.0,
                     );
                   },
@@ -808,6 +888,233 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
             ),
         ],
       ),
+    );
+  }
+
+  void _showLocationPicker() {
+    final appState = Provider.of<AppStateProvider>(context, listen: false);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: const BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Seleccionar Ubicación',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0F172A),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    // Current GPS Location Option
+                    ListTile(
+                      leading: const Icon(Icons.my_location, color: Color(0xFF2563EB)),
+                      title: const Text(
+                        'Ubicación GPS Actual',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      trailing: _selectedLocation == null
+                          ? const Icon(Icons.check, color: Color(0xFF2563EB))
+                          : null,
+                      onTap: () {
+                        setState(() {
+                          _selectedLocation = null;
+                          _selectedLocationName = 'Ubicación GPS Actual';
+                        });
+                        _mapController.move(
+                          LatLng(appState.currentLat, appState.currentLng),
+                          14.0,
+                        );
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const Divider(),
+                    // Saved User Locations List
+                    if (_userSavedLocations.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Text(
+                          'No tienes ubicaciones guardadas.',
+                          style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    else
+                      Flexible(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: _userSavedLocations.length,
+                          itemBuilder: (context, index) {
+                            final loc = _userSavedLocations[index];
+                            final isSelected = _selectedLocation != null &&
+                                _selectedLocation!['id'] == loc['id'];
+
+                            return ListTile(
+                              leading: const Icon(Icons.location_on, color: Colors.red),
+                              title: Text(loc['label'] ?? ''),
+                              subtitle: Text(loc['address'] ?? 'Sin dirección'),
+                              trailing: isSelected
+                                  ? const Icon(Icons.check, color: Color(0xFF2563EB))
+                                  : null,
+                              onTap: () {
+                                setState(() {
+                                  _selectedLocation = loc;
+                                  _selectedLocationName = loc['label'] ?? '';
+                                });
+                                _mapController.move(
+                                  LatLng(
+                                    (loc['lat'] as num).toDouble(),
+                                    (loc['lng'] as num).toDouble(),
+                                  ),
+                                  14.0,
+                                );
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    const Divider(),
+                    // Add Location Button
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0F172A),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.add_location_alt),
+                      label: const Text('Agregar Nueva Ubicación'),
+                      onPressed: () {
+                        Navigator.pop(context); // Close bottom sheet
+                        _showAddLocationDialog(); // Show dialog to save location
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showAddLocationDialog() {
+    final labelController = TextEditingController();
+    final addressController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Guardar Ubicación Actual'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Se guardará la posición que está en el centro actual de tu mapa.',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: labelController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de la ubicación (Ej: Mi Casa)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: addressController,
+                decoration: const InputDecoration(
+                  labelText: 'Dirección (Ej: Av. Providencia 123)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0F172A),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () async {
+                final label = labelController.text.trim();
+                final address = addressController.text.trim();
+                if (label.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Por favor ingresa un nombre para la ubicación')),
+                  );
+                  return;
+                }
+
+                final userId = SupabaseService.instance.currentUser?.id;
+                if (userId != null) {
+                  final center = _mapController.camera.center;
+                  final success = await SupabaseService.instance.saveUserLocation(
+                    userId: userId,
+                    label: label,
+                    address: address.isNotEmpty ? address : 'Centro del mapa',
+                    lat: center.latitude,
+                    lng: center.longitude,
+                  );
+
+                  if (success) {
+                    await _loadSavedLocations();
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Ubicación "$label" guardada con éxito')),
+                      );
+                    }
+                  } else {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Error al guardar la ubicación')),
+                      );
+                    }
+                  }
+                }
+                if (mounted) Navigator.pop(context);
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
