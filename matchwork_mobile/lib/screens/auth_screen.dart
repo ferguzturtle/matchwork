@@ -132,6 +132,30 @@ class _AuthScreenState extends State<AuthScreen> {
                       'assets/logo.png',
                       height: 120,
                       fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: surfaceNavy,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(
+                                Icons.handshake_rounded,
+                                color: Colors.white,
+                                size: 40,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Reinicia la app (flutter run) para ver el logo',
+                              style: TextStyle(fontSize: 11, color: Colors.grey, fontStyle: FontStyle.italic),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(height: 20),
