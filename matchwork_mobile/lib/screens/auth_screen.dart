@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../providers/app_state_provider.dart';
 import 'client_map_screen.dart';
-import 'provider_panel_screen.dart';
 import '../models/categories_data.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -68,9 +67,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
         final user = response.user;
         if (user != null && mounted) {
-          // Resolve role from profiles
-          final profile = await SupabaseService.instance.getUserProfile(user.id);
-          final role = profile != null ? (profile['role'] ?? 'customer') : 'customer';
+          // Always default to customer (Client Map) upon login
+          const role = 'customer';
 
           final appState = Provider.of<AppStateProvider>(context, listen: false);
           await appState.switchRole(role);
@@ -80,9 +78,7 @@ class _AuthScreenState extends State<AuthScreen> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => role == 'customer' 
-                    ? const ClientMapScreen() 
-                    : const ProviderPanelScreen(),
+                builder: (context) => const ClientMapScreen(),
               ),
             );
           }

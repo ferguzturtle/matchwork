@@ -6,6 +6,7 @@ import 'providers/app_state_provider.dart';
 import 'screens/auth_screen.dart';
 import 'screens/client_map_screen.dart';
 import 'screens/provider_panel_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -135,8 +136,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Future<void> _resolveSession() async {
     final userId = SupabaseService.instance.currentUser?.id;
     if (userId != null) {
-      final profile = await SupabaseService.instance.getUserProfile(userId);
-      final resolvedRole = profile != null ? (profile['role'] ?? 'customer') : 'customer';
+      final prefs = await SharedPreferences.getInstance();
+      // Read saved role, default to 'customer' so any login defaults to the map
+      final resolvedRole = prefs.getString('user_role') ?? 'customer';
 
       final appState = Provider.of<AppStateProvider>(context, listen: false);
       await appState.switchRole(resolvedRole);
