@@ -1,5 +1,7 @@
 import 'dart:math' show sin, cos, sqrt, atan2, pi;
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' hide Path;
 import 'package:provider/provider.dart';
@@ -1084,13 +1086,39 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
 
                 final userId = SupabaseService.instance.currentUser?.id;
                 if (userId != null) {
-                  final center = _mapController.camera.center;
+                  double targetLat = _mapController.camera.center.latitude;
+                  double targetLng = _mapController.camera.center.longitude;
+
+                  if (address.isNotEmpty) {
+                    try {
+                      final query = Uri.encodeComponent('$address, Chile');
+                      final url = Uri.parse('https://nominatim.openstreetmap.org/search?format=json&q=$query&limit=1');
+                      final res = await http.get(url, headers: {'User-Agent': 'MatchWorkMobileApp'});
+                      
+                      if (res.statusCode == 200) {
+                        final data = json.decode(res.body) as List;
+                        if (data.isNotEmpty) {
+                          targetLat = double.parse(data[0]['lat']);
+                          targetLng = double.parse(data[0]['lon']);
+                        } else {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('No se encontró la dirección exacta. Se guardará el centro del mapa.')),
+                            );
+                          }
+                        }
+                      }
+                    } catch (e) {
+                      print("Error geocoding address: $e");
+                    }
+                  }
+
                   final success = await SupabaseService.instance.saveUserLocation(
                     userId: userId,
                     label: label,
                     address: address.isNotEmpty ? address : 'Centro del mapa',
-                    lat: center.latitude,
-                    lng: center.longitude,
+                    lat: targetLat,
+                    lng: targetLng,
                   );
 
                   if (success) {
