@@ -5,9 +5,8 @@ import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../models/request_model.dart';
 import '../providers/app_state_provider.dart';
-import 'client_map_screen.dart';
 import 'chat_screen.dart';
-import 'auth_screen.dart';
+import '../widgets/app_drawer.dart';
 
 class ProviderPanelScreen extends StatefulWidget {
   const ProviderPanelScreen({super.key});
@@ -166,35 +165,8 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
           backgroundColor: surfaceNavy,
           foregroundColor: Colors.white,
           title: const Text('Panel del Prestador', style: TextStyle(fontWeight: FontWeight.bold)),
-          actions: [
-            // Switch to Client Map
-            TextButton.icon(
-              onPressed: () async {
-                await appState.switchRole('customer');
-                if (mounted) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ClientMapScreen()),
-                  );
-                }
-              },
-              icon: const Icon(Icons.map, color: Color(0xFF10B981)),
-              label: const Text('Modo Cliente', style: TextStyle(color: Colors.white)),
-            ),
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () async {
-                await SupabaseService.instance.signOut();
-                if (mounted) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AuthScreen()),
-                  );
-                }
-              },
-            ),
-          ],
         ),
+        drawer: const AppDrawer(),
         body: Column(
           children: [
             // 1. Availability Picker Header

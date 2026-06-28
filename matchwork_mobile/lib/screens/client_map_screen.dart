@@ -6,9 +6,8 @@ import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../models/provider_model.dart';
 import '../providers/app_state_provider.dart';
-import 'provider_panel_screen.dart';
 import 'chat_screen.dart';
-import 'auth_screen.dart';
+import '../widgets/app_drawer.dart';
 
 class ClientMapScreen extends StatefulWidget {
   const ClientMapScreen({super.key});
@@ -174,39 +173,8 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
         backgroundColor: surfaceNavy,
         foregroundColor: Colors.white,
         title: const Text('MatchWork', style: TextStyle(fontWeight: FontWeight.bold)),
-        actions: [
-          // Switch to Provider Panel
-          TextButton.icon(
-            onPressed: () async {
-              await appState.switchRole('provider');
-              final userId = SupabaseService.instance.currentUser?.id;
-              if (userId != null) {
-                await appState.initializeProviderState(userId);
-              }
-              if (mounted) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProviderPanelScreen()),
-                );
-              }
-            },
-            icon: const Icon(Icons.engineering, color: Colors.amber),
-            label: const Text('Modo Prestador', style: TextStyle(color: Colors.white)),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await SupabaseService.instance.signOut();
-              if (mounted) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AuthScreen()),
-                );
-              }
-            },
-          ),
-        ],
       ),
+      drawer: const AppDrawer(),
       body: Stack(
         children: [
           // 1. Interactive Map
