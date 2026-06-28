@@ -12,8 +12,8 @@ void main() async {
 
   // 1. Load keys from assets/.env
   final env = await loadEnv();
-  final supabaseUrl = env['SUPABASE_URL'] ?? '';
-  final supabaseAnonKey = env['SUPABASE_KEY'] ?? env['SUPABASE_ANON_KEY'] ?? '';
+  final supabaseUrl = env['SUPABASE_URL'] ?? env['VITE_SUPABASE_URL'] ?? '';
+  final supabaseAnonKey = env['SUPABASE_KEY'] ?? env['SUPABASE_ANON_KEY'] ?? env['VITE_SUPABASE_ANON_KEY'] ?? '';
 
   if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
     print("WARNING: Supabase URL or Key is empty. Please verify your assets/.env file.");
