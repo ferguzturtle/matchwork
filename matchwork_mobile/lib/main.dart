@@ -15,20 +15,20 @@ void main() async {
   final supabaseUrl = env['SUPABASE_URL'] ?? env['VITE_SUPABASE_URL'] ?? '';
   final supabaseAnonKey = env['SUPABASE_KEY'] ?? env['SUPABASE_ANON_KEY'] ?? env['VITE_SUPABASE_ANON_KEY'] ?? '';
 
-  if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
-    print("WARNING: Supabase URL or Key is empty. Please verify your assets/.env file.");
-  }
+  final isConfigMissing = supabaseUrl.isEmpty || supabaseAnonKey.isEmpty;
 
-  // 2. Initialize Supabase
-  await SupabaseService.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
-  );
+  if (!isConfigMissing) {
+    // 2. Initialize Supabase
+    await SupabaseService.initialize(
+      url: supabaseUrl,
+      anonKey: supabaseAnonKey,
+    );
+  }
 
   runApp(
     ChangeNotifierProvider(
       create: (_) => AppStateProvider(),
-      child: const MatchWorkApp(),
+      child: MatchWorkApp(isConfigMissing: isConfigMissing),
     ),
   );
 }
@@ -56,10 +56,43 @@ Future<Map<String, String>> loadEnv() async {
 }
 
 class MatchWorkApp extends StatelessWidget {
-  const MatchWorkApp({super.key});
+  final bool isConfigMissing;
+  const MatchWorkApp({super.key, this.isConfigMissing = false});
 
   @override
   Widget build(BuildContext context) {
+    if (isConfigMissing) {
+      return MaterialApp(
+        title: 'MatchWork',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(useMaterial3: true),
+        home: Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 64),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Configuración Faltante',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'No se pudo cargar o leer el archivo "assets/.env".\n\nPor favor, detén el comando "flutter run" en tu terminal y vuelve a iniciarlo para que Flutter compile el archivo de assets.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     final session = SupabaseService.instance.client.auth.currentSession;
     
     return MaterialApp(
