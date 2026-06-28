@@ -21,52 +21,79 @@ class SubcategoryDetail {
 }
 
 const Map<String, CategoryDetail> categories = {
-  'construccion': CategoryDetail(
-    label: 'Construcción y Reformas',
-    icon: 'construction',
+  'reparaciones_mantenimiento': CategoryDetail(
+    label: 'Reparaciones y Mantenimiento',
+    icon: 'handyman',
     subcategories: {
-      'albanileria': SubcategoryDetail(label: 'Albañilería', icon: 'construction'),
-      'pintura': SubcategoryDetail(label: 'Pintura', icon: 'format_paint'),
-      'carpinteria': SubcategoryDetail(label: 'Carpintería', icon: 'handyman'),
       'gasfiteria': SubcategoryDetail(label: 'Gasfitería', icon: 'plumbing'),
-    },
-  ),
-  'salud': CategoryDetail(
-    label: 'Servicios de Salud y Cuidado',
-    icon: 'medical_services',
-    subcategories: {
-      'enfermeria': SubcategoryDetail(label: 'Enfermería', icon: 'medical_services'),
-      'kinesiologia': SubcategoryDetail(label: 'Kinesiología', icon: 'physical_therapy'),
-      'adulto_mayor': SubcategoryDetail(label: 'Cuidado de Adulto Mayor', icon: 'elderly'),
-      'ninos': SubcategoryDetail(label: 'Cuidado de Niños', icon: 'child_care'),
-    },
-  ),
-  'instalaciones': CategoryDetail(
-    label: 'Instalaciones y Electricidad',
-    icon: 'engineering',
-    subcategories: {
-      'electricidad': SubcategoryDetail(label: 'Electricidad Residencial', icon: 'bolt'),
+      'electricidad': SubcategoryDetail(label: 'Electricidad', icon: 'bolt'),
+      'cerrajeria': SubcategoryDetail(label: 'Cerrajería', icon: 'vpn_key'),
+      'carpinteria': SubcategoryDetail(label: 'Carpintería', icon: 'construction'),
       'climatizacion': SubcategoryDetail(label: 'Climatización', icon: 'ac_unit'),
-      'redes': SubcategoryDetail(label: 'Redes y Telecomunicaciones', icon: 'router'),
     },
   ),
-  'mantenimiento': CategoryDetail(
-    label: 'Mantenimiento y Limpieza',
+  'limpieza_hogar': CategoryDetail(
+    label: 'Limpieza y Cuidado del Hogar',
     icon: 'cleaning_services',
     subcategories: {
-      'limpieza_hogar': SubcategoryDetail(label: 'Limpieza de Hogar', icon: 'cleaning_services'),
-      'fumigacion': SubcategoryDetail(label: 'Fumigación', icon: 'pest_control'),
-      'jardineria': SubcategoryDetail(label: 'Jardinería', icon: 'yard'),
-      'piscinas': SubcategoryDetail(label: 'Limpieza de Piscinas', icon: 'pool'),
+      'limpieza_residencial': SubcategoryDetail(label: 'Limpieza Residencial', icon: 'home'),
+      'lavanderia_planchado': SubcategoryDetail(label: 'Lavandería y Planchado', icon: 'local_laundry_service'),
+      'limpieza_profunda': SubcategoryDetail(label: 'Limpieza Profunda', icon: 'dry_cleaning'),
+      'control_plagas': SubcategoryDetail(label: 'Control de Plagas', icon: 'bug_report'),
     },
   ),
-  'profesionales': CategoryDetail(
-    label: 'Servicios Profesionales',
-    icon: 'support_agent',
+  'jardineria_exteriores': CategoryDetail(
+    label: 'Jardinería y Exteriores',
+    icon: 'yard',
     subcategories: {
-      'tutorias': SubcategoryDetail(label: 'Tutorías / Clases', icon: 'school'),
-      'asistencia_tec': SubcategoryDetail(label: 'Asistencia Tecnológica', icon: 'computer'),
-      'mudanzas': SubcategoryDetail(label: 'Mudanzas y Desembalaje', icon: 'local_shipping'),
+      'jardineria': SubcategoryDetail(label: 'Jardinería', icon: 'yard'),
+      'piscinas': SubcategoryDetail(label: 'Piscinas', icon: 'pool'),
+      'techos_canaletas': SubcategoryDetail(label: 'Techos y Canaletas', icon: 'home_work'),
+    },
+  ),
+  'tecnologia_linea_blanca': CategoryDetail(
+    label: 'Tecnología y Línea Blanca',
+    icon: 'computer',
+    subcategories: {
+      'reparacion_electrodomesticos': SubcategoryDetail(label: 'Reparación de Electrodomésticos', icon: 'kitchen'),
+      'soporte_tecnico': SubcategoryDetail(label: 'Soporte Técnico', icon: 'computer'),
+    },
+  ),
+  'salud_belleza_bienestar': CategoryDetail(
+    label: 'Salud, Belleza y Bienestar',
+    icon: 'spa',
+    subcategories: {
+      'belleza_salon': SubcategoryDetail(label: 'Belleza y Salón', icon: 'content_cut'),
+      'salud_fitness': SubcategoryDetail(label: 'Salud y Fitness', icon: 'fitness_center'),
+      'cuidados': SubcategoryDetail(label: 'Cuidados', icon: 'volunteer_activism'),
+    },
+  ),
+  'mudanzas_logistica': CategoryDetail(
+    label: 'Mudanzas y Logística',
+    icon: 'local_shipping',
+    subcategories: {
+      'fletes_mudanzas': SubcategoryDetail(label: 'Fletes y Mudanzas', icon: 'local_shipping'),
+      'armado_muebles': SubcategoryDetail(label: 'Armado de Muebles', icon: 'weekend'),
+      'pago_cuentas': SubcategoryDetail(label: 'Trámites y Acompañamiento', icon: 'receipt_long'),
+      'revision_tecnica': SubcategoryDetail(label: 'Gestión de Revisión Técnica', icon: 'directions_car'),
+      'gestion_compras': SubcategoryDetail(label: 'Gestión de Compras', icon: 'shopping_cart'),
+    },
+  ),
+  'cuidado_mascotas': CategoryDetail(
+    label: 'Cuidado de Mascotas',
+    icon: 'pets',
+    subcategories: {
+      'peluqueria_canina': SubcategoryDetail(label: 'Peluquería Canina', icon: 'pets'),
+      'paseo_perros': SubcategoryDetail(label: 'Paseo de Perros', icon: 'directions_walk'),
+      'guarderia_mascotas': SubcategoryDetail(label: 'Guardería de Mascotas', icon: 'home_max'),
+    },
+  ),
+  'servicios_profesionales': CategoryDetail(
+    label: 'Servicios Profesionales',
+    icon: 'school',
+    subcategories: {
+      'tutorias_clases': SubcategoryDetail(label: 'Tutorías / Clases', icon: 'school'),
+      'clases_conducir': SubcategoryDetail(label: 'Clases de Conducir', icon: 'drive_eta'),
     },
   ),
 };

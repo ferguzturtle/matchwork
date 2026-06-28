@@ -23,8 +23,8 @@ class _AuthScreenState extends State<AuthScreen> {
   String _selectedRole = 'customer'; // 'customer' or 'provider'
   bool _isLoading = false;
   
-  String? _selectedCategory = 'construccion';
-  String? _selectedSubcategory = 'albanileria';
+  String? _selectedCategory = 'reparaciones_mantenimiento';
+  String? _selectedSubcategory = 'gasfiteria';
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;

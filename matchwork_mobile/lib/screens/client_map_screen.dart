@@ -193,21 +193,30 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                     child: ListView(
                       children: categories.entries.map((e) {
                         IconData catIcon;
-                        switch (e.key) {
-                          case 'construccion':
-                            catIcon = Icons.construction;
+                         switch (e.key) {
+                          case 'reparaciones_mantenimiento':
+                            catIcon = Icons.handyman;
                             break;
-                          case 'salud':
-                            catIcon = Icons.medical_services;
-                            break;
-                          case 'instalaciones':
-                            catIcon = Icons.engineering;
-                            break;
-                          case 'mantenimiento':
+                          case 'limpieza_hogar':
                             catIcon = Icons.cleaning_services;
                             break;
-                          case 'profesionales':
-                            catIcon = Icons.support_agent;
+                          case 'jardineria_exteriores':
+                            catIcon = Icons.yard;
+                            break;
+                          case 'tecnologia_linea_blanca':
+                            catIcon = Icons.computer;
+                            break;
+                          case 'salud_belleza_bienestar':
+                            catIcon = Icons.spa;
+                            break;
+                          case 'mudanzas_logistica':
+                            catIcon = Icons.local_shipping;
+                            break;
+                          case 'cuidado_mascotas':
+                            catIcon = Icons.pets;
+                            break;
+                          case 'servicios_profesionales':
+                            catIcon = Icons.school;
                             break;
                           default:
                             catIcon = Icons.category;
@@ -294,46 +303,64 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
 
   IconData _getIconData(String iconName) {
     switch (iconName) {
-      case 'construction':
-        return Icons.construction;
-      case 'format_paint':
-        return Icons.format_paint;
       case 'handyman':
         return Icons.handyman;
       case 'plumbing':
         return Icons.plumbing;
-      case 'medical_services':
-        return Icons.medical_services;
-      case 'physical_therapy':
-        return Icons.accessibility_new;
-      case 'elderly':
-        return Icons.elderly;
-      case 'child_care':
-        return Icons.child_care;
       case 'bolt':
         return Icons.bolt;
+      case 'vpn_key':
+        return Icons.vpn_key;
+      case 'construction':
+        return Icons.construction;
       case 'ac_unit':
         return Icons.ac_unit;
-      case 'router':
-        return Icons.router;
-      case 'cleaning_services':
-        return Icons.cleaning_services;
-      case 'pest_control':
+      case 'home':
+        return Icons.home;
+      case 'local_laundry_service':
+        return Icons.local_laundry_service;
+      case 'dry_cleaning':
+        return Icons.dry_cleaning;
+      case 'bug_report':
         return Icons.bug_report;
       case 'yard':
         return Icons.yard;
       case 'pool':
         return Icons.pool;
-      case 'school':
-        return Icons.school;
+      case 'home_work':
+        return Icons.home_work;
+      case 'kitchen':
+        return Icons.kitchen;
       case 'computer':
         return Icons.computer;
+      case 'spa':
+        return Icons.spa;
+      case 'content_cut':
+        return Icons.content_cut;
+      case 'fitness_center':
+        return Icons.fitness_center;
+      case 'volunteer_activism':
+        return Icons.volunteer_activism;
       case 'local_shipping':
         return Icons.local_shipping;
-      case 'support_agent':
-        return Icons.support_agent;
-      case 'engineering':
-        return Icons.engineering;
+      case 'weekend':
+        return Icons.weekend;
+      case 'receipt_long':
+        return Icons.receipt_long;
+      case 'directions_car':
+        return Icons.directions_car;
+      case 'shopping_cart':
+        return Icons.shopping_cart;
+      case 'pets':
+        return Icons.pets;
+      case 'directions_walk':
+        return Icons.directions_walk;
+      case 'home_max':
+        return Icons.home_max;
+      case 'school':
+        return Icons.school;
+      case 'drive_eta':
+        return Icons.drive_eta;
       default:
         return Icons.build;
     }
