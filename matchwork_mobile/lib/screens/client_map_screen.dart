@@ -504,6 +504,32 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
             bottom: _selectedProvider != null ? 240 : 16,
             child: Column(
               children: [
+                // Zoom In Button
+                FloatingActionButton(
+                  heroTag: 'zoom_in_btn',
+                  backgroundColor: Colors.white,
+                  foregroundColor: surfaceNavy,
+                  mini: true,
+                  child: const Icon(Icons.add),
+                  onPressed: () {
+                    final currentZoom = _mapController.camera.zoom;
+                    _mapController.move(_mapController.camera.center, currentZoom + 1.0);
+                  },
+                ),
+                const SizedBox(height: 8),
+                // Zoom Out Button
+                FloatingActionButton(
+                  heroTag: 'zoom_out_btn',
+                  backgroundColor: Colors.white,
+                  foregroundColor: surfaceNavy,
+                  mini: true,
+                  child: const Icon(Icons.remove),
+                  onPressed: () {
+                    final currentZoom = _mapController.camera.zoom;
+                    _mapController.move(_mapController.camera.center, currentZoom - 1.0);
+                  },
+                ),
+                const SizedBox(height: 12),
                 // Radius trigger float button
                 FloatingActionButton(
                   heroTag: 'radius_btn',
