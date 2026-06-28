@@ -128,17 +128,10 @@ class _AuthScreenState extends State<AuthScreen> {
                 children: [
                   // Brand Logo or Emblem
                   Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: surfaceNavy,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Icon(
-                        Icons.handshake,
-                        color: Colors.white,
-                        size: 40,
-                      ),
+                    child: Image.asset(
+                      'assets/logo.png',
+                      height: 120,
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(height: 20),
