@@ -140,7 +140,6 @@ class AuthWrapper extends StatefulWidget {
 
 class _AuthWrapperState extends State<AuthWrapper> {
   bool _isInit = false;
-  String _role = 'customer';
 
   @override
   void initState() {
@@ -161,7 +160,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
       if (mounted) {
         setState(() {
-          _role = resolvedRole;
           _isInit = true;
         });
       }
@@ -184,7 +182,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
       );
     }
 
-    return _role == 'customer' 
+    final appState = Provider.of<AppStateProvider>(context);
+    return appState.userRole == 'customer' 
         ? const ClientMapScreen() 
         : const ProviderPanelScreen();
   }

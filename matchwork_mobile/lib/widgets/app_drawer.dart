@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../providers/app_state_provider.dart';
-import '../screens/client_map_screen.dart';
-import '../screens/provider_panel_screen.dart';
 import '../screens/conversations_list_screen.dart';
 import '../screens/auth_screen.dart';
 
@@ -105,10 +103,6 @@ class AppDrawer extends StatelessWidget {
                     Navigator.pop(context);
                     if (appState.userRole != 'customer') {
                       appState.switchRole('customer');
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ClientMapScreen()),
-                      );
                     }
                   },
                 ),
@@ -170,19 +164,6 @@ class AppDrawer extends StatelessWidget {
                       final userId = SupabaseService.instance.currentUser?.id;
                       if (userId != null) {
                         await appState.initializeProviderState(userId);
-                      }
-                      if (context.mounted) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const ProviderPanelScreen()),
-                        );
-                      }
-                    } else {
-                      if (context.mounted) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const ClientMapScreen()),
-                        );
                       }
                     }
                   },
