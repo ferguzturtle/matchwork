@@ -77,6 +77,7 @@ class AppStateProvider extends ChangeNotifier {
     if (_userRole == 'customer') {
       // Force offline if customer
       await updateAvailabilityState('Fuera de servicio');
+      await startGpsTracking();
     } else if (_userRole == 'provider') {
       // Initialize pings/inactivity if provider
       startActivityTracker();
@@ -97,6 +98,7 @@ class AppStateProvider extends ChangeNotifier {
       // Force offline
       stopActivityTracker();
       await updateAvailabilityState('Fuera de servicio');
+      await startGpsTracking();
     } else {
       // Reset activity and tracker
       resetActivityTimer();
@@ -150,15 +152,17 @@ class AppStateProvider extends ChangeNotifier {
       _currentLng = pos.longitude;
       notifyListeners();
 
-      // Update Supabase with new location (throttled)
-      final userId = SupabaseService.instance.currentUser?.id;
-      if (userId != null) {
-        await SupabaseService.instance.updateProviderAvailability(
-          providerId: userId,
-          status: _currentStatusState,
-          lat: _currentLat,
-          lng: _currentLng,
-        );
+      // Update Supabase with new location (throttled) - ONLY IF PROVIDER
+      if (_userRole == 'provider') {
+        final userId = SupabaseService.instance.currentUser?.id;
+        if (userId != null) {
+          await SupabaseService.instance.updateProviderAvailability(
+            providerId: userId,
+            status: _currentStatusState,
+            lat: _currentLat,
+            lng: _currentLng,
+          );
+        }
       }
     });
   }
