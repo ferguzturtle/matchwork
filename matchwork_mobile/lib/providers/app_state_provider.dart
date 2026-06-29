@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -245,6 +246,55 @@ class AppStateProvider extends ChangeNotifier {
     if (onInactivityDetected != null) {
       onInactivityDetected!();
     }
+  }
+
+  // --- MULTIPLE PROFESSIONS (OFFICES) ---
+  Future<List<Map<String, dynamic>>> getUserProfessions(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonStr = prefs.getString('prolink_professions_$userId') ?? '[]';
+    try {
+      final List<dynamic> list = json.decode(jsonStr);
+      return list.map((e) => Map<String, dynamic>.from(e)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> saveUserProfession(String userId, Map<String, dynamic> professionData) async {
+    final prefs = await SharedPreferences.getInstance();
+    final professions = await getUserProfessions(userId);
+
+    // Avoid duplicates
+    final exists = professions.any((p) => p['subcategory'] == professionData['subcategory']);
+    if (exists) return;
+
+    final newProf = {
+      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      ...professionData,
+    };
+    professions.add(newProf);
+    await prefs.setString('prolink_professions_$userId', json.encode(professions));
+  }
+
+  Future<void> setActiveProfession(String userId, String professionId) async {
+    final professions = await getUserProfessions(userId);
+    final prof = professions.firstWhere((p) => p['id'] == professionId, orElse: () => {});
+    if (prof.isEmpty) return;
+
+    // Update active profile in Supabase
+    await SupabaseService.instance.updateUserProfile(userId, {
+      'profession': prof['profession'] ?? 'Especialista',
+      'category': prof['category'] ?? '',
+      'subcategory': prof['subcategory'] ?? '',
+    });
+
+    // Also update provider availability in Supabase to sync the active trade on the map
+    await SupabaseService.instance.updateProviderAvailability(
+      providerId: userId,
+      status: _currentStatusState,
+      lat: _currentLat,
+      lng: _currentLng,
+    );
   }
 
   @override

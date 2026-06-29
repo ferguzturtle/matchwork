@@ -4,6 +4,7 @@ import '../services/supabase_service.dart';
 import '../providers/app_state_provider.dart';
 import '../screens/conversations_list_screen.dart';
 import '../screens/auth_screen.dart';
+import '../models/categories_data.dart';
 
 class AppDrawer extends StatelessWidget {
   final VoidCallback? onAddLocationTap;
@@ -145,13 +146,8 @@ class AppDrawer extends StatelessWidget {
                         iconColor: iconColor,
                         activeTileBg: activeTileBg,
                         activeTextColor: activeTextColor,
-                        onTap: () async {
-                          Navigator.pop(context);
-                          await appState.switchRole('provider');
-                          final userId = SupabaseService.instance.currentUser?.id;
-                          if (userId != null) {
-                            await appState.initializeProviderState(userId);
-                          }
+                        onTap: () {
+                          _handleWorkerRoleSwitch(context, appState);
                         },
                       ),
                       _buildDrawerItem(
@@ -521,6 +517,374 @@ class AppDrawer extends StatelessWidget {
               child: const Text('Cerrar'),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _handleWorkerRoleSwitch(BuildContext context, AppStateProvider appState) async {
+    final userId = SupabaseService.instance.currentUser?.id;
+    if (userId == null) return;
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      // 1. Get database profile to check if user has a category set
+      final profile = await SupabaseService.instance.getUserProfile(userId);
+      final profileCategory = profile?['category'] as String?;
+      final profileSubcategory = profile?['subcategory'] as String?;
+      final profileProfession = (profile?['profession'] as String?) ?? 'Especialista';
+
+      // 2. Get saved professions
+      final professions = await appState.getUserProfessions(userId);
+
+      // Close loading dialog
+      if (context.mounted) Navigator.pop(context);
+
+      // 3. If local professions is empty but profile has category, save it as first local profession
+      if (professions.isEmpty && profileCategory != null && profileCategory.isNotEmpty) {
+        await appState.saveUserProfession(userId, {
+          'category': profileCategory,
+          'subcategory': profileSubcategory ?? '',
+          'profession': profileProfession,
+        });
+      }
+
+      // Re-fetch professions
+      final updatedProfessions = await appState.getUserProfessions(userId);
+
+      if (context.mounted) {
+        if (updatedProfessions.isEmpty) {
+          // If completely empty, go straight to register dialog
+          _showAddProfessionDialog(context, appState, userId);
+        } else {
+          // Show selection dialog
+          _showSelectProfessionDialog(context, appState, userId, updatedProfessions);
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // Close loading if still open
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al verificar perfil: $e')),
+        );
+      }
+    }
+  }
+
+  void _showSelectProfessionDialog(
+    BuildContext context,
+    AppStateProvider appState,
+    String userId,
+    List<Map<String, dynamic>> professions,
+  ) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text(
+            'Seleccionar Oficio',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 12.0),
+                  child: Text(
+                    'Elige con qué oficio deseas conectarte ahora.',
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+                ),
+                ...professions.map((prof) {
+                  final catKey = prof['category'] ?? '';
+                  final subcatKey = prof['subcategory'] ?? '';
+                  final profName = prof['profession'] ?? 'Especialista';
+
+                  // Get subcategory icon and label
+                  String subcatLabel = subcatKey.replaceAll('_', ' ');
+                  IconData iconData = Icons.build_outlined;
+                  if (categories[catKey] != null &&
+                      categories[catKey]!.subcategories[subcatKey] != null) {
+                    subcatLabel = categories[catKey]!.subcategories[subcatKey]!.label;
+                    final iconName = categories[catKey]!.subcategories[subcatKey]!.icon;
+                    if (iconName == 'plumbing') { iconData = Icons.plumbing; }
+                    else if (iconName == 'bolt') { iconData = Icons.bolt; }
+                    else if (iconName == 'key') { iconData = Icons.key; }
+                    else if (iconName == 'carpenter') { iconData = Icons.handyman; }
+                    else if (iconName == 'thermostat') { iconData = Icons.thermostat; }
+                    else if (iconName == 'cleaning_services') { iconData = Icons.cleaning_services; }
+                    else if (iconName == 'iron') { iconData = Icons.iron; }
+                    else if (iconName == 'wash') { iconData = Icons.local_laundry_service; }
+                    else if (iconName == 'bug_report') { iconData = Icons.bug_report; }
+                    else if (iconName == 'agriculture') { iconData = Icons.agriculture; }
+                    else if (iconName == 'pool') { iconData = Icons.pool; }
+                    else if (iconName == 'roofing') { iconData = Icons.roofing; }
+                    else if (iconName == 'format_paint') { iconData = Icons.format_paint; }
+                    else if (iconName == 'construction') { iconData = Icons.construction; }
+                    else if (iconName == 'home_repair_service') { iconData = Icons.home_repair_service; }
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: InkWell(
+                      onTap: () async {
+                        // Close dialog
+                        Navigator.pop(dialogContext);
+
+                        // Show loader
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => const Center(child: CircularProgressIndicator()),
+                        );
+
+                        try {
+                          await appState.setActiveProfession(userId, prof['id']);
+                          await appState.switchRole('provider');
+                          await appState.initializeProviderState(userId);
+                          if (context.mounted) Navigator.pop(context); // Close loader
+                        } catch (e) {
+                          if (context.mounted) {
+                            Navigator.pop(context); // Close loader
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error al cambiar de oficio: $e')),
+                            );
+                          }
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey[300]!),
+                          borderRadius: BorderRadius.circular(12),
+                          color: const Color(0xFFF8FAFC),
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: const Color(0xFFEFF6FF),
+                              foregroundColor: const Color(0xFF2563EB),
+                              child: Icon(iconData, size: 20),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    profName,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    subcatLabel,
+                                    style: const TextStyle(color: Colors.grey, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    _showAddProfessionDialog(context, appState, userId);
+                  },
+                  icon: const Icon(Icons.add, color: Color(0xFF2563EB)),
+                  label: const Text(
+                    'Agregar nuevo oficio',
+                    style: TextStyle(color: Color(0xFF2563EB), fontWeight: FontWeight.bold),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAddProfessionDialog(
+    BuildContext context,
+    AppStateProvider appState,
+    String userId,
+  ) {
+    String? selectedCat = 'reparaciones_mantenimiento';
+    String? selectedSubcat = 'gasfiteria';
+    final nameController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text(
+                'Agregar Nuevo Oficio',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Define tu nuevo servicio o especialidad para recibir solicitudes.',
+                      style: TextStyle(color: Colors.grey, fontSize: 13),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Nombre del Oficio / Título',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        hintText: 'Ej. Gasfíter a Domicilio',
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Categoría',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<String>(
+                      value: selectedCat,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                      items: categories.entries.map((e) {
+                        return DropdownMenuItem(value: e.key, child: Text(e.value.label));
+                      }).toList(),
+                      onChanged: (val) {
+                        setState(() {
+                          selectedCat = val;
+                          if (val != null && categories[val] != null) {
+                            selectedSubcat = categories[val]!.subcategories.keys.first;
+                          }
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Subcategoría',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<String>(
+                      value: selectedSubcat,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                      items: selectedCat == null || categories[selectedCat] == null
+                          ? []
+                          : categories[selectedCat]!.subcategories.entries.map((e) {
+                              return DropdownMenuItem(value: e.key, child: Text(e.value.label));
+                            }).toList(),
+                      onChanged: (val) {
+                        setState(() {
+                          selectedSubcat = val;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final title = nameController.text.trim();
+                    if (title.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Por favor ingresa un título para el oficio')),
+                      );
+                      return;
+                    }
+                    if (selectedCat == null || selectedSubcat == null) return;
+
+                    // Close dialog
+                    Navigator.pop(dialogContext);
+
+                    // Show loader
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => const Center(child: CircularProgressIndicator()),
+                    );
+
+                    try {
+                      final newProfession = {
+                        'category': selectedCat!,
+                        'subcategory': selectedSubcat!,
+                        'profession': title,
+                      };
+                      // Save profession locally
+                      await appState.saveUserProfession(userId, newProfession);
+
+                      // Get list to find the ID of the newly saved profession
+                      final updated = await appState.getUserProfessions(userId);
+                      final match = updated.firstWhere(
+                        (p) => p['subcategory'] == selectedSubcat && p['profession'] == title,
+                        orElse: () => {},
+                      );
+
+                      if (match.isNotEmpty) {
+                        await appState.setActiveProfession(userId, match['id']);
+                      }
+
+                      // Switch role to provider
+                      await appState.switchRole('provider');
+                      await appState.initializeProviderState(userId);
+
+                      if (context.mounted) Navigator.pop(context); // Close loader
+                    } catch (e) {
+                      if (context.mounted) {
+                        Navigator.pop(context); // Close loader
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error al crear oficio: $e')),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2563EB),
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Registrar'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
