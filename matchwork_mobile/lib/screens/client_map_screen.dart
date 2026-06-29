@@ -9,6 +9,8 @@ import '../services/supabase_service.dart';
 import '../models/provider_model.dart';
 import '../providers/app_state_provider.dart';
 import 'chat_screen.dart';
+import 'provider_profile_screen.dart';
+import 'conversations_list_screen.dart';
 import '../widgets/app_drawer.dart';
 import '../models/categories_data.dart';
 
@@ -745,49 +747,69 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundImage: NetworkImage(_selectedProvider!.image),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _selectedProvider!.name,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: surfaceNavy,
-                                  ),
-                                ),
-                                Text(
-                                  _selectedProvider!.profession,
-                                  style: const TextStyle(color: Colors.grey, fontSize: 14),
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.star, color: Colors.amber, size: 16),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      _selectedProvider!.rating.toString(),
-                                      style: const TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      '${_calculateDistance(appState.currentLat, appState.currentLng, _selectedProvider!.lat, _selectedProvider!.lng).toStringAsFixed(1)} km de distancia',
-                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProviderProfileScreen(providerId: _selectedProvider!.id),
                             ),
-                          ),
-                        ],
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 30,
+                              backgroundImage: NetworkImage(_selectedProvider!.image),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          _selectedProvider!.name,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: surfaceNavy,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                                    ],
+                                  ),
+                                  Text(
+                                    _selectedProvider!.profession,
+                                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.star, color: Colors.amber, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        _selectedProvider!.rating.toString(),
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        '${_calculateDistance(appState.currentLat, appState.currentLng, _selectedProvider!.lat, _selectedProvider!.lng).toStringAsFixed(1)} km de distancia',
+                                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 16),
                       // Status Badge row
@@ -888,6 +910,38 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 ),
               ),
             ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        selectedItemColor: const Color(0xFF2563EB),
+        unselectedItemColor: Colors.grey,
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ConversationsListScreen()),
+            );
+          } else if (index == 2) {
+            final user = SupabaseService.instance.currentUser;
+            final userName = user?.userMetadata?['name'] ?? 'Usuario de MatchWork';
+            final userEmail = user?.email ?? '';
+            _showClientProfileDialog(context, userName, userEmail);
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore),
+            label: 'Explorar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline),
+            label: 'Mensajes',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Perfil',
+          ),
         ],
       ),
     );
@@ -1139,6 +1193,59 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 if (mounted) Navigator.pop(context);
               },
               child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showClientProfileDialog(BuildContext context, String name, String email) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.person, color: Color(0xFF2563EB)),
+              SizedBox(width: 10),
+              Text('Perfil del Cliente'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Center(
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundImage: NetworkImage(
+                    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('Nombre:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+              Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              const Text('Correo Electrónico:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+              Text(email, style: const TextStyle(fontSize: 15)),
+              const SizedBox(height: 12),
+              const Text('Estado de Cuenta:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+              const Row(
+                children: [
+                  Icon(Icons.verified, color: Color(0xFF2563EB), size: 18),
+                  SizedBox(width: 6),
+                  Text('Verificado por MatchWork', style: TextStyle(fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cerrar'),
             ),
           ],
         );

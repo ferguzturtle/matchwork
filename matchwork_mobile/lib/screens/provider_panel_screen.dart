@@ -6,6 +6,8 @@ import '../services/supabase_service.dart';
 import '../models/request_model.dart';
 import '../providers/app_state_provider.dart';
 import 'chat_screen.dart';
+import 'conversations_list_screen.dart';
+import 'provider_profile_screen.dart';
 import '../widgets/app_drawer.dart';
 
 class ProviderPanelScreen extends StatefulWidget {
@@ -446,6 +448,43 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                   ],
                 ),
               ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: 1,
+          selectedItemColor: const Color(0xFF2563EB),
+          unselectedItemColor: Colors.grey,
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ConversationsListScreen()),
+              );
+            } else if (index == 2) {
+              final userId = SupabaseService.instance.currentUser?.id;
+              if (userId != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProviderProfileScreen(providerId: userId),
+                  ),
+                );
+              }
+            }
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.chat_bubble_outline),
+              label: 'Mensajes',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.assignment_outlined),
+              label: 'Solicitudes',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              label: 'Perfil',
             ),
           ],
         ),
