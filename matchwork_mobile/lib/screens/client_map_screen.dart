@@ -407,6 +407,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
     const accentBlue = Color(0xFF2563EB);
 
     final appState = Provider.of<AppStateProvider>(context);
+    final isDark = appState.isDarkMode;
     final double searchLat = _selectedLocation != null 
         ? (_selectedLocation!['lat'] as num).toDouble() 
         : appState.currentLat;
@@ -743,171 +744,204 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
               child: Card(
                 elevation: 8,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProviderProfileScreen(providerId: _selectedProvider!.id),
-                            ),
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 30,
-                              backgroundImage: NetworkImage(_selectedProvider!.image),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          _selectedProvider!.name,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: surfaceNavy,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-                                    ],
-                                  ),
-                                  Text(
-                                    _selectedProvider!.profession,
-                                    style: const TextStyle(color: Colors.grey, fontSize: 14),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.star, color: Colors.amber, size: 16),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        _selectedProvider!.rating.toString(),
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        '${_calculateDistance(appState.currentLat, appState.currentLng, _selectedProvider!.lat, _selectedProvider!.lng).toStringAsFixed(1)} km de distancia',
-                                        style: const TextStyle(fontSize: 12, color: Colors.grey),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Status Badge row
-                      Row(
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: _selectedProvider!.status.startsWith('Ocupado')
-                                  ? Colors.amber[50]
-                                  : const Color(0xFFECFDF5),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                color: _selectedProvider!.status.startsWith('Ocupado')
-                                    ? Colors.amber[200]!
-                                    : const Color(0xFFA7F3D0),
+                          // 1. Avatar & Info block
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                radius: 28,
+                                backgroundImage: NetworkImage(_selectedProvider!.image),
                               ),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: _selectedProvider!.status.startsWith('Ocupado')
-                                        ? Colors.amber
-                                        : const Color(0xFF10B981),
-                                    shape: BoxShape.circle,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _selectedProvider!.name,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: surfaceNavy,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _selectedProvider!.profession,
+                                      style: const TextStyle(color: Colors.grey, fontSize: 14),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    // Row with Pin icon, distance, and Status Badge
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.location_on_outlined, size: 15, color: Colors.grey),
+                                        const SizedBox(width: 2),
+                                        Text(
+                                          '${_calculateDistance(appState.currentLat, appState.currentLng, _selectedProvider!.lat, _selectedProvider!.lng).toStringAsFixed(1)} km',
+                                          style: const TextStyle(fontSize: 13, color: Colors.grey),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        // Status Pill
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: _selectedProvider!.status.startsWith('Ocupado')
+                                                ? Colors.amber[50]
+                                                : const Color(0xFFECFDF5),
+                                            borderRadius: BorderRadius.circular(6),
+                                            border: Border.all(
+                                              color: _selectedProvider!.status.startsWith('Ocupado')
+                                                  ? Colors.amber[200]!
+                                                  : const Color(0xFFA7F3D0),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                width: 6,
+                                                height: 6,
+                                                decoration: BoxDecoration(
+                                                  color: _selectedProvider!.status.startsWith('Ocupado')
+                                                      ? Colors.amber
+                                                      : const Color(0xFF10B981),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                _formatStatusLabel(_selectedProvider!.status),
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: _selectedProvider!.status.startsWith('Ocupado')
+                                                      ? Colors.amber[800]
+                                                      : const Color(0xFF065F46),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          // 2. Buttons: Solicitar and Ver Perfil
+                          Row(
+                            children: [
+                              // Solicitar Button
+                              if (_isMatched) ...[
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ChatScreen(
+                                            providerId: _selectedProvider!.id,
+                                            providerName: _selectedProvider!.name,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: accentBlue,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    icon: const Icon(Icons.chat, size: 18),
+                                    label: const Text('Chatear', style: TextStyle(fontWeight: FontWeight.bold)),
                                   ),
                                 ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  _formatStatusLabel(_selectedProvider!.status),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: _selectedProvider!.status.startsWith('Ocupado')
-                                        ? Colors.amber[800]
-                                        : const Color(0xFF065F46),
+                              ] else if (_isPending) ...[
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: null,
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    icon: const Icon(Icons.hourglass_empty, size: 18),
+                                    label: const Text('Esperando...', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                              ] else ...[
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: () => _sendRequest(_selectedProvider!),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: accentBlue,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    icon: const Icon(Icons.handshake, size: 18),
+                                    label: const Text('Solicitar', style: TextStyle(fontWeight: FontWeight.bold)),
                                   ),
                                 ),
                               ],
-                            ),
+                              const SizedBox(width: 12),
+                              // Ver Perfil Button
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProviderProfileScreen(providerId: _selectedProvider!.id),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                                    foregroundColor: isDark ? Colors.white : const Color(0xFF334155),
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide(
+                                        color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                                      ),
+                                    ),
+                                  ),
+                                  child: const Text('Ver Perfil', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      // Buttons
-                      Row(
-                        children: [
-                          if (_isMatched) ...[
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ChatScreen(
-                                        providerId: _selectedProvider!.id,
-                                        providerName: _selectedProvider!.name,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: accentBlue,
-                                  foregroundColor: Colors.white,
-                                ),
-                                icon: const Icon(Icons.chat),
-                                label: const Text('Chatear'),
-                              ),
-                            ),
-                          ] else if (_isPending) ...[
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: null,
-                                icon: const Icon(Icons.hourglass_empty),
-                                label: const Text('Esperando Aceptación...'),
-                              ),
-                            ),
-                          ] else ...[
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: () => _sendRequest(_selectedProvider!),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: accentBlue,
-                                  foregroundColor: Colors.white,
-                                ),
-                                icon: const Icon(Icons.send),
-                                label: const Text('Solicitar Asistencia'),
-                              ),
-                            ),
-                          ]
-                        ],
+                    ),
+                    // Close Button in top right
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: Colors.grey),
+                        onPressed: () {
+                          setState(() {
+                            _selectedProvider = null;
+                          });
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
