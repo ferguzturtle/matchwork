@@ -290,11 +290,12 @@ class AppDrawer extends StatelessWidget {
             ),
             onTap: () async {
               Navigator.pop(context);
-              await SupabaseService.instance.signOut();
+              await appState.performLogoutCleanup();
               if (context.mounted) {
-                Navigator.pushReplacement(
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const AuthScreen()),
+                  (route) => false,
                 );
               }
             },

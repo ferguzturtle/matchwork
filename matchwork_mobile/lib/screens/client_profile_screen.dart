@@ -335,9 +335,8 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
 
     if (confirm == true) {
       final appState = Provider.of<AppStateProvider>(context, listen: false);
-      appState.stopGpsTracking();
-      appState.stopActivityTracker();
-      await SupabaseService.instance.signOut();
+      setState(() => _isLoading = true);
+      await appState.performLogoutCleanup();
       if (mounted) {
         Navigator.pushAndRemoveUntil(
           context,

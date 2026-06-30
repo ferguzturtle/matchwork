@@ -109,6 +109,14 @@ class AppStateProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> performLogoutCleanup() async {
+    stopGpsTracking();
+    stopActivityTracker();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user_role');
+    await SupabaseService.instance.signOut();
+  }
+
   // --- UPDATE AVAILABILITY STATE ---
   Future<void> updateAvailabilityState(String status) async {
     _currentStatusState = status;
