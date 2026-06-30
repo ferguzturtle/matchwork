@@ -11,6 +11,7 @@ import '../providers/app_state_provider.dart';
 import 'chat_screen.dart';
 import 'provider_profile_screen.dart';
 import 'conversations_list_screen.dart';
+import 'client_profile_screen.dart';
 import '../widgets/app_drawer.dart';
 import '../models/categories_data.dart';
 
@@ -923,10 +924,10 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
               MaterialPageRoute(builder: (context) => const ConversationsListScreen()),
             );
           } else if (index == 2) {
-            final user = SupabaseService.instance.currentUser;
-            final userName = user?.userMetadata?['name'] ?? 'Usuario de MatchWork';
-            final userEmail = user?.email ?? '';
-            _showClientProfileDialog(context, userName, userEmail);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ClientProfileScreen()),
+            );
           }
         },
         items: const [
@@ -1200,58 +1201,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
     );
   }
 
-  void _showClientProfileDialog(BuildContext context, String name, String email) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Row(
-            children: [
-              Icon(Icons.person, color: Color(0xFF2563EB)),
-              SizedBox(width: 10),
-              Text('Perfil del Cliente'),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Center(
-                child: CircleAvatar(
-                  radius: 40,
-                  backgroundImage: NetworkImage(
-                    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text('Nombre:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-              Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              const Text('Correo Electrónico:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-              Text(email, style: const TextStyle(fontSize: 15)),
-              const SizedBox(height: 12),
-              const Text('Estado de Cuenta:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-              const Row(
-                children: [
-                  Icon(Icons.verified, color: Color(0xFF2563EB), size: 18),
-                  SizedBox(width: 6),
-                  Text('Verificado por MatchWork', style: TextStyle(fontWeight: FontWeight.w600)),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cerrar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 }
 
 // Custom Painter for pins arrow

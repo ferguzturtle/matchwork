@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../providers/app_state_provider.dart';
-import 'client_map_screen.dart';
 import '../main.dart';
 import '../models/categories_data.dart';
 

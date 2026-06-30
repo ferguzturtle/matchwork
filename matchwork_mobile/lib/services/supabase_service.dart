@@ -357,6 +357,33 @@ class SupabaseService {
     }
   }
 
+  Future<bool> deleteUserLocation(String locationId) async {
+    try {
+      await client.from('user_locations').delete().eq('id', locationId);
+      return true;
+    } catch (e) {
+      print("Error deleting user location: $e");
+      return false;
+    }
+  }
+
+  Future<bool> updateUserLocation({
+    required String locationId,
+    required String label,
+    required String address,
+  }) async {
+    try {
+      await client.from('user_locations').update({
+        'label': label,
+        'address': address,
+      }).eq('id', locationId);
+      return true;
+    } catch (e) {
+      print("Error updating user location: $e");
+      return false;
+    }
+  }
+
   Future<bool> saveFeedback(String userId, String comment) async {
     try {
       await client.from('app_feedback').insert({
