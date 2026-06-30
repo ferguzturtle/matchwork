@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
 import '../models/request_model.dart';
 import '../providers/app_state_provider.dart';
@@ -22,10 +24,19 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
   List<ServiceRequestModel> _requests = [];
   bool _isLoadingRequests = false;
 
+  Timer? _refreshTimer;
+  RealtimeChannel? _requestsChannel;
+
   @override
   void initState() {
     super.initState();
     _loadRequests();
+    _setupRealtimeRequests();
+
+    // Polling de respaldo cada 5 segundos
+    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      _loadRequestsSilent();
+    });
     
     // Set up hook to show inactivity dialog
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -34,6 +45,64 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
         _showInactivityDialog();
       };
     });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    if (_requestsChannel != null) {
+      SupabaseService.instance.client.removeChannel(_requestsChannel!);
+    }
+    super.dispose();
+  }
+
+  void _setupRealtimeRequests() {
+    final userId = SupabaseService.instance.currentUser?.id;
+    if (userId == null) return;
+
+    _requestsChannel = SupabaseService.instance.client
+        .channel('provider-alerts')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'service_requests',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'provider_id',
+            value: userId,
+          ),
+          callback: (payload) {
+            debugPrint("Nueva solicitud detectada en tiempo real: ${payload.newRecord}");
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('¡Tienes una nueva solicitud de servicio!'),
+                  backgroundColor: Color(0xFF2563EB),
+                  behavior: SnackBarBehavior.floating,
+                  duration: Duration(seconds: 4),
+                ),
+              );
+              _loadRequestsSilent();
+            }
+          },
+        )
+        .subscribe();
+  }
+
+  Future<void> _loadRequestsSilent() async {
+    final userId = SupabaseService.instance.client.auth.currentUser?.id;
+    if (userId == null) return;
+
+    try {
+      final data = await SupabaseService.instance.getProviderRequests(userId);
+      if (mounted) {
+        setState(() {
+          _requests = data;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading requests silently: $e');
+    }
   }
 
   Future<void> _loadRequests() async {
