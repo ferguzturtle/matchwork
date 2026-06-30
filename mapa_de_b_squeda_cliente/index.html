@@ -1981,6 +1981,12 @@
           btn.onclick = async () => {
             btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-secondary mx-auto">autorenew</span>`;
             await setActiveProfession(userId, prof.id);
+            try {
+              await supabase.from("profiles").update({ role: "provider" }).eq("id", userId);
+              await supabase.auth.updateUser({ data: { role: "provider" } });
+            } catch (err) {
+              console.error("Error updating role in database", err);
+            }
             localStorage.setItem("user_role", "provider");
             window.location.href = "/panel_del_prestador/index.html";
           };
@@ -2033,14 +2039,32 @@
               }
             } catch (err) {
               console.error(err);
+              try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                  await supabase.from("profiles").update({ role: "provider" }).eq("id", user.id);
+                  await supabase.auth.updateUser({ data: { role: "provider" } });
+                }
+              } catch (dbErr) {
+                console.error(dbErr);
+              }
               localStorage.setItem("user_role", "provider");
               window.location.href = "/panel_del_prestador/index.html";
             }
           });
         } else {
           switchText.innerText = "Cambiar a Cliente";
-          switchBtn.addEventListener("click", (e) => {
+          switchBtn.addEventListener("click", async (e) => {
             e.preventDefault();
+            try {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user) {
+                await supabase.from("profiles").update({ role: "customer" }).eq("id", user.id);
+                await supabase.auth.updateUser({ data: { role: "customer" } });
+              }
+            } catch (err) {
+              console.error("Error updating role in database", err);
+            }
             localStorage.setItem("user_role", "customer");
             window.location.href = "/mapa_de_b_squeda_cliente/index.html";
           });

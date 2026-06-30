@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
 import '../services/location_service.dart';
 
@@ -94,6 +95,18 @@ class AppStateProvider extends ChangeNotifier {
     _userRole = role;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_role', role);
+
+    final userId = SupabaseService.instance.currentUser?.id;
+    if (userId != null) {
+      try {
+        await SupabaseService.instance.updateUserProfile(userId, {'role': role});
+        await SupabaseService.instance.client.auth.updateUser(
+          UserAttributes(data: {'role': role}),
+        );
+      } catch (e) {
+        print("Error syncing profile role to database: $e");
+      }
+    }
 
     if (role == 'customer') {
       // Force offline
