@@ -115,6 +115,7 @@ class _ChatScreenState extends State<ChatScreen> {
     const accentBlue = Color(0xFF2563EB);
 
     final appState = Provider.of<AppStateProvider>(context, listen: false);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: () {
@@ -123,7 +124,7 @@ class _ChatScreenState extends State<ChatScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: surfaceNavy,
+          backgroundColor: isDark ? const Color(0xFF1E293B) : surfaceNavy,
           foregroundColor: Colors.white,
           title: Row(
             children: [
@@ -164,7 +165,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 margin: const EdgeInsets.only(bottom: 12),
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                                 decoration: BoxDecoration(
-                                  color: isMe ? accentBlue : Colors.grey[200],
+                                  color: isMe ? accentBlue : (isDark ? const Color(0xFF1E293B) : Colors.grey[200]),
                                   borderRadius: BorderRadius.only(
                                     topLeft: const Radius.circular(12),
                                     topRight: const Radius.circular(12),
@@ -178,7 +179,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     Text(
                                       msg['text'] ?? '',
                                       style: TextStyle(
-                                        color: isMe ? Colors.white : Colors.black87,
+                                        color: isMe ? Colors.white : (isDark ? Colors.white : Colors.black87),
                                         fontSize: 15,
                                       ),
                                     ),
@@ -193,17 +194,18 @@ class _ChatScreenState extends State<ChatScreen> {
             // Bottom Send Input Box
             Container(
               padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24, top: 10),
-              color: Colors.white,
+              color: isDark ? const Color(0xFF0F172A) : Colors.white,
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: _messageController,
-                      style: const TextStyle(color: Colors.black87),
+                      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                       decoration: InputDecoration(
                         hintText: 'Escribe tu mensaje...',
+                        hintStyle: TextStyle(color: isDark ? Colors.grey : Colors.black54),
                         filled: true,
-                        fillColor: const Color(0xFFF1F5F9),
+                        fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
                           borderSide: BorderSide.none,

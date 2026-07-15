@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:provider/provider.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'services/supabase_service.dart';
 import 'providers/app_state_provider.dart';
 import 'screens/auth_screen.dart';
 import 'screens/client_map_screen.dart';
 import 'screens/provider_panel_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // 1. Load keys from assets/.env
   final env = await loadEnv();
@@ -32,6 +35,9 @@ void main() async {
       child: MatchWorkApp(isConfigMissing: isConfigMissing),
     ),
   );
+  
+  // Remove splash screen now that Flutter is ready and Supabase is initialized
+  FlutterNativeSplash.remove();
 }
 
 // Custom manual .env parser from assets
@@ -123,6 +129,8 @@ class MatchWorkApp extends StatelessWidget {
         fontFamily: 'Inter',
       ),
       themeMode: appState.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      builder: BotToastInit(),
+      navigatorObservers: [BotToastNavigatorObserver()],
       home: session == null 
           ? const AuthScreen() 
           : const AuthWrapper(),
@@ -157,6 +165,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
       final appState = Provider.of<AppStateProvider>(context, listen: false);
       await appState.switchRole(resolvedRole);
       await appState.initializeProviderState(userId);
+      
+      // Initialize real-time notifications
+      SupabaseService.instance.initializeNotificationsListener();
 
       if (mounted) {
         setState(() {

@@ -109,12 +109,18 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
     final userId = SupabaseService.instance.client.auth.currentUser?.id;
     if (userId == null) return;
 
-    setState(() => _isLoadingRequests = true);
+    // Solo mostramos la rueda grande si la lista está completamente vacía (primera carga)
+    if (_requests.isEmpty) {
+      setState(() => _isLoadingRequests = true);
+    }
+    
     final data = await SupabaseService.instance.getProviderRequests(userId);
-    setState(() {
-      _requests = data;
-      _isLoadingRequests = false;
-    });
+    if (mounted) {
+      setState(() {
+        _requests = data;
+        _isLoadingRequests = false;
+      });
+    }
   }
 
   void _showInactivityDialog() {
@@ -227,13 +233,14 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
 
     final appState = Provider.of<AppStateProvider>(context);
     final status = appState.currentStatusState;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: () => appState.resetActivityTimer(), // Reset activity timer on interaction
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
         appBar: AppBar(
-          backgroundColor: surfaceNavy,
+          backgroundColor: isDark ? const Color(0xFF1E293B) : surfaceNavy,
           foregroundColor: Colors.white,
           title: const Text('Panel del Prestador', style: TextStyle(fontWeight: FontWeight.bold)),
         ),
@@ -242,7 +249,7 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
           children: [
             // 1. Availability Picker Header
             Container(
-              color: Colors.white,
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
@@ -259,7 +266,7 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                       const SizedBox(width: 8),
                       Text(
                         _formatStatusText(status),
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: surfaceNavy),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : surfaceNavy),
                       ),
                     ],
                   ),
@@ -279,7 +286,7 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                           },
                           selectedColor: const Color(0xFF10B981),
                           labelStyle: TextStyle(
-                            color: status == 'En línea' ? Colors.white : Colors.black,
+                            color: status == 'En línea' ? Colors.white : (isDark ? Colors.white : Colors.black),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -297,7 +304,7 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                           },
                           selectedColor: Colors.amber,
                           labelStyle: TextStyle(
-                            color: status.startsWith('Ocupado') ? Colors.white : Colors.black,
+                            color: status.startsWith('Ocupado') ? Colors.white : (isDark ? Colors.white : Colors.black),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -315,7 +322,7 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                           },
                           selectedColor: Colors.grey,
                           labelStyle: TextStyle(
-                            color: status == 'Fuera de servicio' ? Colors.white : Colors.black,
+                            color: status == 'Fuera de servicio' ? Colors.white : (isDark ? Colors.white : Colors.black),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -355,7 +362,7 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                           },
                           selectedColor: surfaceNavy,
                           labelStyle: TextStyle(
-                            color: isSel ? Colors.white : Colors.black,
+                            color: isSel ? Colors.white : (isDark ? Colors.white : Colors.black),
                             fontWeight: FontWeight.bold,
                           ),
                         );
@@ -370,7 +377,7 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
             if (appState.isAvailable)
               Container(
                 height: 180,
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 child: FlutterMap(
                   mapController: _miniMapController,
                   options: MapOptions(
@@ -386,12 +393,25 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                       markers: [
                         Marker(
                           point: LatLng(appState.currentLat, appState.currentLng),
-                          width: 32,
-                          height: 32,
-                          child: const Icon(
-                            Icons.person_pin_circle,
-                            color: Colors.redAccent,
-                            size: 32,
+                          width: 40,
+                          height: 40,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: accentBlue.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: accentBlue,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(color: isDark ? const Color(0xFF1E293B) : Colors.white, blurRadius: 4, spreadRadius: 2),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -410,9 +430,9 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'Solicitudes de Servicio',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: surfaceNavy),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: isDark ? Colors.white : surfaceNavy),
                         ),
                         IconButton(
                           icon: const Icon(Icons.refresh),
@@ -433,6 +453,8 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                                     final isPending = req.status == 'pendiente';
                                     
                                     return Card(
+                                      elevation: 2,
+                                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                       margin: const EdgeInsets.only(bottom: 12),
                                       child: Padding(
@@ -445,7 +467,7 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                                               children: [
                                                 Text(
                                                   req.userName ?? 'Cliente de MatchWork',
-                                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black),
                                                 ),
                                                 Container(
                                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -453,8 +475,8 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                                                     color: req.status == 'aceptado'
                                                         ? const Color(0xFFECFDF5)
                                                         : req.status == 'pendiente'
-                                                            ? Colors.blue[50]
-                                                            : Colors.red[50],
+                                                            ? (isDark ? Colors.blue[900] : Colors.blue[50])
+                                                            : (isDark ? Colors.red[900] : Colors.red[50]),
                                                     borderRadius: BorderRadius.circular(4),
                                                   ),
                                                   child: Text(
@@ -472,10 +494,13 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
                                                 ),
                                               ],
                                             ),
-                                            const SizedBox(height: 8),
+                                            const SizedBox(height: 12),
                                             Text(
-                                              req.message,
-                                              style: const TextStyle(color: Colors.grey),
+                                              '"${req.message}"',
+                                              style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: isDark ? Colors.grey[300] : Colors.black87,
+                                              ),
                                             ),
                                             if (isPending) ...[
                                               const SizedBox(height: 16),
@@ -522,6 +547,7 @@ class _ProviderPanelScreenState extends State<ProviderPanelScreen> {
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: 1,
+          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
           selectedItemColor: const Color(0xFF2563EB),
           unselectedItemColor: Colors.grey,
           onTap: (index) {

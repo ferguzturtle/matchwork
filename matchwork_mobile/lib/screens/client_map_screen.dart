@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' hide Path;
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
 import '../models/provider_model.dart';
 import '../providers/app_state_provider.dart';
@@ -34,16 +35,62 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
   ProviderModel? _selectedProvider;
   bool _isMatched = false;
   bool _isPending = false;
+  bool _isLoadingStatus = false;
 
   List<Map<String, dynamic>> _userSavedLocations = [];
   Map<String, dynamic>? _selectedLocation;
   String _selectedLocationName = 'Ubicación GPS Actual';
   
+  RealtimeChannel? _providersSubscription;
+
   @override
   void initState() {
     super.initState();
     _loadProviders();
     _loadSavedLocations();
+    _setupProvidersSubscription();
+  }
+
+  @override
+  void dispose() {
+    _providersSubscription?.unsubscribe();
+    super.dispose();
+  }
+
+  void _setupProvidersSubscription() {
+    _providersSubscription = SupabaseService.instance.client
+        .channel('public:providers')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'providers',
+          callback: (payload) {
+            if (!mounted) return;
+            if (payload.eventType == PostgresChangeEvent.update) {
+              final newRecord = payload.newRecord;
+              if (newRecord != null) {
+                setState(() {
+                  final index = _allProviders.indexWhere((p) => p.id == newRecord['id']);
+                  if (index != -1) {
+                    _allProviders[index] = ProviderModel.fromJson(newRecord);
+                  }
+                });
+              }
+            } else {
+              _loadProvidersSilently();
+            }
+          },
+        )
+        .subscribe();
+  }
+
+  Future<void> _loadProvidersSilently() async {
+    final data = await SupabaseService.instance.getProviders();
+    if (mounted) {
+      setState(() {
+        _allProviders = data;
+      });
+    }
   }
 
   Future<void> _loadSavedLocations() async {
@@ -105,16 +152,26 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
       _selectedProvider = p;
       _isMatched = false;
       _isPending = false;
+      _isLoadingStatus = true;
     });
 
     final currentUserId = SupabaseService.instance.currentUser?.id;
     if (currentUserId != null) {
       final matched = await SupabaseService.instance.checkIfMatched(p.id, currentUserId);
       final pending = await SupabaseService.instance.checkIfPending(p.id, currentUserId);
-      setState(() {
-        _isMatched = matched;
-        _isPending = pending;
-      });
+      if (mounted) {
+        setState(() {
+          _isMatched = matched;
+          _isPending = pending;
+          _isLoadingStatus = false;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _isLoadingStatus = false;
+        });
+      }
     }
   }
 
@@ -187,16 +244,18 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
           builder: (context, setModalState) {
             const surfaceNavy = Color(0xFF0F172A);
             const accentBlue = Color(0xFF2563EB);
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            final textColor = isDark ? Colors.white : surfaceNavy;
 
             if (activeCategoryKey == null) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Text(
                       'Explorar Categorías',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: surfaceNavy),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
                     ),
                   ),
                   const Divider(height: 1),
@@ -244,7 +303,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                             catIcon = Icons.category;
                         }
                         return ListTile(
-                          leading: Icon(catIcon, color: surfaceNavy),
+                          leading: Icon(catIcon, color: textColor),
                           title: Text(e.value.label, style: const TextStyle(fontWeight: FontWeight.bold)),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () {
@@ -268,7 +327,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back, color: surfaceNavy),
+                          icon: Icon(Icons.arrow_back, color: textColor),
                           onPressed: () {
                             setModalState(() {
                               activeCategoryKey = null;
@@ -278,7 +337,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                         Expanded(
                           child: Text(
                             catDetail.label,
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: surfaceNavy),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -301,7 +360,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                     child: ListView(
                       children: catDetail.subcategories.entries.map((sub) {
                         return ListTile(
-                          leading: Icon(_getIconData(sub.value.icon), color: surfaceNavy),
+                          leading: Icon(_getIconData(sub.value.icon), color: textColor),
                           title: Text(sub.value.label),
                           onTap: () {
                             setState(() {
@@ -405,9 +464,9 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
   Widget build(BuildContext context) {
     const surfaceNavy = Color(0xFF0F172A);
     const accentBlue = Color(0xFF2563EB);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final appState = Provider.of<AppStateProvider>(context);
-    final isDark = appState.isDarkMode;
     final double searchLat = _selectedLocation != null 
         ? (_selectedLocation!['lat'] as num).toDouble() 
         : appState.currentLat;
@@ -418,7 +477,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: surfaceNavy,
+        backgroundColor: isDark ? const Color(0xFF1E293B) : surfaceNavy,
         foregroundColor: Colors.white,
         title: const Text('MatchWork', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
@@ -439,7 +498,9 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                urlTemplate: isDark
+                    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
                 subdomains: const ['a', 'b', 'c', 'd'],
               ),
               
@@ -543,16 +604,16 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                   onTap: _showLocationPicker,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
                       borderRadius: BorderRadius.circular(30),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
+                          color: Colors.black.withOpacity(isDark ? 0.3 : 0.08),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
                       ],
-                      border: Border.all(color: Colors.grey[200]!),
+                      border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey[200]!),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     child: Row(
@@ -564,10 +625,10 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                         Flexible(
                           child: Text(
                             _selectedLocationName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: surfaceNavy,
+                              color: isDark ? Colors.white : surfaceNavy,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -581,7 +642,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 Card(
                   elevation: 4,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
                   child: InkWell(
                     onTap: _showCategoryExplorer,
                     borderRadius: BorderRadius.circular(12),
@@ -594,10 +655,10 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                           Expanded(
                             child: Text(
                               _getFilterLabel(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
-                                color: surfaceNavy,
+                                color: isDark ? Colors.white : surfaceNavy,
                               ),
                             ),
                           ),
@@ -620,8 +681,8 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 // Zoom In Button
                 FloatingActionButton(
                   heroTag: 'zoom_in_btn',
-                  backgroundColor: Colors.white,
-                  foregroundColor: surfaceNavy,
+                  backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  foregroundColor: isDark ? Colors.white : surfaceNavy,
                   mini: true,
                   child: const Icon(Icons.add),
                   onPressed: () {
@@ -633,8 +694,8 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 // Zoom Out Button
                 FloatingActionButton(
                   heroTag: 'zoom_out_btn',
-                  backgroundColor: Colors.white,
-                  foregroundColor: surfaceNavy,
+                  backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  foregroundColor: isDark ? Colors.white : surfaceNavy,
                   mini: true,
                   child: const Icon(Icons.remove),
                   onPressed: () {
@@ -646,7 +707,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 // Radius trigger float button
                 FloatingActionButton(
                   heroTag: 'radius_btn',
-                  backgroundColor: surfaceNavy,
+                  backgroundColor: isDark ? accentBlue : surfaceNavy,
                   foregroundColor: Colors.white,
                   child: const Icon(Icons.radar),
                   onPressed: () {
@@ -684,8 +745,8 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 // Fit all providers button
                 FloatingActionButton(
                   heroTag: 'fit_all_btn',
-                  backgroundColor: Colors.white,
-                  foregroundColor: surfaceNavy,
+                  backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  foregroundColor: isDark ? Colors.white : surfaceNavy,
                   child: const Icon(Icons.zoom_out_map),
                   onPressed: () {
                     if (filtered.isNotEmpty) {
@@ -721,8 +782,8 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 // Recenter map button
                 FloatingActionButton(
                   heroTag: 'center_btn',
-                  backgroundColor: Colors.white,
-                  foregroundColor: surfaceNavy,
+                  backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  foregroundColor: isDark ? Colors.white : surfaceNavy,
                   child: const Icon(Icons.my_location),
                   onPressed: () {
                     _mapController.move(
@@ -743,6 +804,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
               bottom: 16,
               child: Card(
                 elevation: 8,
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: Stack(
                   children: [
@@ -766,10 +828,10 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                                   children: [
                                     Text(
                                       _selectedProvider!.name,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
-                                        color: surfaceNavy,
+                                        color: isDark ? Colors.white : surfaceNavy,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -845,7 +907,23 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                           Row(
                             children: [
                               // Solicitar Button
-                              if (_isMatched) ...[
+                              if (_isLoadingStatus) ...[
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: null,
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    icon: const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    ),
+                                    label: const Text('Cargando...', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                              ] else if (_isMatched) ...[
                                 Expanded(
                                   child: ElevatedButton.icon(
                                     onPressed: () {
@@ -866,7 +944,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                     icon: const Icon(Icons.chat, size: 18),
-                                    label: const Text('Chatear', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    label: const Text('Hablar', style: TextStyle(fontWeight: FontWeight.bold)),
                                   ),
                                 ),
                               ] else if (_isPending) ...[
@@ -878,7 +956,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                     icon: const Icon(Icons.hourglass_empty, size: 18),
-                                    label: const Text('Esperando...', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    label: const Text('Esperando solicitud', style: TextStyle(fontWeight: FontWeight.bold)),
                                   ),
                                 ),
                               ] else ...[
@@ -982,12 +1060,16 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
     );
   }
 
-  void _showLocationPicker() {
+  Future<void> _showLocationPicker() async {
+    await _loadSavedLocations();
+    if (!mounted) return;
+
     final appState = Provider.of<AppStateProvider>(context, listen: false);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -1012,12 +1094,12 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       'Seleccionar Ubicación',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -1127,12 +1209,12 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
       builder: (context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Guardar Ubicación Actual'),
+          title: const Text('Guardar Ubicación'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Se guardará la posición que está en el centro actual de tu mapa.',
+                'Puedes buscar una dirección, o dejarlo en blanco para guardar el punto rojo del mapa.',
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(height: 16),
@@ -1147,8 +1229,58 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
               TextField(
                 controller: addressController,
                 decoration: const InputDecoration(
-                  labelText: 'Dirección (Ej: Av. Providencia 123)',
+                  labelText: 'Dirección',
+                  hintText: 'Ej: Av. Providencia 1234, Providencia, Santiago',
+                  helperText: 'Formato ideal: Calle + Número, Comuna, Ciudad',
+                  helperStyle: TextStyle(color: Colors.blue),
                   border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    final label = labelController.text.trim();
+                    if (label.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Por favor ingresa un nombre arriba primero')),
+                      );
+                      return;
+                    }
+                    
+                    final userId = SupabaseService.instance.currentUser?.id;
+                    if (userId == null) return;
+                    
+                    // Use exact GPS from AppState
+                    final appState = Provider.of<AppStateProvider>(context, listen: false);
+                    final exactLat = appState.currentLat;
+                    final exactLng = appState.currentLng;
+                    
+                    final success = await SupabaseService.instance.saveUserLocation(
+                      userId: userId,
+                      label: label,
+                      address: 'Ubicación GPS Exacta',
+                      lat: exactLat,
+                      lng: exactLng,
+                    );
+                    
+                    if (success) {
+                      await _loadSavedLocations();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Ubicación "$label" (GPS Exacto) guardada')),
+                        );
+                        Navigator.pop(context);
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.my_location, size: 18),
+                  label: const Text('Usar mi GPS exacto actual', style: TextStyle(fontSize: 12)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF2563EB),
+                    side: const BorderSide(color: Color(0xFF2563EB)),
+                  ),
                 ),
               ),
             ],
@@ -1192,7 +1324,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                         } else {
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('No se encontró la dirección exacta. Se guardará el centro del mapa.')),
+                              const SnackBar(content: Text('No se encontró la dirección exacta. Se guardó el centro del mapa.')),
                             );
                           }
                         }

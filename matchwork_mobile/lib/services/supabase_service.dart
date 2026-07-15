@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/provider_model.dart';
 import '../models/request_model.dart';
@@ -165,6 +168,21 @@ class SupabaseService {
     }
 
     await client.from('providers').upsert(updateData);
+  }
+
+  Future<void> updateProviderLocation({
+    required String providerId,
+    required double lat,
+    required double lng,
+  }) async {
+    try {
+      await client.from('providers').update({
+        'lat': lat,
+        'lng': lng,
+      }).eq('id', providerId);
+    } catch (e) {
+      print("Error updating provider location: $e");
+    }
   }
 
   String _getSubcategoryIcon(String subcategory) {
@@ -395,6 +413,90 @@ class SupabaseService {
     } catch (e) {
       print("Error saving feedback: $e");
       return false;
+    }
+  }
+
+  // --- STORAGE ---
+  Future<String?> uploadProfileImage(String userId, Uint8List fileBytes, String fileExtension) async {
+    try {
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+      final storagePath = '$userId/$fileName';
+      
+      await client.storage.from('avatars').uploadBinary(
+        storagePath,
+        fileBytes,
+        fileOptions: const FileOptions(upsert: true),
+      );
+
+      final publicUrl = client.storage.from('avatars').getPublicUrl(storagePath);
+      return publicUrl;
+    } catch (e) {
+      print("Error uploading image: $e");
+      return null;
+    }
+  }
+
+  // --- NOTIFICATIONS ---
+  RealtimeChannel? _notificationsChannel;
+
+  void initializeNotificationsListener() {
+    final userId = currentUser?.id;
+    if (userId == null) return;
+
+    if (_notificationsChannel != null) {
+      client.removeChannel(_notificationsChannel!);
+    }
+
+    _notificationsChannel = client.channel('global_notifications_$userId')
+      ..onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'service_requests',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'provider_id',
+          value: userId,
+        ),
+        callback: (payload) {
+          BotToast.showSimpleNotification(
+            title: "¡Nueva solicitud de servicio!",
+            subTitle: "Revisa tu panel de trabajador.",
+            duration: const Duration(seconds: 4),
+            backgroundColor: Colors.green.shade600,
+            titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            subTitleStyle: const TextStyle(color: Colors.white),
+            hideCloseButton: true,
+          );
+        },
+      )
+      ..onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'messages',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'receiver_id',
+          value: userId,
+        ),
+        callback: (payload) {
+          BotToast.showSimpleNotification(
+            title: "¡Nuevo mensaje!",
+            subTitle: "Alguien te ha escrito en el chat.",
+            duration: const Duration(seconds: 4),
+            backgroundColor: const Color(0xFF2563EB),
+            titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            subTitleStyle: const TextStyle(color: Colors.white),
+            hideCloseButton: true,
+          );
+        },
+      )
+      ..subscribe();
+  }
+
+  void disposeNotificationsListener() {
+    if (_notificationsChannel != null) {
+      client.removeChannel(_notificationsChannel!);
+      _notificationsChannel = null;
     }
   }
 }

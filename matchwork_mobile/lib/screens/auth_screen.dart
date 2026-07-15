@@ -21,6 +21,7 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isSignUp = false;
   String _selectedRole = 'customer'; // 'customer' or 'provider'
   bool _isLoading = false;
+  bool _obscurePassword = true;
   
   String? _selectedCategory = 'reparaciones_mantenimiento';
   String? _selectedSubcategory = 'gasfiteria';
@@ -231,7 +232,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   // Password Field
                   TextFormField(
                     controller: _passwordController,
-                    obscureText: true,
+                    obscureText: _obscurePassword,
                     style: const TextStyle(color: surfaceNavy),
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
@@ -244,6 +245,17 @@ class _AuthScreenState extends State<AuthScreen> {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: accentBlue, width: 2),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
                       ),
                     ),
                     validator: (val) => val == null || val.length < 6 ? 'Mínimo 6 caracteres' : null,

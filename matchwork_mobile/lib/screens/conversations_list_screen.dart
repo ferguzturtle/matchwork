@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_state_provider.dart';
 import '../services/supabase_service.dart';
 import 'chat_screen.dart';
 
@@ -83,11 +85,12 @@ class _ConversationsListScreenState extends State<ConversationsListScreen> {
   @override
   Widget build(BuildContext context) {
     const surfaceNavy = Color(0xFF0F172A);
+    final isDark = Provider.of<AppStateProvider>(context).isDarkMode;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: surfaceNavy,
+        backgroundColor: isDark ? const Color(0xFF1E293B) : surfaceNavy,
         foregroundColor: Colors.white,
         title: const Text('Centro de Mensajería', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
@@ -100,20 +103,20 @@ class _ConversationsListScreenState extends State<ConversationsListScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _conversations.isEmpty
-              ? const Center(
+              ? Center(
                   child: Padding(
-                    padding: EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(24),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
-                        SizedBox(height: 16),
+                        const Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
+                        const SizedBox(height: 16),
                         Text(
                           'Sin Conversaciones Activas',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: isDark ? Colors.white : surfaceNavy),
                         ),
-                        SizedBox(height: 8),
-                        Text(
+                        const SizedBox(height: 8),
+                        const Text(
                           'Haz match con un prestador o cliente desde el mapa para iniciar un chat.',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.grey),
@@ -125,7 +128,7 @@ class _ConversationsListScreenState extends State<ConversationsListScreen> {
               : ListView.separated(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: _conversations.length,
-                  separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                  separatorBuilder: (context, index) => Divider(height: 1, color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                   itemBuilder: (context, index) {
                     final chat = _conversations[index];
                     
@@ -137,7 +140,7 @@ class _ConversationsListScreenState extends State<ConversationsListScreen> {
                       ),
                       title: Text(
                         chat['name'],
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: surfaceNavy),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : surfaceNavy),
                       ),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),

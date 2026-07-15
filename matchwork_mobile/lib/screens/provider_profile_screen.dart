@@ -48,7 +48,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: surfaceNavy,
+        backgroundColor: isDark ? const Color(0xFF1E293B) : surfaceNavy,
         foregroundColor: Colors.white,
         title: const Text('MatchWork', style: TextStyle(fontWeight: FontWeight.bold)),
         leading: IconButton(

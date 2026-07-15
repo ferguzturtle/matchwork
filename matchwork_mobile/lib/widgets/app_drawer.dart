@@ -4,6 +4,8 @@ import '../services/supabase_service.dart';
 import '../providers/app_state_provider.dart';
 import '../screens/conversations_list_screen.dart';
 import '../screens/auth_screen.dart';
+import '../screens/client_profile_screen.dart';
+import '../main.dart';
 import '../models/categories_data.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -133,7 +135,12 @@ class AppDrawer extends StatelessWidget {
                         activeTextColor: activeTextColor,
                         onTap: () {
                           Navigator.pop(context);
-                          _showProfileDialog(context, userName, userEmail);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ClientProfileScreen(),
+                            ),
+                          );
                         },
                       ),
                       const Divider(),
@@ -244,8 +251,13 @@ class AppDrawer extends StatelessWidget {
                         activeTileBg: activeTileBg,
                         activeTextColor: activeTextColor,
                         onTap: () async {
-                          Navigator.pop(context);
+                          final nav = Navigator.of(context);
+                          nav.pop();
                           await appState.switchRole('customer');
+                          nav.pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (context) => const AuthWrapper()),
+                            (route) => false,
+                          );
                         },
                       ),
                       _buildDrawerItem(
@@ -638,8 +650,11 @@ class AppDrawer extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: InkWell(
                       onTap: () async {
+                        final nav = Navigator.of(context);
+                        final scaffold = ScaffoldMessenger.of(context);
+                        
                         // Close dialog
-                        Navigator.pop(dialogContext);
+                        nav.pop();
 
                         // Show loader
                         showDialog(
@@ -652,14 +667,17 @@ class AppDrawer extends StatelessWidget {
                           await appState.setActiveProfession(userId, prof['id']);
                           await appState.switchRole('provider');
                           await appState.initializeProviderState(userId);
-                          if (context.mounted) Navigator.pop(context); // Close loader
+                          
+                          nav.pop(); // Close loader
+                          nav.pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (context) => const AuthWrapper()),
+                            (route) => false,
+                          );
                         } catch (e) {
-                          if (context.mounted) {
-                            Navigator.pop(context); // Close loader
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error al cambiar de oficio: $e')),
-                            );
-                          }
+                          nav.pop(); // Close loader
+                          scaffold.showSnackBar(
+                            SnackBar(content: Text('Error al cambiar de oficio: $e')),
+                          );
                         }
                       },
                       child: Container(
@@ -754,20 +772,7 @@ class AppDrawer extends StatelessWidget {
                       style: TextStyle(color: Colors.grey, fontSize: 13),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Nombre del Oficio / Título',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        hintText: 'Ej. Gasfíter a Domicilio',
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    // Field "Nombre del Oficio" was removed as requested
                     const Text(
                       'Categoría',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -824,17 +829,16 @@ class AppDrawer extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    final title = nameController.text.trim();
-                    if (title.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Por favor ingresa un título para el oficio')),
-                      );
-                      return;
-                    }
                     if (selectedCat == null || selectedSubcat == null) return;
+                    
+                    // Auto-generate title from the subcategory label
+                    final title = categories[selectedCat]!.subcategories[selectedSubcat]!.label;
+                    
+                    final nav = Navigator.of(context);
+                    final scaffold = ScaffoldMessenger.of(context);
 
                     // Close dialog
-                    Navigator.pop(dialogContext);
+                    nav.pop();
 
                     // Show loader
                     showDialog(
@@ -867,14 +871,16 @@ class AppDrawer extends StatelessWidget {
                       await appState.switchRole('provider');
                       await appState.initializeProviderState(userId);
 
-                      if (context.mounted) Navigator.pop(context); // Close loader
+                      nav.pop(); // Close loader
+                      nav.pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => const AuthWrapper()),
+                        (route) => false,
+                      );
                     } catch (e) {
-                      if (context.mounted) {
-                        Navigator.pop(context); // Close loader
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error al crear oficio: $e')),
-                        );
-                      }
+                      nav.pop(); // Close loader
+                      scaffold.showSnackBar(
+                        SnackBar(content: Text('Error al crear oficio: $e')),
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(

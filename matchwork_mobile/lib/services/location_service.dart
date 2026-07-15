@@ -11,10 +11,9 @@ class LocationService {
 
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return false;
-    }
-
+    
+    // Always check/request permission even if service is disabled, 
+    // as browsers and some devices need the prompt to trigger the service.
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -25,6 +24,15 @@ class LocationService {
 
     if (permission == LocationPermission.deniedForever) {
       return false;
+    }
+
+    // If permission granted but GPS is physically off, try to open settings (works on mobile)
+    if (!serviceEnabled) {
+      try {
+        await Geolocator.openLocationSettings();
+      } catch (e) {
+        print("Could not open location settings: $e");
+      }
     }
 
     return true;
@@ -38,7 +46,7 @@ class LocationService {
     try {
       return await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
+          accuracy: LocationAccuracy.bestForNavigation, // Mejor precisión posible
           timeLimit: Duration(seconds: 10),
         ),
       );
@@ -52,8 +60,8 @@ class LocationService {
   Stream<Position> getPositionStream() {
     return Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10, // Update when moving 10 meters
+        accuracy: LocationAccuracy.bestForNavigation, // Mejor precisión posible
+        distanceFilter: 2, // Actualizar cada 2 metros (antes estaba en 10m)
       ),
     );
   }

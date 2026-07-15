@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../providers/app_state_provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'client_map_screen.dart';
 import 'conversations_list_screen.dart';
 import 'auth_screen.dart';
@@ -23,8 +24,7 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
 
   bool _isEditingName = false;
   final _nameController = TextEditingController();
-  final _photoUrlController = TextEditingController();
-  bool _isEditingPhoto = false;
+  bool _isUploadingPhoto = false;
 
   @override
   void initState() {
@@ -59,8 +59,6 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
           _savedLocations = locs;
           _hiredWorkers = hired;
           _nameController.text = profile?['name'] ?? '';
-          _photoUrlController.text = profile?['avatar_url'] ??
-              'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
           _isLoading = false;
         });
       }
@@ -98,32 +96,40 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
     }
   }
 
-  Future<void> _savePhoto() async {
-    final userId = SupabaseService.instance.currentUser?.id;
-    if (userId == null) return;
-    final newPhoto = _photoUrlController.text.trim();
-    if (newPhoto.isEmpty) return;
-
-    setState(() => _isLoading = true);
+  Future<void> _pickAndUploadPhoto() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (pickedFile == null) return;
+    
+    setState(() => _isUploadingPhoto = true);
+    
     try {
-      await SupabaseService.instance.updateUserProfile(userId, {'avatar_url': newPhoto});
-      setState(() {
-        _isEditingPhoto = false;
-      });
-      await _loadData();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Foto de perfil actualizada con éxito')),
-        );
+      final bytes = await pickedFile.readAsBytes();
+      final extension = pickedFile.name.split('.').last;
+      
+      final userId = SupabaseService.instance.currentUser?.id;
+      if (userId == null) throw Exception("Usuario no autenticado");
+
+      final url = await SupabaseService.instance.uploadProfileImage(userId, bytes, extension);
+      if (url != null) {
+        await SupabaseService.instance.updateUserProfile(userId, {'avatar_url': url});
+        await _loadData(); 
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Foto actualizada correctamente')),
+          );
+        }
+      } else {
+        throw Exception("No se pudo obtener la URL de la imagen");
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al actualizar foto: $e')),
+          SnackBar(content: Text('Error al subir la foto: $e')),
         );
       }
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() => _isUploadingPhoto = false);
     }
   }
 
@@ -154,7 +160,10 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                   TextField(
                     controller: addressCtrl,
                     decoration: const InputDecoration(
-                      labelText: 'Dirección (Ej. El Molino 1787, Santiago)',
+                      labelText: 'Dirección',
+                      hintText: 'Ej: Av. Providencia 1234, Providencia, Santiago',
+                      helperText: 'Formato ideal: Calle + Número, Comuna, Ciudad',
+                      helperStyle: TextStyle(color: Colors.blue),
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -269,16 +278,23 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                 Navigator.pop(context);
                 setState(() => _isLoading = true);
 
-                final success = await SupabaseService.instance.updateUserLocation(
-                  locationId: location['id'],
-                  label: label,
-                  address: address,
-                );
+                try {
+                  final success = await SupabaseService.instance.updateUserLocation(
+                    locationId: location['id'].toString(),
+                    label: label,
+                    address: address,
+                  );
 
-                if (success) {
-                  await _loadData();
+                  if (success) {
+                    await _loadData();
+                  }
+                } catch (e) {
+                  debugPrint('Error updating location: $e');
+                } finally {
+                  if (mounted) {
+                    setState(() => _isLoading = false);
+                  }
                 }
-                setState(() => _isLoading = false);
               },
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB), foregroundColor: Colors.white),
               child: const Text('Guardar'),
@@ -308,11 +324,19 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
 
     if (confirm == true) {
       setState(() => _isLoading = true);
-      final success = await SupabaseService.instance.deleteUserLocation(location['id']);
-      if (success) {
-        await _loadData();
+      try {
+        // location['id'] podria ser un int, aseguramos pasarlo como String
+        final success = await SupabaseService.instance.deleteUserLocation(location['id'].toString());
+        if (success) {
+          await _loadData();
+        }
+      } catch (e) {
+        debugPrint('Error deleting location: $e');
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
       }
-      setState(() => _isLoading = false);
     }
   }
 
@@ -371,6 +395,7 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
             child: CircleAvatar(
               radius: 16,
               backgroundImage: NetworkImage(avatarUrl),
+              onBackgroundImageError: (e, s) => debugPrint('Error image: $e'),
             ),
           )
         ],
@@ -392,9 +417,27 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                     ),
                     child: Column(
                       children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundImage: NetworkImage(avatarUrl),
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundImage: NetworkImage(avatarUrl),
+                              onBackgroundImageError: (e, s) => debugPrint('Error image: $e'),
+                            ),
+                            if (_isUploadingPhoto)
+                              Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  color: Colors.black45,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Center(
+                                  child: CircularProgressIndicator(color: Colors.white),
+                                ),
+                              ),
+                          ],
                         ),
                         const SizedBox(height: 16),
 
@@ -420,7 +463,7 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                               ),
                               const SizedBox(width: 12),
                               TextButton.icon(
-                                onPressed: () => setState(() => _isEditingPhoto = true),
+                                onPressed: _isUploadingPhoto ? null : _pickAndUploadPhoto,
                                 icon: const Icon(Icons.photo_camera, size: 16),
                                 label: const Text('Editar Foto'),
                                 style: TextButton.styleFrom(foregroundColor: const Color(0xFF2563EB)),
@@ -452,41 +495,6 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                                   onPressed: () => setState(() {
                                     _isEditingName = false;
                                     _nameController.text = name;
-                                  }),
-                                  child: const Text('Cancelar'),
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-
-                        // Photo Edit block
-                        if (_isEditingPhoto) ...[
-                          const SizedBox(height: 12),
-                          TextField(
-                            controller: _photoUrlController,
-                            style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A)),
-                            decoration: const InputDecoration(
-                              labelText: 'URL de la Foto de Perfil',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: _savePhoto,
-                                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB), foregroundColor: Colors.white),
-                                  child: const Text('Guardar'),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () => setState(() {
-                                    _isEditingPhoto = false;
-                                    _photoUrlController.text = avatarUrl;
                                   }),
                                   child: const Text('Cancelar'),
                                 ),
@@ -634,6 +642,7 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                               return ListTile(
                                 leading: CircleAvatar(
                                   backgroundImage: NetworkImage(pImage),
+                                  onBackgroundImageError: (e, s) => debugPrint('Error image: $e'),
                                 ),
                                 title: Text(pName, style: const TextStyle(fontWeight: FontWeight.bold)),
                                 subtitle: Text(pProfession),

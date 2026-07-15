@@ -23,6 +23,7 @@ class AppStateProvider extends ChangeNotifier {
   Timer? _inactivityTimer;
   Timer? _pingTimer;
   Timer? _busyExpirationTimer;
+  DateTime? _lastGpsUpdateTime;
 
   // Getters
   String get userRole => _userRole;
@@ -178,12 +179,15 @@ class AppStateProvider extends ChangeNotifier {
       if (_userRole == 'provider') {
         final userId = SupabaseService.instance.currentUser?.id;
         if (userId != null) {
-          await SupabaseService.instance.updateProviderAvailability(
-            providerId: userId,
-            status: _currentStatusState,
-            lat: _currentLat,
-            lng: _currentLng,
-          );
+          final now = DateTime.now();
+          if (_lastGpsUpdateTime == null || now.difference(_lastGpsUpdateTime!).inSeconds >= 5) {
+            _lastGpsUpdateTime = now;
+            await SupabaseService.instance.updateProviderLocation(
+              providerId: userId,
+              lat: _currentLat,
+              lng: _currentLng,
+            );
+          }
         }
       }
     });
