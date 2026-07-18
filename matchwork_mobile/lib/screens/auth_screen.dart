@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../providers/app_state_provider.dart';
@@ -25,6 +26,67 @@ class _AuthScreenState extends State<AuthScreen> {
   
   String? _selectedCategory = 'reparaciones_mantenimiento';
   String? _selectedSubcategory = 'gasfiteria';
+
+  Future<void> _showForgotPasswordDialog() async {
+    final emailController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text('Recuperar contraseña', style: TextStyle(color: Color(0xFF0F172A))),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.', style: TextStyle(color: Colors.black87)),
+              const SizedBox(height: 16),
+              TextField(
+                controller: emailController,
+                style: const TextStyle(color: Colors.black87),
+                decoration: InputDecoration(
+                  hintText: 'Correo electrónico',
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: const Color(0xFFF8FAFC),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final email = emailController.text.trim();
+                if (email.isNotEmpty) {
+                  Navigator.pop(context); // Cerrar diálogo
+                  try {
+                    await SupabaseService.instance.resetPassword(email);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Se ha enviado un enlace a tu correo para restablecer la contraseña.')),
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Error al enviar el correo. Verifica tu dirección.')),
+                      );
+                    }
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB)),
+              child: const Text('Enviar Enlace', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -185,8 +247,14 @@ class _AuthScreenState extends State<AuthScreen> {
                     TextFormField(
                       controller: _nameController,
                       style: const TextStyle(color: surfaceNavy),
+                      textCapitalization: TextCapitalization.words,
+                      maxLength: 50,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]')),
+                      ],
                       decoration: InputDecoration(
                         labelText: 'Nombre Completo',
+                        counterText: '',
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
                         border: OutlineInputBorder(
@@ -208,6 +276,9 @@ class _AuthScreenState extends State<AuthScreen> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     style: const TextStyle(color: surfaceNavy),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                    ],
                     decoration: InputDecoration(
                       labelText: 'Correo electrónico',
                       filled: true,
@@ -234,8 +305,13 @@ class _AuthScreenState extends State<AuthScreen> {
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     style: const TextStyle(color: surfaceNavy),
+                    maxLength: 30,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                    ],
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
+                      counterText: '',
                       filled: true,
                       fillColor: const Color(0xFFF8FAFC),
                       border: OutlineInputBorder(
@@ -410,6 +486,17 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                   ),
                   const SizedBox(height: 16),
+
+                  // Forgot Password Button (Only in login mode)
+                  if (!_isSignUp)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: _showForgotPasswordDialog,
+                        style: TextButton.styleFrom(foregroundColor: accentBlue),
+                        child: const Text('¿Olvidaste tu contraseña?'),
+                      ),
+                    ),
 
                   // Toggle Button
                   TextButton(

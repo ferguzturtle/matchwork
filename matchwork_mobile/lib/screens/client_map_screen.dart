@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_map/flutter_map.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:latlong2/latlong.dart' hide Path;
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -187,8 +188,11 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
         title: const Text('Solicitar Asistencia'),
         content: TextField(
           controller: controller,
+          textCapitalization: TextCapitalization.sentences,
+          maxLength: 200,
           decoration: const InputDecoration(
             labelText: 'Mensaje de solicitud',
+            counterText: '',
             border: OutlineInputBorder(),
           ),
           maxLines: 3,
@@ -507,30 +511,31 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
               // Providers markers
               MarkerLayer(
                 markers: [
-                  // Client position pin
-                  Marker(
-                    point: LatLng(appState.currentLat, appState.currentLng),
-                    width: 40,
-                    height: 40,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: accentBlue.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      alignment: Alignment.center,
+                  // Client position pin (only if using real-time location)
+                  if (_selectedLocation == null)
+                    Marker(
+                      point: LatLng(appState.currentLat, appState.currentLng),
+                      width: 40,
+                      height: 40,
                       child: Container(
-                        width: 14,
-                        height: 14,
-                        decoration: const BoxDecoration(
-                          color: accentBlue,
+                        decoration: BoxDecoration(
+                          color: accentBlue.withOpacity(0.2),
                           shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(color: Colors.white, blurRadius: 4, spreadRadius: 2),
-                          ],
+                        ),
+                        alignment: Alignment.center,
+                        child: Container(
+                          width: 14,
+                          height: 14,
+                          decoration: const BoxDecoration(
+                            color: accentBlue,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(color: Colors.white, blurRadius: 4, spreadRadius: 2),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
                   if (_selectedLocation != null)
                     Marker(
@@ -818,8 +823,8 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               CircleAvatar(
-                                radius: 28,
-                                backgroundImage: NetworkImage(_selectedProvider!.image),
+                                radius: 24,
+                                backgroundImage: CachedNetworkImageProvider(_selectedProvider!.image),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -1220,19 +1225,25 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: labelController,
+                textCapitalization: TextCapitalization.words,
+                maxLength: 30,
                 decoration: const InputDecoration(
                   labelText: 'Nombre de la ubicación (Ej: Mi Casa)',
+                  counterText: '',
                   border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: addressController,
+                textCapitalization: TextCapitalization.words,
+                maxLength: 100,
                 decoration: const InputDecoration(
                   labelText: 'Dirección',
                   hintText: 'Ej: Av. Providencia 1234, Providencia, Santiago',
                   helperText: 'Formato ideal: Calle + Número, Comuna, Ciudad',
                   helperStyle: TextStyle(color: Colors.blue),
+                  counterText: '',
                   border: OutlineInputBorder(),
                 ),
               ),

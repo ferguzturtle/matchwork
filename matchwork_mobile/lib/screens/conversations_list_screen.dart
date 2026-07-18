@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
 import '../services/supabase_service.dart';
@@ -136,7 +137,7 @@ class _ConversationsListScreenState extends State<ConversationsListScreen> {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       leading: CircleAvatar(
                         radius: 26,
-                        backgroundImage: NetworkImage(chat['avatarUrl']),
+                        backgroundImage: CachedNetworkImageProvider(chat['avatarUrl']),
                       ),
                       title: Text(
                         chat['name'],

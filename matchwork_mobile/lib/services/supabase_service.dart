@@ -96,31 +96,64 @@ class SupabaseService {
     await client.auth.signOut();
   }
 
+  Future<void> resetPassword(String email) async {
+    await client.auth.resetPasswordForEmail(email);
+  }
+
   User? get currentUser => client.auth.currentUser;
 
+  // --- CACHES ---
+  List<ProviderModel>? _cachedProviders;
+  DateTime? _lastProvidersFetch;
+  
+  final Map<String, Map<String, dynamic>> _cachedProfiles = {};
+  final Map<String, DateTime> _lastProfileFetch = {};
+
+  final Map<String, List<Map<String, dynamic>>> _cachedLocations = {};
+  final Map<String, DateTime> _lastLocationsFetch = {};
+
+  void clearProvidersCache() => _cachedProviders = null;
+  void clearProfileCache(String userId) => _cachedProfiles.remove(userId);
+  void clearLocationsCache(String userId) => _cachedLocations.remove(userId);
+
   // --- PROFILES ---
-  Future<Map<String, dynamic>?> getUserProfile(String userId) async {
+  Future<Map<String, dynamic>?> getUserProfile(String userId, {bool forceRefresh = false}) async {
+    if (!forceRefresh && _cachedProfiles.containsKey(userId) && _lastProfileFetch.containsKey(userId)) {
+      if (DateTime.now().difference(_lastProfileFetch[userId]!).inMinutes < 5) {
+        return _cachedProfiles[userId];
+      }
+    }
     try {
       final data = await client.from('profiles').select().eq('id', userId).single();
+      _cachedProfiles[userId] = data;
+      _lastProfileFetch[userId] = DateTime.now();
       return data;
     } catch (e) {
       print("Error getting profile: $e");
-      return null;
+      return _cachedProfiles[userId];
     }
   }
 
   Future<void> updateUserProfile(String userId, Map<String, dynamic> updates) async {
     await client.from('profiles').update(updates).eq('id', userId);
+    clearProfileCache(userId);
   }
 
   // --- PROVIDERS ---
-  Future<List<ProviderModel>> getProviders() async {
+  Future<List<ProviderModel>> getProviders({bool forceRefresh = false}) async {
+    if (!forceRefresh && _cachedProviders != null && _lastProvidersFetch != null) {
+      if (DateTime.now().difference(_lastProvidersFetch!).inMinutes < 5) {
+        return _cachedProviders!;
+      }
+    }
     try {
       final List<dynamic> data = await client.from('providers').select();
-      return data.map((json) => ProviderModel.fromJson(json as Map<String, dynamic>)).toList();
+      _cachedProviders = data.map((json) => ProviderModel.fromJson(json as Map<String, dynamic>)).toList();
+      _lastProvidersFetch = DateTime.now();
+      return _cachedProviders!;
     } catch (e) {
       print("Error getting providers: $e");
-      return [];
+      return _cachedProviders ?? [];
     }
   }
 
@@ -339,17 +372,25 @@ class SupabaseService {
     return channel;
   }
 
-  Future<List<Map<String, dynamic>>> getUserLocations(String userId) async {
+  Future<List<Map<String, dynamic>>> getUserLocations(String userId, {bool forceRefresh = false}) async {
+    if (!forceRefresh && _cachedLocations.containsKey(userId) && _lastLocationsFetch.containsKey(userId)) {
+      if (DateTime.now().difference(_lastLocationsFetch[userId]!).inMinutes < 5) {
+        return _cachedLocations[userId]!;
+      }
+    }
     try {
       final List<dynamic> data = await client
           .from('user_locations')
           .select()
           .eq('user_id', userId)
           .order('created_at', ascending: true);
-      return List<Map<String, dynamic>>.from(data);
+      final locs = List<Map<String, dynamic>>.from(data);
+      _cachedLocations[userId] = locs;
+      _lastLocationsFetch[userId] = DateTime.now();
+      return locs;
     } catch (e) {
       print("Error getting user locations: $e");
-      return [];
+      return _cachedLocations[userId] ?? [];
     }
   }
 
@@ -368,9 +409,10 @@ class SupabaseService {
         'lat': lat,
         'lng': lng,
       });
+      clearLocationsCache(userId);
       return true;
     } catch (e) {
-      print("Error saving user location: $e");
+      print("Error saving location: $e");
       return false;
     }
   }

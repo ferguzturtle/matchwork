@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../providers/app_state_provider.dart';
@@ -45,9 +46,9 @@ class AppDrawer extends StatelessWidget {
             color: headerBgColor,
             child: Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 30,
-                  backgroundImage: NetworkImage(
+                  backgroundImage: const CachedNetworkImageProvider(
                     'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
                   ),
                 ),
@@ -375,7 +376,7 @@ class AppDrawer extends StatelessWidget {
               const Center(
                 child: CircleAvatar(
                   radius: 40,
-                  backgroundImage: NetworkImage(
+                  backgroundImage: CachedNetworkImageProvider(
                     'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
                   ),
                 ),
@@ -434,8 +435,11 @@ class AppDrawer extends StatelessWidget {
               TextField(
                 controller: commentController,
                 maxLines: 4,
+                textCapitalization: TextCapitalization.sentences,
+                maxLength: 300,
                 decoration: const InputDecoration(
                   hintText: 'Escribe tu comentario aquí...',
+                  counterText: '',
                   border: OutlineInputBorder(),
                 ),
               ),

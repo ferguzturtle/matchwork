@@ -201,11 +201,14 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: TextField(
                       controller: _messageController,
                       style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                      textCapitalization: TextCapitalization.sentences,
+                      maxLength: 500,
                       decoration: InputDecoration(
                         hintText: 'Escribe tu mensaje...',
                         hintStyle: TextStyle(color: isDark ? Colors.grey : Colors.black54),
                         filled: true,
                         fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                        counterText: '',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
                           borderSide: BorderSide.none,

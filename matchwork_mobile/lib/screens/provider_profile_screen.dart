@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../providers/app_state_provider.dart';
@@ -82,8 +84,8 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                           child: Column(
                             children: [
                               CircleAvatar(
-                                radius: 48,
-                                backgroundImage: NetworkImage(
+                                radius: 45,
+                                backgroundImage: CachedNetworkImageProvider(
                                   _profileData!['avatar_url'] ??
                                       'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
                                 ),
@@ -382,12 +384,12 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
   Widget _buildWorkGalleryImage(String url) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: Image.network(
-        url,
+      child: CachedNetworkImage(
+        imageUrl: url,
         width: 160,
         height: 120,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => Container(
+        errorWidget: (context, url, error) => Container(
           width: 160,
           height: 120,
           color: Colors.grey[350],
@@ -508,33 +510,49 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                   children: [
                     TextField(
                       controller: nameController,
-                      decoration: const InputDecoration(labelText: 'Nombre Completo'),
+                      textCapitalization: TextCapitalization.words,
+                      maxLength: 50,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]')),
+                      ],
+                      decoration: const InputDecoration(labelText: 'Nombre Completo', counterText: ''),
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       controller: professionController,
-                      decoration: const InputDecoration(labelText: 'Profesión / Especialidad'),
+                      textCapitalization: TextCapitalization.words,
+                      maxLength: 50,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]')),
+                      ],
+                      decoration: const InputDecoration(labelText: 'Profesión / Especialidad', counterText: ''),
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       controller: descController,
                       maxLines: 3,
-                      decoration: const InputDecoration(labelText: 'Descripción del Servicio'),
+                      textCapitalization: TextCapitalization.sentences,
+                      maxLength: 300,
+                      decoration: const InputDecoration(labelText: 'Descripción del Servicio', counterText: ''),
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       controller: priceController,
-                      decoration: const InputDecoration(labelText: 'Precio por Hora Base (Ej: \$15.000)'),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(labelText: 'Precio por Hora Base (Ej: 15000)'),
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       controller: expController,
-                      decoration: const InputDecoration(labelText: 'Experiencia (Ej: 5+ años)'),
+                      maxLength: 50,
+                      decoration: const InputDecoration(labelText: 'Experiencia (Ej: 5+ años)', counterText: ''),
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       controller: guarController,
-                      decoration: const InputDecoration(labelText: 'Garantía (Ej: 30 días de garantía)'),
+                      maxLength: 50,
+                      decoration: const InputDecoration(labelText: 'Garantía (Ej: 30 días de garantía)', counterText: ''),
                     ),
                     const SizedBox(height: 16),
                     const Align(

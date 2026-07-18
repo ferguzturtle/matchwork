@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
@@ -151,19 +153,25 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                 children: [
                   TextField(
                     controller: labelCtrl,
+                    textCapitalization: TextCapitalization.words,
+                    maxLength: 30,
                     decoration: const InputDecoration(
                       labelText: 'Nombre (Ej. Mi Casa, Trabajo)',
+                      counterText: '',
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: addressCtrl,
+                    textCapitalization: TextCapitalization.words,
+                    maxLength: 100,
                     decoration: const InputDecoration(
                       labelText: 'Dirección',
                       hintText: 'Ej: Av. Providencia 1234, Providencia, Santiago',
                       helperText: 'Formato ideal: Calle + Número, Comuna, Ciudad',
                       helperStyle: TextStyle(color: Colors.blue),
+                      counterText: '',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -258,12 +266,16 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
             children: [
               TextField(
                 controller: labelCtrl,
-                decoration: const InputDecoration(labelText: 'Nombre', border: OutlineInputBorder()),
+                textCapitalization: TextCapitalization.words,
+                maxLength: 30,
+                decoration: const InputDecoration(labelText: 'Nombre', counterText: '', border: OutlineInputBorder()),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: addressCtrl,
-                decoration: const InputDecoration(labelText: 'Dirección', border: OutlineInputBorder()),
+                textCapitalization: TextCapitalization.words,
+                maxLength: 100,
+                decoration: const InputDecoration(labelText: 'Dirección', counterText: '', border: OutlineInputBorder()),
               ),
             ],
           ),
@@ -394,8 +406,7 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
             padding: const EdgeInsets.only(right: 12.0),
             child: CircleAvatar(
               radius: 16,
-              backgroundImage: NetworkImage(avatarUrl),
-              onBackgroundImageError: (e, s) => debugPrint('Error image: $e'),
+              backgroundImage: CachedNetworkImageProvider(avatarUrl),
             ),
           )
         ],
@@ -422,8 +433,7 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                           children: [
                             CircleAvatar(
                               radius: 50,
-                              backgroundImage: NetworkImage(avatarUrl),
-                              onBackgroundImageError: (e, s) => debugPrint('Error image: $e'),
+                              backgroundImage: CachedNetworkImageProvider(avatarUrl),
                             ),
                             if (_isUploadingPhoto)
                               Container(
