@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
+import '../services/notification_service.dart';
 import '../providers/app_state_provider.dart';
 import '../main.dart';
 import '../models/categories_data.dart';
@@ -137,6 +138,8 @@ class _AuthScreenState extends State<AuthScreen> {
           final appState = Provider.of<AppStateProvider>(context, listen: false);
           await appState.switchRole(role);
           await appState.initializeProviderState(user.id);
+          
+          NotificationService().saveTokenToDatabase(user.id);
 
           if (mounted) {
             Navigator.pushReplacement(

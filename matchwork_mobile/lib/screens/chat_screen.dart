@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
+import '../services/notification_service.dart';
 import '../providers/app_state_provider.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -77,6 +78,24 @@ class _ChatScreenState extends State<ChatScreen> {
         receiverId: _otherId,
         text: text,
       );
+      
+      // Enviar notificación push al receptor
+      try {
+        final receiverProfile = await SupabaseService.instance.getUserProfile(_otherId);
+        if (receiverProfile != null && receiverProfile['fcm_token'] != null) {
+          final String fcmToken = receiverProfile['fcm_token'];
+          final String currentUserName = SupabaseService.instance.currentUser?.userMetadata?['name'] ?? 'Usuario';
+          await NotificationService().sendPushNotification(
+            fcmToken,
+            'Nuevo mensaje de $currentUserName',
+            text,
+            data: {'type': 'chat', 'senderId': _myId},
+          );
+        }
+      } catch (e) {
+        print("Error enviando notif de chat: $e");
+      }
+
       // Reset inactivity timer in case of provider
       final appState = Provider.of<AppStateProvider>(context, listen: false);
       appState.resetActivityTimer();

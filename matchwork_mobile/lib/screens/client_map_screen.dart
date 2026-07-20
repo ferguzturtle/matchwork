@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart' hide Path;
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
+import '../services/notification_service.dart';
 import '../models/provider_model.dart';
 import '../providers/app_state_provider.dart';
 import 'chat_screen.dart';
@@ -43,6 +44,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
   String _selectedLocationName = 'Ubicación GPS Actual';
   
   RealtimeChannel? _providersSubscription;
+  RealtimeChannel? _requestsSubscription;
 
   @override
   void initState() {
@@ -50,12 +52,39 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
     _loadProviders();
     _loadSavedLocations();
     _setupProvidersSubscription();
+    _setupRequestsSubscription();
   }
 
   @override
   void dispose() {
     _providersSubscription?.unsubscribe();
+    _requestsSubscription?.unsubscribe();
     super.dispose();
+  }
+  void _setupRequestsSubscription() {
+    final currentUserId = SupabaseService.instance.currentUser?.id;
+    if (currentUserId == null) return;
+    
+    _requestsSubscription = SupabaseService.instance.client
+        .channel('public:service_requests_client')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'service_requests',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'customer_id',
+            value: currentUserId,
+          ),
+          callback: (payload) {
+            if (!mounted) return;
+            // If a provider is currently selected, refresh its request status
+            if (_selectedProvider != null) {
+              _onProviderSelected(_selectedProvider!);
+            }
+          },
+        )
+        .subscribe();
   }
 
   void _setupProvidersSubscription() {
@@ -210,9 +239,29 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 customerId: currentUserId,
                 message: controller.text,
               );
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('¡Solicitud enviada!')),
-              );
+              
+              // Enviar notificación push al proveedor
+              try {
+                final providerProfile = await SupabaseService.instance.getUserProfile(p.id);
+                if (providerProfile != null && providerProfile['fcm_token'] != null) {
+                  final String fcmToken = providerProfile['fcm_token'];
+                  final String currentUserName = SupabaseService.instance.currentUser?.userMetadata?['name'] ?? 'Un cliente';
+                  await NotificationService().sendPushNotification(
+                    fcmToken,
+                    'Nueva Solicitud de Trabajo',
+                    '$currentUserName necesita tu ayuda con un servicio.',
+                    data: {'type': 'new_request', 'customerId': currentUserId},
+                  );
+                }
+              } catch (e) {
+                print("Error enviando notif a proveedor: $e");
+              }
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('¡Solicitud enviada!')),
+                );
+              }
               _onProviderSelected(p); // Refresh card state
             },
             child: const Text('Enviar'),

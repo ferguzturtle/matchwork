@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "216500698195",
+    "project_id": "matchwork-9431e",
+    "storage_bucket": "matchwork-9431e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:216500698195:android:ce379d1439303ba7a49aa6",
+        "android_client_info": {
+          "package_name": "com.matchwork.matchwork_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFnS_cmR0eu-8wkB4U1yqsTigTG-gpqcg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

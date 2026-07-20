@@ -4,7 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bot_toast/bot_toast.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'services/supabase_service.dart';
+import 'services/notification_service.dart';
 import 'providers/app_state_provider.dart';
 import 'screens/auth_screen.dart';
 import 'screens/client_map_screen.dart';
@@ -12,6 +15,12 @@ import 'screens/provider_panel_screen.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await NotificationService().initialize();
+  
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // 1. Load keys from assets/.env
@@ -168,6 +177,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
       
       // Initialize real-time notifications
       SupabaseService.instance.initializeNotificationsListener();
+      NotificationService().saveTokenToDatabase(userId);
 
       if (mounted) {
         setState(() {
