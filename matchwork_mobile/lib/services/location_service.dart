@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import '../main.dart';
 
 class LocationService {
   static final LocationService instance = LocationService._internal();
@@ -16,6 +18,42 @@ class LocationService {
     // as browsers and some devices need the prompt to trigger the service.
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
+      // Prominent Disclosure for Google Play
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        final proceed = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.location_on, color: Color(0xFF2563EB)),
+                SizedBox(width: 8),
+                Text('Uso de Ubicación'),
+              ],
+            ),
+            content: const Text(
+              'MatchWork recopila datos de ubicación para poder mostrar tu disponibilidad a los clientes en el mapa de servicios de forma precisa, incluso si la app está cerrada o no está en uso.\n\nEsta función es esencial para que los clientes puedan encontrarte cuando estás en estado "Disponible".',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2563EB), 
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Entendido'),
+              ),
+            ],
+          ),
+        );
+        if (proceed != true) return false;
+      }
+
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         return false;

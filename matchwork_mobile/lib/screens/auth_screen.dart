@@ -6,6 +6,7 @@ import '../services/notification_service.dart';
 import '../providers/app_state_provider.dart';
 import '../main.dart';
 import '../models/categories_data.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -513,6 +514,26 @@ class _AuthScreenState extends State<AuthScreen> {
                       _isSignUp 
                           ? '¿Ya tienes una cuenta? Inicia sesión' 
                           : '¿No tienes una cuenta? Regístrate',
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  // Privacy Policy Link
+                  TextButton(
+                    onPressed: () async {
+                      final url = Uri.parse('https://matchwork.com/privacidad');
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      }
+                    },
+                    child: const Text(
+                      'Términos, Condiciones y Políticas de Privacidad',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                        decoration: TextDecoration.underline,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],

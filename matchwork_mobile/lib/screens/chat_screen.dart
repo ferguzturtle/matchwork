@@ -211,50 +211,52 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             
             // Bottom Send Input Box
-            Container(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24, top: 10),
-              color: isDark ? const Color(0xFF0F172A) : Colors.white,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _messageController,
-                      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
-                      textCapitalization: TextCapitalization.sentences,
-                      maxLength: 500,
-                      decoration: InputDecoration(
-                        hintText: 'Escribe tu mensaje...',
-                        hintStyle: TextStyle(color: isDark ? Colors.grey : Colors.black54),
-                        filled: true,
-                        fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                        counterText: '',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide.none,
+            SafeArea(
+              child: Container(
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8, top: 10),
+                color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                        textCapitalization: TextCapitalization.sentences,
+                        maxLength: 500,
+                        decoration: InputDecoration(
+                          hintText: 'Escribe tu mensaje...',
+                          hintStyle: TextStyle(color: isDark ? Colors.grey : Colors.black54),
+                          filled: true,
+                          fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                          counterText: '',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      ),
-                      onTap: () => appState.resetActivityTimer(),
-                      onChanged: (_) => appState.resetActivityTimer(),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: _sendMessage,
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: const BoxDecoration(
-                        color: accentBlue,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.send,
-                        color: Colors.white,
-                        size: 20,
+                        onTap: () => appState.resetActivityTimer(),
+                        onChanged: (_) => appState.resetActivityTimer(),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: _sendMessage,
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: const BoxDecoration(
+                          color: accentBlue,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

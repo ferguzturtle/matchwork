@@ -352,6 +352,47 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
     }
   }
 
+  Future<void> _deleteAccount() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar Cuenta'),
+        content: const Text(
+          '¿Estás seguro de que deseas eliminar tu cuenta de forma permanente? Esta acción no se puede deshacer y perderás todo tu historial de servicios, chats y datos.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('ELIMINAR CUENTA', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      setState(() => _isLoading = true);
+      final success = await SupabaseService.instance.deleteAccount();
+      if (mounted) {
+        setState(() => _isLoading = false);
+        if (success) {
+          final appState = Provider.of<AppStateProvider>(context, listen: false);
+          await appState.performLogoutCleanup();
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const AuthScreen()),
+            (route) => false,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error al eliminar cuenta. Intenta de nuevo o contacta a soporte.')),
+          );
+        }
+      }
+    }
+  }
+
   Future<void> _logout() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -671,11 +712,26 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                     icon: const Icon(Icons.logout),
                     label: const Text('Cerrar Sesión', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isDark ? const Color(0xFF991B1B) : const Color(0xFFFEE2E2),
-                      foregroundColor: isDark ? Colors.white : const Color(0xFF991B1B),
+                      backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.grey[200],
+                      foregroundColor: isDark ? Colors.white : Colors.black87,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  ElevatedButton.icon(
+                    onPressed: _deleteAccount,
+                    icon: const Icon(Icons.delete_forever),
+                    label: const Text('Eliminar mi cuenta y datos', style: TextStyle(fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red, width: 2),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
                     ),
                   ),
                 ],

@@ -8,10 +8,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'services/supabase_service.dart';
 import 'services/notification_service.dart';
+import 'services/network_service.dart';
 import 'providers/app_state_provider.dart';
 import 'screens/auth_screen.dart';
 import 'screens/client_map_screen.dart';
 import 'screens/provider_panel_screen.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +23,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await NotificationService().initialize();
+  NetworkService().initialize();
   
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
@@ -79,6 +83,7 @@ class MatchWorkApp extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isConfigMissing) {
       return MaterialApp(
+        navigatorKey: navigatorKey,
         title: 'MatchWork',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(useMaterial3: true),
@@ -113,6 +118,7 @@ class MatchWorkApp extends StatelessWidget {
     final appState = Provider.of<AppStateProvider>(context);
     
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'MatchWork',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

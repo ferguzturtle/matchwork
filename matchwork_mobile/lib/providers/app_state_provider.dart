@@ -211,8 +211,8 @@ class AppStateProvider extends ChangeNotifier {
       final isBusy = _currentStatusState.startsWith('Ocupado');
       if (_isAvailable && !isBusy) {
         final diff = DateTime.now().difference(_lastActivityTime);
-        if (diff.inMinutes >= 15) {
-          print("Inactivity detected (15 mins). Going Offline.");
+        if (diff.inMinutes >= 60) {
+          print("Inactivity detected (60 mins). Going Offline.");
           await updateAvailabilityState('Fuera de servicio');
           // Show inactivity alert in the active UI
           _showInactivityDialog();

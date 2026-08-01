@@ -38,6 +38,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
   bool _isMatched = false;
   bool _isPending = false;
   bool _isLoadingStatus = false;
+  bool _isCategoryExplorerShowing = false;
 
   List<Map<String, dynamic>> _userSavedLocations = [];
   Map<String, dynamic>? _selectedLocation;
@@ -53,6 +54,15 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
     _loadSavedLocations();
     _setupProvidersSubscription();
     _setupRequestsSubscription();
+    
+    // Abre automáticamente el selector de categorías al entrar a la pantalla (con delay para evitar conflictos de navegación)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          _showCategoryExplorer();
+        }
+      });
+    });
   }
 
   @override
@@ -96,26 +106,14 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
           table: 'providers',
           callback: (payload) {
             if (!mounted) return;
-            if (payload.eventType == PostgresChangeEvent.update) {
-              final newRecord = payload.newRecord;
-              if (newRecord != null) {
-                setState(() {
-                  final index = _allProviders.indexWhere((p) => p.id == newRecord['id']);
-                  if (index != -1) {
-                    _allProviders[index] = ProviderModel.fromJson(newRecord);
-                  }
-                });
-              }
-            } else {
-              _loadProvidersSilently();
-            }
+            _loadProvidersSilently();
           },
         )
         .subscribe();
   }
 
   Future<void> _loadProvidersSilently() async {
-    final data = await SupabaseService.instance.getProviders();
+    final data = await SupabaseService.instance.getProviders(forceRefresh: true);
     if (mounted) {
       setState(() {
         _allProviders = data;
@@ -137,7 +135,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
 
   Future<void> _loadProviders() async {
     setState(() => _isLoadingProviders = true);
-    final data = await SupabaseService.instance.getProviders();
+    final data = await SupabaseService.instance.getProviders(forceRefresh: true);
     setState(() {
       _allProviders = data;
       _isLoadingProviders = false;
@@ -159,6 +157,17 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
   List<ProviderModel> _getFilteredProviders(double centerLat, double centerLng) {
     return _allProviders.filter((p) {
       if (p.status == 'Fuera de servicio') return false;
+      
+      // Filter out providers who haven't updated their presence/location in the last 4 minutes (app is closed)
+      if (p.createdAt.isNotEmpty) {
+        try {
+          final lastActive = DateTime.parse(p.createdAt);
+          final now = DateTime.now().toUtc();
+          if (now.difference(lastActive).inMinutes >= 4) {
+            return false;
+          }
+        } catch (_) {}
+      }
       
       bool matchesCategory = true;
       if (_selectedFilterType == 'category') {
@@ -286,12 +295,13 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
   }
 
   void _showCategoryExplorer() {
+    if (_isCategoryExplorerShowing) return;
+    _isCategoryExplorerShowing = true;
+
     String? activeCategoryKey;
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
@@ -299,16 +309,30 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
             const accentBlue = Color(0xFF2563EB);
             final isDark = Theme.of(context).brightness == Brightness.dark;
             final textColor = isDark ? Colors.white : surfaceNavy;
+            final dialogBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+
+            Widget content;
 
             if (activeCategoryKey == null) {
-              return Column(
+              content = Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Text(
-                      'Explorar Categorías',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Selecciona tu categoría',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: textColor),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Elige una especialidad antes de seguir para ver los trabajadores en el mapa',
+                          style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   ),
                   const Divider(height: 1),
@@ -327,7 +351,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                     child: ListView(
                       children: categories.entries.map((e) {
                         IconData catIcon;
-                         switch (e.key) {
+                        switch (e.key) {
                           case 'reparaciones_mantenimiento':
                             catIcon = Icons.handyman;
                             break;
@@ -372,7 +396,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
               );
             } else {
               final catDetail = categories[activeCategoryKey!]!;
-              return Column(
+              content = Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
@@ -429,10 +453,23 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 ],
               );
             }
+
+            return Dialog(
+              backgroundColor: dialogBg,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
+                width: MediaQuery.of(context).size.width * 0.85,
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: content,
+              ),
+            );
           },
         );
       },
-    );
+    ).then((_) {
+      _isCategoryExplorerShowing = false;
+    });
   }
 
   IconData _getIconData(String iconName) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../providers/app_state_provider.dart';
@@ -44,48 +45,55 @@ class AppDrawer extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.only(top: 60, left: 20, right: 20, bottom: 20),
             color: headerBgColor,
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: const CachedNetworkImageProvider(
-                    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        userName,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: textColor,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
+            child: FutureBuilder<Map<String, dynamic>?>(
+              future: user != null ? SupabaseService.instance.getUserProfile(user.id) : Future.value(null),
+              builder: (context, snapshot) {
+                final profile = snapshot.data;
+                final displayName = profile?['name'] ?? userName;
+                final avatarUrl = profile?['avatar_url'] ?? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
+
+                return Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: CachedNetworkImageProvider(avatarUrl),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.verified, color: accentBlue, size: 16),
-                          const SizedBox(width: 4),
                           Text(
-                            'Verificado',
+                            displayName,
                             style: TextStyle(
-                              fontSize: 13,
-                              color: subTextColor,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: textColor,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(Icons.verified, color: accentBlue, size: 16),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Verificado',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: subTextColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           
@@ -293,6 +301,24 @@ class AppDrawer extends StatelessWidget {
           ),
           
           const Divider(),
+          
+          const Divider(),
+          
+          // Privacy Policy
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined, color: Colors.grey),
+            title: const Text(
+              'Políticas y Privacidad', 
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+            ),
+            onTap: () async {
+              Navigator.pop(context);
+              final url = Uri.parse('https://matchwork.com/privacidad');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url);
+              }
+            },
+          ),
           
           // Logout Button
           ListTile(

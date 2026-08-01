@@ -96,6 +96,19 @@ class SupabaseService {
     await client.auth.signOut();
   }
 
+  Future<bool> deleteAccount() async {
+    try {
+      final userId = currentUser?.id;
+      if (userId == null) return false;
+      await client.rpc('delete_user');
+      await signOut();
+      return true;
+    } catch (e) {
+      print("Error deleting account: $e");
+      return false;
+    }
+  }
+
   Future<void> resetPassword(String email) async {
     await client.auth.resetPasswordForEmail(email);
   }
@@ -212,6 +225,7 @@ class SupabaseService {
       await client.from('providers').update({
         'lat': lat,
         'lng': lng,
+        'created_at': DateTime.now().toUtc().toIso8601String(),
       }).eq('id', providerId);
     } catch (e) {
       print("Error updating provider location: $e");
