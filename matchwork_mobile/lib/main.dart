@@ -18,39 +18,53 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await NotificationService().initialize();
-  NetworkService().initialize();
-  
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // 1. Load keys from assets/.env
-  final env = await loadEnv();
-  final supabaseUrl = env['SUPABASE_URL'] ?? env['VITE_SUPABASE_URL'] ?? '';
-  final supabaseAnonKey = env['SUPABASE_KEY'] ?? env['SUPABASE_ANON_KEY'] ?? env['VITE_SUPABASE_ANON_KEY'] ?? '';
+  bool isConfigMissing = true;
 
-  final isConfigMissing = supabaseUrl.isEmpty || supabaseAnonKey.isEmpty;
-
-  if (!isConfigMissing) {
-    // 2. Initialize Supabase
-    await SupabaseService.initialize(
-      url: supabaseUrl,
-      anonKey: supabaseAnonKey,
+  // 1. Iniciar Firebase de forma completamente aislada
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
     );
+    
+    // El servicio de notificaciones choca en Release con cuentas gratis de Apple y puede demorar
+    NotificationService().initialize().timeout(const Duration(seconds: 2)).catchError((e) {
+      debugPrint('Error o timeout en notificaciones al arrancar: $e');
+    });
+  } catch (e, stack) {
+    debugPrint('Firebase Init Error: $e\n$stack');
   }
 
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) => AppStateProvider(),
-      child: MatchWorkApp(isConfigMissing: isConfigMissing),
-    ),
-  );
-  
-  // Remove splash screen now that Flutter is ready and Supabase is initialized
-  FlutterNativeSplash.remove();
+  // 2. Iniciar el resto de servicios (Supabase)
+  try {
+    NetworkService().initialize();
+
+    final env = await loadEnv();
+    final supabaseUrl = env['SUPABASE_URL'] ?? env['VITE_SUPABASE_URL'] ?? '';
+    final supabaseAnonKey = env['SUPABASE_KEY'] ?? env['SUPABASE_ANON_KEY'] ?? env['VITE_SUPABASE_ANON_KEY'] ?? '';
+
+    isConfigMissing = supabaseUrl.isEmpty || supabaseAnonKey.isEmpty;
+
+    if (!isConfigMissing) {
+      await SupabaseService.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseAnonKey,
+      );
+    }
+  } catch (e, stack) {
+    debugPrint('Supabase Init Error: $e\n$stack');
+  } finally {
+    runApp(
+      ChangeNotifierProvider(
+        create: (_) => AppStateProvider(),
+        child: MatchWorkApp(isConfigMissing: isConfigMissing),
+      ),
+    );
+    
+    // Remove splash screen ALWAYS, even if init fails
+    FlutterNativeSplash.remove();
+  }
 }
 
 // Custom manual .env parser from assets

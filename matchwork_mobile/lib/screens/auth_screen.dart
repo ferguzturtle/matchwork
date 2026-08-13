@@ -1,3 +1,4 @@
+import '../utils/security_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,7 @@ class _AuthScreenState extends State<AuthScreen> {
   String _selectedRole = 'customer'; // 'customer' or 'provider'
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _acceptedTerms = false;
   
   String? _selectedCategory = 'reparaciones_mantenimiento';
   String? _selectedSubcategory = 'gasfiteria';
@@ -42,7 +44,7 @@ class _AuthScreenState extends State<AuthScreen> {
             children: [
               const Text('Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.', style: TextStyle(color: Colors.black87)),
               const SizedBox(height: 16),
-              TextField(
+              TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                 controller: emailController,
                 style: const TextStyle(color: Colors.black87),
                 decoration: InputDecoration(
@@ -93,6 +95,16 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    if (_isSignUp && !_acceptedTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Debes aceptar los Términos y Condiciones y la Política de Privacidad para registrarte.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -124,25 +136,72 @@ class _AuthScreenState extends State<AuthScreen> {
           }
         }
       } else {
-        // Sign in
+        debugPrint('--- INICIANDO LOGIN ---');
+        debugPrint('Intentando signIn con email: $email');
+        
+        // Timeout para que no se quede infinito si la red o supabase no responde
         final response = await SupabaseService.instance.signIn(
           email: email,
           password: password,
-        );
+        ).timeout(const Duration(seconds: 15), onTimeout: () {
+          throw Exception("Supabase signIn no respondió después de 15 segundos.");
+        });
 
+        debugPrint('Respuesta de signIn obtenida. Usuario: ${response.user?.id}');
+        
         final user = response.user;
         if (user != null && mounted) {
-          // Obtener el rol real del usuario desde su perfil en Supabase
-          final profile = await SupabaseService.instance.getUserProfile(user.id);
+          debugPrint('Obteniendo perfil del usuario...');
+          final profile = await SupabaseService.instance.getUserProfile(user.id)
+            .timeout(const Duration(seconds: 10));
+            
+          debugPrint('Perfil obtenido: $profile');
           final role = profile?['role'] ?? 'customer';
+          
+          bool isBanned = profile?['is_banned'] ?? false;
+          
+          if (role == 'provider' && !isBanned) {
+             try {
+                debugPrint('Verificando baneo del provider...');
+                final providerData = await SupabaseService.instance.client.from('providers').select('is_banned').eq('id', user.id).single();
+                isBanned = providerData['is_banned'] ?? false;
+             } catch (e) {
+                debugPrint('Error obteniendo baneo del provider: $e');
+             }
+          }
 
+          if (isBanned) {
+            debugPrint('Usuario baneado.');
+            await SupabaseService.instance.signOut();
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Tu cuenta ha sido suspendida permanentemente.'),
+                  backgroundColor: Colors.redAccent,
+                  duration: Duration(seconds: 4),
+                ),
+              );
+              setState(() {
+                _isLoading = false;
+              });
+            }
+            return;
+          }
+
+          debugPrint('Inicializando AppState...');
           final appState = Provider.of<AppStateProvider>(context, listen: false);
           await appState.switchRole(role);
           await appState.initializeProviderState(user.id);
           
-          NotificationService().saveTokenToDatabase(user.id);
+          debugPrint('Guardando token de notificación...');
+          try {
+            NotificationService().saveTokenToDatabase(user.id);
+          } catch(e) {
+            debugPrint('Error guardando token: $e');
+          }
 
           if (mounted) {
+            debugPrint('Navegando a la pantalla principal...');
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -150,24 +209,28 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
             );
           }
+        } else {
+           debugPrint('Usuario nulo después del login o widget no mounted.');
         }
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
+    } catch (e, stack) {
+        debugPrint('ERROR EN LOGIN: $e\n$stack');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${e.toString()}'),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        }
+      } finally {
+        debugPrint('--- FIN DEL LOGIN (FINALLY) ---');
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
   }
 
   @override
@@ -254,6 +317,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       textCapitalization: TextCapitalization.words,
                       maxLength: 50,
                       inputFormatters: [
+                        ...SecurityUtils.secureInputFormatters,
                         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]')),
                       ],
                       decoration: InputDecoration(
@@ -281,6 +345,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     keyboardType: TextInputType.emailAddress,
                     style: const TextStyle(color: surfaceNavy),
                     inputFormatters: [
+                      ...SecurityUtils.secureInputFormatters,
                       FilteringTextInputFormatter.deny(RegExp(r'\s')),
                     ],
                     decoration: InputDecoration(
@@ -311,6 +376,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     style: const TextStyle(color: surfaceNavy),
                     maxLength: 30,
                     inputFormatters: [
+                      ...SecurityUtils.secureInputFormatters,
                       FilteringTextInputFormatter.deny(RegExp(r'\s')),
                     ],
                     decoration: InputDecoration(
@@ -464,9 +530,50 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(height: 24),
                   ],
 
+                  if (_isSignUp)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: CheckboxListTile(
+                        title: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            const Text(
+                              'Acepto los ',
+                              style: TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
+                            ),
+                            InkWell(
+                              onTap: () async {
+                                final url = Uri.parse('https://matchwork.com/privacidad');
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(url);
+                                }
+                              },
+                              child: const Text(
+                                'Términos y Condiciones y la Política de Privacidad',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF2563EB),
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        value: _acceptedTerms,
+                        onChanged: (val) {
+                          setState(() {
+                            _acceptedTerms = val ?? false;
+                          });
+                        },
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: const Color(0xFF2563EB),
+                      ),
+                    ),
+
                   // Action Button
                   ElevatedButton(
-                    onPressed: _isLoading ? null : _submit,
+                    onPressed: _isLoading || (_isSignUp && !_acceptedTerms) ? null : _submit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: accentBlue,
                       foregroundColor: Colors.white,
@@ -514,26 +621,6 @@ class _AuthScreenState extends State<AuthScreen> {
                       _isSignUp 
                           ? '¿Ya tienes una cuenta? Inicia sesión' 
                           : '¿No tienes una cuenta? Regístrate',
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  // Privacy Policy Link
-                  TextButton(
-                    onPressed: () async {
-                      final url = Uri.parse('https://matchwork.com/privacidad');
-                      if (await canLaunchUrl(url)) {
-                        await launchUrl(url);
-                      }
-                    },
-                    child: const Text(
-                      'Términos, Condiciones y Políticas de Privacidad',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                        decoration: TextDecoration.underline,
-                      ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],

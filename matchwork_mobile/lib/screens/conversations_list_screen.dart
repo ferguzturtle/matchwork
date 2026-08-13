@@ -57,19 +57,26 @@ class _ConversationsListScreenState extends State<ConversationsListScreen> {
       final List<Map<String, dynamic>> resolvedChats = [];
       for (var chat in uniqueChats.values) {
         String partnerId = chat['partnerId'];
-        String name = 'Usuario de MatchWork';
-        String avatarUrl = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
+        String name;
+        String avatarUrl;
+        bool isDeleted = false;
 
         final profile = await SupabaseService.instance.getUserProfile(partnerId);
         if (profile != null) {
-          name = profile['name'] ?? name;
-          avatarUrl = profile['avatar_url'] ?? avatarUrl;
+          name = profile['name'] ?? 'Usuario de MatchWork';
+          avatarUrl = profile['avatar_url'] ?? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
+        } else {
+          // El usuario ha sido eliminado
+          name = 'Usuario no encontrado';
+          avatarUrl = 'https://ui-avatars.com/api/?name=X&background=E2E8F0&color=64748B';
+          isDeleted = true;
         }
 
         resolvedChats.add({
           ...chat,
           'name': name,
           'avatarUrl': avatarUrl,
+          'isDeleted': isDeleted,
         });
       }
 
@@ -160,7 +167,8 @@ class _ConversationsListScreenState extends State<ConversationsListScreen> {
                             builder: (context) => ChatScreen(
                               providerId: chat['partnerId'],
                               providerName: chat['name'],
-                              chatWithCustomerId: chat['partnerId'], // Resolve as partnerId dynamically
+                              chatWithCustomerId: chat['partnerId'], 
+                              isUserDeleted: chat['isDeleted'] ?? false,
                             ),
                           ),
                         ).then((_) => _loadConversations());

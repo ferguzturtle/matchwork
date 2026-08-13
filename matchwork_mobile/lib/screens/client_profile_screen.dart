@@ -1,3 +1,4 @@
+import '../utils/security_utils.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -151,7 +152,7 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(
+                  TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                     controller: labelCtrl,
                     textCapitalization: TextCapitalization.words,
                     maxLength: 30,
@@ -162,7 +163,7 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  TextField(
+                  TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                     controller: addressCtrl,
                     textCapitalization: TextCapitalization.words,
                     maxLength: 100,
@@ -264,14 +265,14 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
+              TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                 controller: labelCtrl,
                 textCapitalization: TextCapitalization.words,
                 maxLength: 30,
                 decoration: const InputDecoration(labelText: 'Nombre', counterText: '', border: OutlineInputBorder()),
               ),
               const SizedBox(height: 12),
-              TextField(
+              TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                 controller: addressCtrl,
                 textCapitalization: TextCapitalization.words,
                 maxLength: 100,
@@ -353,22 +354,56 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
   }
 
   Future<void> _deleteAccount() async {
+    final TextEditingController deleteController = TextEditingController();
+    bool canDelete = false;
+
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar Cuenta'),
-        content: const Text(
-          '¿Estás seguro de que deseas eliminar tu cuenta de forma permanente? Esta acción no se puede deshacer y perderás todo tu historial de servicios, chats y datos.',
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('ELIMINAR CUENTA', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Eliminar Cuenta'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '¿Estás seguro de que deseas eliminar tu cuenta de forma permanente? Esta acción no se puede deshacer y perderás todo tu historial de servicios, chats y datos.',
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Escribe "eliminar" para confirmar:',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(inputFormatters: SecurityUtils.secureInputFormatters,
+                    controller: deleteController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'eliminar',
+                      isDense: true,
+                    ),
+                    onChanged: (value) {
+                      setDialogState(() {
+                        canDelete = value.trim().toLowerCase() == 'eliminar';
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+                TextButton(
+                  onPressed: canDelete ? () => Navigator.pop(context, true) : null,
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  child: const Text('ELIMINAR CUENTA', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
 
     if (confirm == true) {
@@ -455,7 +490,7 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: MediaQuery.of(context).padding.bottom + 40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -522,7 +557,7 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                             ],
                           ),
                         ] else ...[
-                          TextField(
+                          TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                             controller: _nameController,
                             textAlign: TextAlign.center,
                             style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontWeight: FontWeight.bold, fontSize: 18),

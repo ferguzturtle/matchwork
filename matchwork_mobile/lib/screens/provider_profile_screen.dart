@@ -1,3 +1,4 @@
+import '../utils/security_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -25,22 +26,56 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
   }
 
   Future<void> _deleteAccount() async {
+    final TextEditingController deleteController = TextEditingController();
+    bool canDelete = false;
+
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar Cuenta'),
-        content: const Text(
-          '¿Estás seguro de que deseas eliminar tu cuenta de forma permanente? Esta acción no se puede deshacer y perderás todo tu historial de servicios, chats y datos.',
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('ELIMINAR CUENTA', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Eliminar Cuenta'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '¿Estás seguro de que deseas eliminar tu cuenta de forma permanente? Esta acción no se puede deshacer y perderás todo tu historial de servicios, chats y datos.',
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Escribe "eliminar" para confirmar:',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(inputFormatters: SecurityUtils.secureInputFormatters,
+                    controller: deleteController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'eliminar',
+                      isDense: true,
+                    ),
+                    onChanged: (value) {
+                      setDialogState(() {
+                        canDelete = value.trim().toLowerCase() == 'eliminar';
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+                TextButton(
+                  onPressed: canDelete ? () => Navigator.pop(context, true) : null,
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  child: const Text('ELIMINAR CUENTA', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
 
     if (confirm == true) {
@@ -112,7 +147,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
           : _profileData == null
               ? const Center(child: Text('No se encontró el perfil de trabajador'))
               : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: MediaQuery.of(context).padding.bottom + 40),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -384,6 +419,36 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
 
                       // 6. Action Button (If Own Profile: "Editar Perfil", If Customer: "Solicitar")
                       if (isOwnProfile) ...[
+                        Card(
+                          color: cardBgColor,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          child: SwitchListTile(
+                            title: Text('Visible en el Mapa', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+                            subtitle: Text('Mostrar mi perfil a los clientes cercanos', style: TextStyle(color: subTextColor)),
+                            value: _profileData!['is_visible'] ?? true,
+                            activeColor: accentBlue,
+                            onChanged: (val) async {
+                              final success = await SupabaseService.instance.updateVisibility(widget.providerId, val);
+                              if (success) {
+                                setState(() {
+                                  _profileData!['is_visible'] = val;
+                                });
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(val ? 'Perfil ahora es visible en el mapa' : 'Perfil oculto del mapa')),
+                                  );
+                                }
+                              } else {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Error al actualizar visibilidad')),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
                         ElevatedButton.icon(
                           onPressed: _showEditProfileDialog,
                           style: ElevatedButton.styleFrom(
@@ -570,6 +635,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                       textCapitalization: TextCapitalization.words,
                       maxLength: 50,
                       inputFormatters: [
+                        ...SecurityUtils.secureInputFormatters,
                         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]')),
                       ],
                       decoration: const InputDecoration(labelText: 'Nombre Completo', counterText: ''),
@@ -580,12 +646,13 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                       textCapitalization: TextCapitalization.words,
                       maxLength: 50,
                       inputFormatters: [
+                        ...SecurityUtils.secureInputFormatters,
                         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]')),
                       ],
                       decoration: const InputDecoration(labelText: 'Profesión / Especialidad', counterText: ''),
                     ),
                     const SizedBox(height: 10),
-                    TextField(
+                    TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                       controller: descController,
                       maxLines: 3,
                       textCapitalization: TextCapitalization.sentences,
@@ -596,17 +663,20 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                     TextField(
                       controller: priceController,
                       keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      inputFormatters: [
+                        ...SecurityUtils.secureInputFormatters,
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
                       decoration: const InputDecoration(labelText: 'Precio por Hora Base (Ej: 15000)'),
                     ),
                     const SizedBox(height: 10),
-                    TextField(
+                    TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                       controller: expController,
                       maxLength: 50,
                       decoration: const InputDecoration(labelText: 'Experiencia (Ej: 5+ años)', counterText: ''),
                     ),
                     const SizedBox(height: 10),
-                    TextField(
+                    TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                       controller: guarController,
                       maxLength: 50,
                       decoration: const InputDecoration(labelText: 'Garantía (Ej: 30 días de garantía)', counterText: ''),

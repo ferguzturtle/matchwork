@@ -1,3 +1,4 @@
+import '../utils/security_utils.dart';
 import 'dart:math' show sin, cos, sqrt, atan2, pi;
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -224,7 +225,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Solicitar Asistencia'),
-        content: TextField(
+        content: TextField(inputFormatters: SecurityUtils.secureInputFormatters,
           controller: controller,
           textCapitalization: TextCapitalization.sentences,
           maxLength: 200,
@@ -538,6 +539,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
   }
 
   String _formatStatusLabel(String status) {
+    if (status == 'Trabajando') return 'Trabajando (No disponible)';
     if (status.startsWith('Ocupado')) {
       final parts = status.split('|');
       if (parts.length > 1) {
@@ -637,8 +639,9 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
 
                   // Providers pins
                   ...filtered.map((p) {
+                    final isWorking = p.status == 'Trabajando';
                     final isBusy = p.status.startsWith('Ocupado');
-                    final color = isBusy ? Colors.amber[600]! : const Color(0xFF10B981);
+                    final color = isWorking ? Colors.orange : (isBusy ? Colors.amber[600]! : const Color(0xFF10B981));
                     
                     return Marker(
                       point: LatLng(p.lat, p.lng),
@@ -945,46 +948,41 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                                           style: const TextStyle(fontSize: 13, color: Colors.grey),
                                         ),
                                         const SizedBox(width: 8),
-                                        // Status Pill
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: _selectedProvider!.status.startsWith('Ocupado')
-                                                ? Colors.amber[50]
-                                                : const Color(0xFFECFDF5),
-                                            borderRadius: BorderRadius.circular(6),
-                                            border: Border.all(
-                                              color: _selectedProvider!.status.startsWith('Ocupado')
-                                                  ? Colors.amber[200]!
-                                                  : const Color(0xFFA7F3D0),
-                                            ),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Container(
-                                                width: 6,
-                                                height: 6,
-                                                decoration: BoxDecoration(
-                                                  color: _selectedProvider!.status.startsWith('Ocupado')
-                                                      ? Colors.amber
-                                                      : const Color(0xFF10B981),
-                                                  shape: BoxShape.circle,
-                                                ),
+                                        Builder(
+                                          builder: (context) {
+                                            final st = _selectedProvider!.status;
+                                            final isW = st == 'Trabajando';
+                                            final isB = st.startsWith('Ocupado');
+                                            
+                                            final bgColor = isW ? Colors.orange[50] : (isB ? Colors.amber[50] : const Color(0xFFECFDF5));
+                                            final borderColor = isW ? Colors.orange[200]! : (isB ? Colors.amber[200]! : const Color(0xFFA7F3D0));
+                                            final dotColor = isW ? Colors.orange : (isB ? Colors.amber : const Color(0xFF10B981));
+                                            final textColor = isW ? Colors.orange[800] : (isB ? Colors.amber[800] : const Color(0xFF065F46));
+                                            
+                                            return Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: bgColor,
+                                                borderRadius: BorderRadius.circular(6),
+                                                border: Border.all(color: borderColor),
                                               ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                _formatStatusLabel(_selectedProvider!.status),
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: _selectedProvider!.status.startsWith('Ocupado')
-                                                      ? Colors.amber[800]
-                                                      : const Color(0xFF065F46),
-                                                ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Container(
+                                                    width: 6,
+                                                    height: 6,
+                                                    decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    _formatStatusLabel(st),
+                                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textColor),
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
+                                            );
+                                          }
                                         ),
                                       ],
                                     ),
@@ -1101,13 +1099,31 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                     Positioned(
                       top: 4,
                       right: 4,
-                      child: IconButton(
-                        icon: const Icon(Icons.close, color: Colors.grey),
-                        onPressed: () {
-                          setState(() {
-                            _selectedProvider = null;
-                          });
-                        },
+                      child: Row(
+                        children: [
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert, color: Colors.grey),
+                            onSelected: (value) {
+                              if (value == 'report') {
+                                _showReportDialog(_selectedProvider!);
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'report',
+                                child: Text('Reportar proveedor', style: TextStyle(color: Colors.red)),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.grey),
+                            onPressed: () {
+                              setState(() {
+                                _selectedProvider = null;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -1148,6 +1164,71 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showReportDialog(ProviderModel provider) {
+    String selectedReason = 'Spam';
+    final reasons = ['Spam', 'Contenido inapropiado', 'Fraude', 'Otro'];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Reportar proveedor'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('¿Por qué deseas reportar a ${provider.name}?'),
+                  const SizedBox(height: 16),
+                  ...reasons.map((reason) {
+                    return RadioListTile<String>(
+                      title: Text(reason),
+                      value: reason,
+                      groupValue: selectedReason,
+                      onChanged: (value) {
+                        setDialogState(() {
+                          selectedReason = value!;
+                        });
+                      },
+                      contentPadding: EdgeInsets.zero,
+                    );
+                  }).toList(),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.pop(context); // Close dialog
+                    final success = await SupabaseService.instance.reportUser(provider.id, selectedReason);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            success
+                                ? 'Reporte enviado exitosamente. Revisaremos el caso.'
+                                : 'Error al enviar el reporte. Inténtalo más tarde.',
+                          ),
+                          backgroundColor: success ? Colors.green : Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  child: const Text('Enviar Reporte', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -1309,7 +1390,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(height: 16),
-              TextField(
+              TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                 controller: labelController,
                 textCapitalization: TextCapitalization.words,
                 maxLength: 30,
@@ -1320,7 +1401,7 @@ class _ClientMapScreenState extends State<ClientMapScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              TextField(
+              TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                 controller: addressController,
                 textCapitalization: TextCapitalization.words,
                 maxLength: 100,

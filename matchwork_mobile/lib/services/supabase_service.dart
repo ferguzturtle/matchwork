@@ -305,6 +305,133 @@ class SupabaseService {
     }
   }
 
+  // --- FLUJO DE TRABAJO FORMAL ---
+  
+  // 1. Obtener estado actual del trabajo
+  Future<String?> getJobStatus(String providerId, String customerId) async {
+    try {
+      final data = await client
+          .from('service_requests')
+          .select('status')
+          .eq('provider_id', providerId)
+          .eq('customer_id', customerId)
+          .order('created_at', ascending: false)
+          .limit(1);
+          
+      if ((data as List).isNotEmpty) {
+        return data[0]['status'] as String;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // 2. Cliente envía solicitud de trabajo formal en el chat
+  Future<bool> requestFormalJob(String providerId, String customerId) async {
+    try {
+      final data = await client
+          .from('service_requests')
+          .select('id')
+          .eq('provider_id', providerId)
+          .eq('customer_id', customerId)
+          .order('created_at', ascending: false)
+          .limit(1);
+          
+      if ((data as List).isNotEmpty) {
+        final requestId = data[0]['id'];
+        await client.from('service_requests').update({'status': 'solicitud_trabajo'}).eq('id', requestId);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // 3. Trabajador acepta el trabajo formal
+  Future<bool> acceptFormalJob(String providerId, String customerId) async {
+    try {
+      final data = await client
+          .from('service_requests')
+          .select('id')
+          .eq('provider_id', providerId)
+          .eq('customer_id', customerId)
+          .eq('status', 'solicitud_trabajo')
+          .order('created_at', ascending: false)
+          .limit(1);
+
+      if ((data as List).isNotEmpty) {
+        final requestId = data[0]['id'];
+        await client.from('service_requests').update({'status': 'trabajando'}).eq('id', requestId);
+        
+        // Actualizar el estado del provider en el mapa a 'Trabajando'
+        await client.from('providers').update({'status': 'Trabajando'}).eq('id', providerId);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // 4. Trabajador finaliza el trabajo formal
+  Future<bool> finishFormalJob(String providerId, String customerId) async {
+    try {
+      final data = await client
+          .from('service_requests')
+          .select('id')
+          .eq('provider_id', providerId)
+          .eq('customer_id', customerId)
+          .eq('status', 'trabajando')
+          .order('created_at', ascending: false)
+          .limit(1);
+
+      if ((data as List).isNotEmpty) {
+        final requestId = data[0]['id'];
+        await client.from('service_requests').update({'status': 'completado'}).eq('id', requestId);
+        
+        // Restaurar estado del provider en el mapa
+        await client.from('providers').update({'status': 'En línea'}).eq('id', providerId);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // 5. Cliente envía su review
+  Future<bool> submitReview(String providerId, String customerId, int rating, String comment) async {
+    try {
+      await client.from('reviews').insert({
+        'provider_id': providerId,
+        'customer_id': customerId,
+        'rating': rating,
+        'comment': comment,
+      });
+
+      // Recalcular el rating promedio del proveedor
+      final reviewsData = await client.from('reviews').select('rating').eq('provider_id', providerId);
+      final List<dynamic> reviews = reviewsData as List;
+      
+      if (reviews.isNotEmpty) {
+        double total = 0;
+        for (var r in reviews) {
+          total += (r['rating'] as num).toDouble();
+        }
+        double newRating = total / reviews.length;
+        newRating = double.parse(newRating.toStringAsFixed(1)); // Redondear a 1 decimal
+        
+        await client.from('providers').update({'rating': newRating}).eq('id', providerId);
+      }
+      
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool> checkIfMatched(String providerId, String customerId) async {
     try {
       final data = await client
@@ -489,6 +616,39 @@ class SupabaseService {
     } catch (e) {
       print("Error uploading image: $e");
       return null;
+    }
+  }
+
+  // --- PRIVACY & SECURITY ---
+  Future<bool> updateVisibility(String userId, bool isVisible) async {
+    try {
+      await client.from('profiles').update({'is_visible': isVisible}).eq('id', userId);
+      // Actualizamos también la tabla de proveedores para que impacte en el mapa
+      await client.from('providers').update({'is_visible': isVisible}).eq('id', userId);
+      clearProfileCache(userId);
+      clearProvidersCache();
+      return true;
+    } catch (e) {
+      print("Error updating visibility: $e");
+      return false;
+    }
+  }
+
+  Future<bool> reportUser(String reportedUserId, String reason) async {
+    try {
+      final reporterId = currentUser?.id;
+      if (reporterId == null) return false;
+      await client.from('user_reports').insert({
+        'reporter_id': reporterId,
+        'reported_user_id': reportedUserId,
+        'reason': reason,
+        'status': 'nuevo',
+        'created_at': DateTime.now().toUtc().toIso8601String(),
+      });
+      return true;
+    } catch (e) {
+      print("Error reporting user: $e");
+      return false;
     }
   }
 

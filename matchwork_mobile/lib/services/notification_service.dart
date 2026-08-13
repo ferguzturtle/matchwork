@@ -123,6 +123,19 @@ class NotificationService {
             'title': title,
             'body': body,
           },
+          'android': {
+            'notification': {
+              'sound': 'default',
+              'channel_id': 'matchwork_channel',
+            }
+          },
+          'apns': {
+            'payload': {
+              'aps': {
+                'sound': 'default',
+              }
+            }
+          },
           'data': data ?? {},
         }
       };

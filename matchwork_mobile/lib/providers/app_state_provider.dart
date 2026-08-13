@@ -80,12 +80,12 @@ class AppStateProvider extends ChangeNotifier {
     if (_userRole == 'customer') {
       // Force offline if customer
       await updateAvailabilityState('Fuera de servicio');
-      await startGpsTracking();
+      startGpsTracking(); // <- Quitamos el await para que no bloquee el login si el GPS falla en iOS
     } else if (_userRole == 'provider') {
       // Initialize pings/inactivity if provider
       startActivityTracker();
       if (_isAvailable) {
-        startGpsTracking();
+        startGpsTracking(); // <- Tampoco tiene await, perfecto.
       }
     }
     notifyListeners();

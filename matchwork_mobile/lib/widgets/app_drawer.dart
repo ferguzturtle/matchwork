@@ -1,3 +1,4 @@
+import '../utils/security_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -99,7 +100,7 @@ class AppDrawer extends StatelessWidget {
           
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: EdgeInsets.only(top: 8, bottom: MediaQuery.of(context).padding.bottom + 30),
               children: appState.userRole == 'customer'
                   ? [
                       // Client Drawer Items
@@ -304,19 +305,43 @@ class AppDrawer extends StatelessWidget {
           
           const Divider(),
           
-          // Privacy Policy
+          // About Us
           ListTile(
-            leading: const Icon(Icons.privacy_tip_outlined, color: Colors.grey),
+            leading: const Icon(Icons.info_outline, color: Colors.grey),
             title: const Text(
-              'Políticas y Privacidad', 
+              'Sobre MatchWork', 
               style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
             ),
-            onTap: () async {
+            onTap: () {
               Navigator.pop(context);
-              final url = Uri.parse('https://matchwork.com/privacidad');
-              if (await canLaunchUrl(url)) {
-                await launchUrl(url);
-              }
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Acerca de nosotros', style: TextStyle(fontWeight: FontWeight.bold)),
+                  content: const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Derechos reservados MatchWork SpA'),
+                      SizedBox(height: 8),
+                      Text('RUT Empresa: 78.428.877-3'),
+                      SizedBox(height: 16),
+                      Text('CEOs:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(height: 4),
+                      Text(
+                        '• Cristian Morales Cocio\n• Claudio Carvallo Delgado\n• Fernando Guzmán Guzmán',
+                        style: TextStyle(height: 1.4),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cerrar'),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
           
@@ -328,11 +353,44 @@ class AppDrawer extends StatelessWidget {
               style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
             ),
             onTap: () async {
-              Navigator.pop(context);
-              await appState.performLogoutCleanup();
-              if (context.mounted) {
-                Navigator.pushAndRemoveUntil(
-                  context,
+              final nav = Navigator.of(context);
+              
+              final bool? confirm = await showDialog<bool>(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    title: const Row(
+                      children: [
+                        Icon(Icons.logout, color: Colors.redAccent),
+                        SizedBox(width: 10),
+                        Text('Cerrar Sesión'),
+                      ],
+                    ),
+                    content: const Text('¿Estás seguro que deseas cerrar tu sesión?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
+                        child: const Text('Cerrar Sesión', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              if (confirm == true) {
+                nav.pop(); // Cierra el menú lateral
+                
+                // Limpia el estado y cierra sesión
+                await appState.performLogoutCleanup();
+                
+                // Navega a la pantalla de Auth
+                nav.pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const AuthScreen()),
                   (route) => false,
                 );
@@ -362,22 +420,25 @@ class AppDrawer extends StatelessWidget {
         color: isSelected ? activeTileBg : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: ListTile(
-        leading: Icon(
-          icon, 
-          color: isSelected ? activeTextColor : iconColor,
-          size: 22,
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            color: isSelected ? activeTextColor : textColor,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            fontSize: 14,
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
+          leading: Icon(
+            icon, 
+            color: isSelected ? activeTextColor : iconColor,
+            size: 22,
           ),
+          title: Text(
+            title,
+            style: TextStyle(
+              color: isSelected ? activeTextColor : textColor,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+          onTap: onTap,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        onTap: onTap,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -458,7 +519,7 @@ class AppDrawer extends StatelessWidget {
                 style: TextStyle(fontSize: 13, color: Colors.grey),
               ),
               const SizedBox(height: 16),
-              TextField(
+              TextField(inputFormatters: SecurityUtils.secureInputFormatters,
                 controller: commentController,
                 maxLines: 4,
                 textCapitalization: TextCapitalization.sentences,
